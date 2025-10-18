@@ -197,6 +197,7 @@ export type Database = {
           team_b_score: string | null
           venue: string | null
           winner_id: string | null
+          youtube_stream_url: string | null
         }
         Insert: {
           created_at?: string | null
@@ -212,6 +213,7 @@ export type Database = {
           team_b_score?: string | null
           venue?: string | null
           winner_id?: string | null
+          youtube_stream_url?: string | null
         }
         Update: {
           created_at?: string | null
@@ -227,6 +229,7 @@ export type Database = {
           team_b_score?: string | null
           venue?: string | null
           winner_id?: string | null
+          youtube_stream_url?: string | null
         }
         Relationships: [
           {

@@ -2,6 +2,13 @@ import { Navigation } from "@/components/Navigation";
 import { LiveMatchCard } from "@/components/LiveMatchCard";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { MatchPredictionPoll } from "@/components/MatchPredictionPoll";
+import { YouTubeLiveStream } from "@/components/YouTubeLiveStream";
+import { PlayerOfMatchVoting } from "@/components/PlayerOfMatchVoting";
+import { RecentMatchHighlights } from "@/components/RecentMatchHighlights";
+import { UpcomingMatches } from "@/components/UpcomingMatches";
+import { LeaderboardSnapshot } from "@/components/LeaderboardSnapshot";
+import { FanZoneSection } from "@/components/FanZoneSection";
+import { SponsorsSection } from "@/components/SponsorsSection";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -114,7 +121,7 @@ const Index = () => {
       {!loading && currentMatch && (
         <section className="container mx-auto px-4 mb-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
+            <div className="space-y-6">
               <LiveMatchCard
                 teamA={currentMatch.team_a?.name || "TBD"}
                 teamB={currentMatch.team_b?.name || "TBD"}
@@ -126,16 +133,18 @@ const Index = () => {
               />
 
               {currentMatch.status === 'upcoming' && (
-                <div className="mt-6">
-                  <CountdownTimer
-                    targetDate={new Date(currentMatch.match_date)}
-                    matchLabel="Match starts in"
-                  />
-                </div>
+                <CountdownTimer
+                  targetDate={new Date(currentMatch.match_date)}
+                  matchLabel="Match starts in"
+                />
+              )}
+
+              {currentMatch.status === 'live' && currentMatch.youtube_stream_url && (
+                <YouTubeLiveStream streamUrl={currentMatch.youtube_stream_url} />
               )}
             </div>
 
-            <div>
+            <div className="space-y-6">
               <MatchPredictionPoll
                 matchId={currentMatch.id}
                 teamAId={currentMatch.team_a_id}
@@ -143,52 +152,29 @@ const Index = () => {
                 teamAName={currentMatch.team_a?.name || "TBD"}
                 teamBName={currentMatch.team_b?.name || "TBD"}
               />
+
+              {currentMatch.status === 'live' && (
+                <PlayerOfMatchVoting matchId={currentMatch.id} />
+              )}
             </div>
           </div>
         </section>
       )}
 
-      {/* Tournament Info */}
-      <section className="container mx-auto px-4 pb-16">
-        <div className="bg-gradient-card rounded-xl p-8 shadow-card">
-          <h2 className="text-3xl font-bold text-center text-primary mb-6">
-            Tournament Format
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
-            <div className="p-4">
-              <div className="w-16 h-16 mx-auto mb-3 bg-primary/10 rounded-full flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary">1</span>
-              </div>
-              <h3 className="font-bold text-foreground mb-2">League 1</h3>
-              <p className="text-sm text-muted-foreground">6 groups of 3 teams</p>
-            </div>
-            
-            <div className="p-4">
-              <div className="w-16 h-16 mx-auto mb-3 bg-primary/10 rounded-full flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary">2</span>
-              </div>
-              <h3 className="font-bold text-foreground mb-2">League 2</h3>
-              <p className="text-sm text-muted-foreground">Top 12 in 4 groups</p>
-            </div>
-            
-            <div className="p-4">
-              <div className="w-16 h-16 mx-auto mb-3 bg-secondary/10 rounded-full flex items-center justify-center">
-                <span className="text-2xl font-bold text-secondary">SF</span>
-              </div>
-              <h3 className="font-bold text-foreground mb-2">Semi Finals</h3>
-              <p className="text-sm text-muted-foreground">Top 4 teams compete</p>
-            </div>
-            
-            <div className="p-4">
-              <div className="w-16 h-16 mx-auto mb-3 bg-secondary/10 rounded-full flex items-center justify-center">
-                <Trophy className="text-secondary" size={28} />
-              </div>
-              <h3 className="font-bold text-foreground mb-2">Grand Final</h3>
-              <p className="text-sm text-muted-foreground">Champions crowned</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Recent Match Highlights */}
+      <RecentMatchHighlights />
+
+      {/* Upcoming Matches */}
+      <UpcomingMatches />
+
+      {/* Leaderboard Snapshot */}
+      <LeaderboardSnapshot />
+
+      {/* Fan Zone */}
+      <FanZoneSection />
+
+      {/* Sponsors Section */}
+      <SponsorsSection />
     </div>
   );
 };
