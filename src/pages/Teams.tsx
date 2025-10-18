@@ -4,10 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Users, Star } from "lucide-react";
+import { TeamDetailDialog } from "@/components/TeamDetailDialog";
 
 const Teams = () => {
   const [teams, setTeams] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTeam, setSelectedTeam] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     loadTeams();
@@ -24,6 +27,11 @@ const Teams = () => {
 
     setTeams(data || []);
     setLoading(false);
+  };
+
+  const handleTeamClick = (team: any) => {
+    setSelectedTeam(team);
+    setDialogOpen(true);
   };
 
   if (loading) {
@@ -51,7 +59,8 @@ const Teams = () => {
           {teams.map((team) => (
             <Card 
               key={team.id} 
-              className="p-6 bg-gradient-card shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-1"
+              className="p-6 bg-gradient-card shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+              onClick={() => handleTeamClick(team)}
             >
               <div className="flex items-start gap-4 mb-4">
                 {team.logo_url && (
@@ -119,6 +128,12 @@ const Teams = () => {
           </div>
         )}
       </div>
+
+      <TeamDetailDialog
+        team={selectedTeam}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   );
 };

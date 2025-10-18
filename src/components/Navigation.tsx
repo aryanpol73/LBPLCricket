@@ -1,13 +1,53 @@
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import lbplLogo from "@/assets/lbpl-logo.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
 
-  const navLinks = [
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .eq('role', 'admin')
+          .single();
+        
+        setIsAdmin(!!roleData);
+      }
+    };
+
+    checkAdminStatus();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .eq('role', 'admin')
+            .single();
+          
+          setIsAdmin(!!roleData);
+        } else {
+          setIsAdmin(false);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const baseNavLinks = [
     { path: "/", label: "Home" },
     { path: "/matches", label: "Matches" },
     { path: "/results", label: "Results" },
@@ -15,8 +55,11 @@ export const Navigation = () => {
     { path: "/teams", label: "Teams" },
     { path: "/rules", label: "Rules" },
     { path: "/fan-zone", label: "Fan Zone" },
-    { path: "/admin", label: "Admin" },
   ];
+
+  const navLinks = isAdmin 
+    ? [...baseNavLinks, { path: "/admin", label: "Admin" }] 
+    : baseNavLinks;
 
   const isActive = (path: string) => location.pathname === path;
 

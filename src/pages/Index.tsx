@@ -61,7 +61,7 @@ const Index = () => {
             LBPL SEASON 3
           </h1>
           <p className="text-xl md:text-2xl text-secondary mb-2">
-            League Box Premiere League • 2026
+            Lad Brahmin Premiere League • 2026
           </p>
           <p className="text-lg text-white/90">
             18 Teams • One Champion
