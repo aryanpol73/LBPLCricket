@@ -9,6 +9,7 @@ import Matches from "./pages/Matches";
 import Results from "./pages/Results";
 import PointsTable from "./pages/PointsTable";
 import Teams from "./pages/Teams";
+import Stats from "./pages/Stats";
 import Rules from "./pages/Rules";
 import FanZone from "./pages/FanZone";
 import Admin from "./pages/Admin";
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/results" element={<Results />} />
           <Route path="/points-table" element={<PointsTable />} />
           <Route path="/teams" element={<Teams />} />
+          <Route path="/stats" element={<Stats />} />
           <Route path="/rules" element={<Rules />} />
           <Route path="/fan-zone" element={<FanZone />} />
           <Route path="/auth" element={<Auth />} />

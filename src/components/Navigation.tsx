@@ -53,6 +53,7 @@ export const Navigation = () => {
     { path: "/results", label: "Results" },
     { path: "/points-table", label: "Points Table" },
     { path: "/teams", label: "Teams" },
+    { path: "/stats", label: "Stats" },
     { path: "/rules", label: "Rules" },
     { path: "/fan-zone", label: "Fan Zone" },
   ];
