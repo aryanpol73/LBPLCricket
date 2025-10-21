@@ -4,10 +4,7 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 import { MatchPredictionPoll } from "@/components/MatchPredictionPoll";
 import { YouTubeLiveStream } from "@/components/YouTubeLiveStream";
 import { PlayerOfMatchVoting } from "@/components/PlayerOfMatchVoting";
-import { RecentMatchHighlights } from "@/components/RecentMatchHighlights";
-import { UpcomingMatches } from "@/components/UpcomingMatches";
 import { LeaderboardSnapshot } from "@/components/LeaderboardSnapshot";
-import { FanZoneSection } from "@/components/FanZoneSection";
 import { SponsorsSection } from "@/components/SponsorsSection";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -161,17 +158,8 @@ const Index = () => {
         </section>
       )}
 
-      {/* Recent Match Highlights */}
-      <RecentMatchHighlights />
-
-      {/* Upcoming Matches */}
-      <UpcomingMatches />
-
       {/* Leaderboard Snapshot */}
       <LeaderboardSnapshot />
-
-      {/* Fan Zone */}
-      <FanZoneSection />
 
       {/* Sponsors Section */}
       <SponsorsSection />
