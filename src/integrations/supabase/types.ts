@@ -265,30 +265,57 @@ export type Database = {
       players: {
         Row: {
           age: number | null
+          batting_average: number | null
+          bowling_average: number | null
+          catches: number | null
           created_at: string | null
+          economy_rate: number | null
           id: string
           is_key_player: boolean | null
+          matches_played: number | null
           name: string
           role: string | null
+          runs_scored: number | null
+          strike_rate: number | null
+          stumpings: number | null
           team_id: string | null
+          wickets_taken: number | null
         }
         Insert: {
           age?: number | null
+          batting_average?: number | null
+          bowling_average?: number | null
+          catches?: number | null
           created_at?: string | null
+          economy_rate?: number | null
           id?: string
           is_key_player?: boolean | null
+          matches_played?: number | null
           name: string
           role?: string | null
+          runs_scored?: number | null
+          strike_rate?: number | null
+          stumpings?: number | null
           team_id?: string | null
+          wickets_taken?: number | null
         }
         Update: {
           age?: number | null
+          batting_average?: number | null
+          bowling_average?: number | null
+          catches?: number | null
           created_at?: string | null
+          economy_rate?: number | null
           id?: string
           is_key_player?: boolean | null
+          matches_played?: number | null
           name?: string
           role?: string | null
+          runs_scored?: number | null
+          strike_rate?: number | null
+          stumpings?: number | null
           team_id?: string | null
+          wickets_taken?: number | null
         }
         Relationships: [
           {
