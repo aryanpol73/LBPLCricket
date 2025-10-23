@@ -30,7 +30,7 @@ export const SponsorsSection = () => {
           ))}
         </div>
         <p className="text-center text-sm text-muted-foreground">
-          Powered by LBPL Committee
+          Powered by LBPL Pune Cricket Team
         </p>
       </div>
     </div>
