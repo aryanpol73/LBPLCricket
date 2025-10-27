@@ -9,6 +9,7 @@ import { SponsorsSection } from "@/components/SponsorsSection";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Trophy, Users, Calendar } from "lucide-react";
 
 const Index = () => {
@@ -59,7 +60,7 @@ const Index = () => {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="bg-gradient-hero py-16 px-4">
+      <section className="relative z-10 bg-gradient-hero py-16 px-4">
         <div className="container mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 animate-slide-in">
             LBPL SEASON 3
@@ -71,18 +72,23 @@ const Index = () => {
             18 Teams • One Champion
           </p>
           
-          {/* Watch Live Button */}
-          {liveMatch && liveMatch.youtube_stream_url && (
-            <a 
-              href={liveMatch.youtube_stream_url}
+          {/* Watch Live Button - Always Visible with Fallback URL */}
+          <Button
+            asChild
+            variant="destructive"
+            size="lg"
+            className="relative z-10 font-bold px-8 py-4 shadow-glow transition-all duration-300 hover:scale-105"
+          >
+            <a
+              href={liveMatch?.youtube_stream_url || import.meta.env.VITE_YOUTUBE_LIVE_URL || "https://www.youtube.com/"}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-lg shadow-glow transition-all duration-300 hover:scale-105 text-lg"
+              aria-label="Watch Live on YouTube"
             >
-              <span className="animate-pulse">🔴</span>
-              WATCH LIVE
+              <span className="mr-2 animate-pulse">🔴</span>
+              Watch Live
             </a>
-          )}
+          </Button>
         </div>
       </section>
 
