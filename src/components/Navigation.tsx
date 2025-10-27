@@ -74,7 +74,7 @@ export const Navigation = () => {
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <button
-                  className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-2 text-primary bg-white hover:bg-white/90 rounded-lg transition-colors shadow-md"
                   aria-label="Menu"
                 >
                   {isOpen ? <X size={24} /> : <Menu size={24} />}

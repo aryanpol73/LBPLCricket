@@ -84,9 +84,10 @@ const Index = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Watch Live on YouTube"
+              className="flex items-center gap-2"
             >
-              <span className="mr-2 animate-pulse">🔴</span>
-              Watch Live
+              <span className="animate-pulse">🔴</span>
+              <span>Click Here to Watch Live</span>
             </a>
           </Button>
         </div>
