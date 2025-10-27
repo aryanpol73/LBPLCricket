@@ -67,9 +67,22 @@ const Index = () => {
           <p className="text-xl md:text-2xl text-secondary mb-2">
             Lad Brahmin Premiere League • 2026
           </p>
-          <p className="text-lg text-white/90">
+          <p className="text-lg text-white/90 mb-6">
             18 Teams • One Champion
           </p>
+          
+          {/* Watch Live Button */}
+          {liveMatch && liveMatch.youtube_stream_url && (
+            <a 
+              href={liveMatch.youtube_stream_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-lg shadow-glow transition-all duration-300 hover:scale-105 text-lg"
+            >
+              <span className="animate-pulse">🔴</span>
+              WATCH LIVE
+            </a>
+          )}
         </div>
       </section>
 
