@@ -74,15 +74,15 @@ export const Navigation = () => {
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <button
-                  className="p-2 text-primary bg-white hover:bg-white/90 rounded-lg transition-colors shadow-md"
+                  className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
                   aria-label="Menu"
                 >
                   {isOpen ? <X size={24} /> : <Menu size={24} />}
                 </button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-72">
+              <SheetContent side="left" className="w-72 bg-gradient-hero border-primary/20">
                 <SheetHeader>
-                  <SheetTitle className="text-left">Navigate</SheetTitle>
+                  <SheetTitle className="text-left text-white">Navigate</SheetTitle>
                 </SheetHeader>
                 <div className="mt-4 flex flex-col gap-2">
                   {navLinks.map((link) => (
@@ -93,7 +93,7 @@ export const Navigation = () => {
                       className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
                         isActive(link.path)
                           ? "bg-secondary text-primary shadow-gold"
-                          : "text-foreground hover:bg-accent/50"
+                          : "text-white hover:bg-white/10"
                       }`}
                     >
                       {link.label}
