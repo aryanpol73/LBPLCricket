@@ -1,6 +1,7 @@
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LiveScoreboard } from "@/components/LiveScoreboard";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -140,6 +141,11 @@ const Matches = () => {
           </TabsContent>
 
           <TabsContent value="live">
+            <LiveScoreboard 
+              title="Live Match Score" 
+              height="300px" 
+              className="!px-0 mb-6"
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filterMatches('live').length > 0 ? (
                 filterMatches('live').map(match => (

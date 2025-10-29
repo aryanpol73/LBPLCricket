@@ -6,6 +6,7 @@ import { YouTubeLiveStream } from "@/components/YouTubeLiveStream";
 import { PlayerOfMatchVoting } from "@/components/PlayerOfMatchVoting";
 import { MatchTimeline } from "@/components/MatchTimeline";
 import { SponsorsSection } from "@/components/SponsorsSection";
+import { LiveScoreboard } from "@/components/LiveScoreboard";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -180,6 +181,9 @@ const Index = () => {
 
       {/* Match Timeline */}
       <MatchTimeline />
+
+      {/* Live Scoreboard */}
+      <LiveScoreboard title="Live Scoreboard" />
 
       {/* Sponsors Section */}
       <SponsorsSection />
