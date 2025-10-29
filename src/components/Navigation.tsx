@@ -56,7 +56,6 @@ export const Navigation = () => {
     { path: "/teams", label: "Teams" },
     { path: "/stats", label: "Stats" },
     { path: "/rules", label: "Rules" },
-    { path: "/fan-zone", label: "Fan Zone" },
   ];
 
   const navLinks = isAdmin 
