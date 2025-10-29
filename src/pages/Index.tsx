@@ -4,7 +4,7 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 import { MatchPredictionPoll } from "@/components/MatchPredictionPoll";
 import { YouTubeLiveStream } from "@/components/YouTubeLiveStream";
 import { PlayerOfMatchVoting } from "@/components/PlayerOfMatchVoting";
-import { LeaderboardSnapshot } from "@/components/LeaderboardSnapshot";
+import { MatchTimeline } from "@/components/MatchTimeline";
 import { SponsorsSection } from "@/components/SponsorsSection";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -94,7 +94,7 @@ const Index = () => {
       </section>
 
       {/* Stats Cards */}
-      <section className="container mx-auto px-4 -mt-8 mb-12">
+      <section className="container mx-auto px-4 py-8 mb-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6 bg-white shadow-card hover:shadow-glow transition-all duration-300">
             <div className="flex items-center gap-4">
@@ -114,7 +114,7 @@ const Index = () => {
                 <Trophy className="text-secondary" size={28} />
               </div>
               <div>
-                <p className="text-3xl font-bold text-secondary">45+</p>
+                <p className="text-3xl font-bold text-secondary">33</p>
                 <p className="text-sm text-muted-foreground">Matches</p>
               </div>
             </div>
@@ -178,8 +178,8 @@ const Index = () => {
         </section>
       )}
 
-      {/* Leaderboard Snapshot */}
-      <LeaderboardSnapshot />
+      {/* Match Timeline */}
+      <MatchTimeline />
 
       {/* Sponsors Section */}
       <SponsorsSection />

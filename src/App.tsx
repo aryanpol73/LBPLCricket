@@ -32,7 +32,7 @@ const App = () => (
           <Route path="/teams" element={<Teams />} />
           <Route path="/stats" element={<Stats />} />
           <Route path="/rules" element={<Rules />} />
-          <Route path="/fan-zone" element={<FanZone />} />
+          {/* <Route path="/fan-zone" element={<FanZone />} /> */}
           <Route path="/auth" element={<Auth />} />
           <Route path="/admin" element={
             <ProtectedRoute>
