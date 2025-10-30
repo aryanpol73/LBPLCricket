@@ -59,7 +59,7 @@ const Teams = () => {
           {teams.map((team) => (
             <Card 
               key={team.id} 
-              className="p-6 bg-gradient-card shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+              className="p-6 bg-gradient-team-card shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-1 cursor-pointer border-primary/20"
               onClick={() => handleTeamClick(team)}
             >
               <div className="flex items-start gap-4 mb-4">

@@ -62,6 +62,7 @@ export default {
         'gradient-hero': 'var(--gradient-hero)',
         'gradient-gold': 'var(--gradient-gold)',
         'gradient-card': 'var(--gradient-card)',
+        'gradient-team-card': 'var(--gradient-team-card)',
       },
       boxShadow: {
         'glow': 'var(--shadow-glow)',
