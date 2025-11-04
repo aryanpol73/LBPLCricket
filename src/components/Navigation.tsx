@@ -65,7 +65,7 @@ export const Navigation = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 bg-gradient-hero shadow-glow">
+    <nav className="sticky top-0 z-50 bg-gradient-hero shadow-glow backdrop-blur-sm bg-gradient-to-r from-primary via-primary to-primary-glow animate-gradient-x" style={{ backgroundSize: '200% 100%' }}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-3">

@@ -7,20 +7,37 @@ import { PlayerOfMatchVoting } from "@/components/PlayerOfMatchVoting";
 import { MatchTimeline } from "@/components/MatchTimeline";
 import { SponsorsSection } from "@/components/SponsorsSection";
 import { LiveScoreboard } from "@/components/LiveScoreboard";
+import { LiveTicker } from "@/components/LiveTicker";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Users, Calendar } from "lucide-react";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { useCountUp } from "@/hooks/useCountUp";
 
 const Index = () => {
   const [liveMatch, setLiveMatch] = useState<any>(null);
   const [upcomingMatch, setUpcomingMatch] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  
+  const statsRef = useScrollAnimation();
+  const { count: teamsCount, startCounting: startTeamsCount } = useCountUp(18, 2000);
+  const { count: matchesCount, startCounting: startMatchesCount } = useCountUp(33, 2000);
+  const { count: seasonCount, startCounting: startSeasonCount } = useCountUp(2026, 2000);
 
   useEffect(() => {
     loadMatches();
   }, []);
+
+  useEffect(() => {
+    if (statsRef.isVisible) {
+      startTeamsCount();
+      startMatchesCount();
+      startSeasonCount();
+    }
+  }, [statsRef.isVisible]);
 
   const loadMatches = async () => {
     // Get live match
@@ -57,8 +74,10 @@ const Index = () => {
   const currentMatch = liveMatch || upcomingMatch;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <AnimatedBackground />
       <Navigation />
+      <LiveTicker />
 
       {/* Hero Section */}
       <section className="relative z-10 bg-gradient-hero py-16 px-4 overflow-hidden">
@@ -97,39 +116,39 @@ const Index = () => {
       </section>
 
       {/* Stats Cards */}
-      <section className="container mx-auto px-4 py-8 mb-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-6 bg-white shadow-card hover:shadow-glow hover:-translate-y-1 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
+      <section className="container mx-auto px-4 py-8 mb-12" ref={statsRef.elementRef}>
+        <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 transition-all duration-700 ${statsRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <Card className="p-6 bg-white shadow-card hover:shadow-glow hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-lg transition-transform duration-300 hover:scale-110">
+              <div className="p-3 bg-primary/10 rounded-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <Users className="text-primary" size={28} />
               </div>
               <div>
-                <p className="text-3xl font-bold text-primary animate-count-up">18</p>
+                <p className="text-3xl font-bold text-primary">{teamsCount}</p>
                 <p className="text-sm text-muted-foreground">Teams</p>
               </div>
             </div>
           </Card>
 
-          <Card className="p-6 bg-white shadow-card hover:shadow-gold hover:-translate-y-1 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
+          <Card className="p-6 bg-white shadow-card hover:shadow-gold hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-secondary/10 rounded-lg transition-transform duration-300 hover:scale-110">
+              <div className="p-3 bg-secondary/10 rounded-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <Trophy className="text-secondary" size={28} />
               </div>
               <div>
-                <p className="text-3xl font-bold text-secondary animate-count-up" style={{ animationDelay: '0.1s' }}>33</p>
+                <p className="text-3xl font-bold text-secondary">{matchesCount}</p>
                 <p className="text-sm text-muted-foreground">Matches</p>
               </div>
             </div>
           </Card>
 
-          <Card className="p-6 bg-white shadow-card hover:shadow-glow hover:-translate-y-1 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
+          <Card className="p-6 bg-white shadow-card hover:shadow-glow hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-success/10 rounded-lg transition-transform duration-300 hover:scale-110">
+              <div className="p-3 bg-success/10 rounded-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <Calendar className="text-success" size={28} />
               </div>
               <div>
-                <p className="text-3xl font-bold text-success animate-count-up" style={{ animationDelay: '0.2s' }}>2026</p>
+                <p className="text-3xl font-bold text-success">{seasonCount}</p>
                 <p className="text-sm text-muted-foreground">Season</p>
               </div>
             </div>
