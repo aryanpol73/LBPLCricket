@@ -48,11 +48,11 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto animate-scale-in">
         <DialogHeader>
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-4 mb-4 animate-slide-in-left">
             {team.logo_url && (
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center flex-shrink-0 transition-transform duration-500 hover:scale-110 hover:rotate-12">
                 <img 
                   src={team.logo_url} 
                   alt={team.name} 
@@ -63,7 +63,7 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
             <div>
               <DialogTitle className="text-2xl text-primary">{team.name}</DialogTitle>
               {team.home_city && (
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-muted-foreground mt-1 animate-fade-in" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
                   📍 {team.home_city}
                 </p>
               )}
@@ -72,7 +72,7 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
         </DialogHeader>
 
         {team.fun_fact && (
-          <div className="mb-4 p-4 bg-secondary/10 rounded-lg">
+          <div className="mb-4 p-4 bg-secondary/10 rounded-lg animate-fade-in-up" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
             <p className="text-sm text-foreground italic">
               💡 {team.fun_fact}
             </p>
@@ -80,17 +80,17 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
         )}
 
         <div className="space-y-6">
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-4 animate-slide-in-right" style={{ animationDelay: '0.4s', animationFillMode: 'both' }}>
             <Users className="text-secondary" size={20} />
             <h3 className="font-bold text-lg text-foreground">Complete Squad</h3>
           </div>
 
-          {roleOrder.map((role) => {
+          {roleOrder.map((role, roleIndex) => {
             const players = playersByRole[role];
             if (!players || players.length === 0) return null;
 
             return (
-              <div key={role} className="space-y-2">
+              <div key={role} className="space-y-2 animate-fade-in-up" style={{ animationDelay: `${0.5 + roleIndex * 0.1}s`, animationFillMode: 'both' }}>
                 <h4 className="font-bold text-primary text-sm uppercase tracking-wide">
                   {role}
                   {role === "All-Rounder" && "s"}
@@ -99,21 +99,22 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
                   {role === "Wicket-Keeper" && "s"}
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {players.map((player) => (
+                  {players.map((player, playerIndex) => (
                     <div
                       key={player.id}
-                      className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+                      className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted hover:scale-[1.02] transition-all duration-300 animate-fade-in"
+                      style={{ animationDelay: `${0.5 + roleIndex * 0.1 + playerIndex * 0.05}s`, animationFillMode: 'both' }}
                     >
                       <div className="flex items-center gap-2">
                         {player.is_key_player && (
-                          <Star className="text-secondary" size={16} fill="currentColor" />
+                          <Star className="text-secondary animate-bounce-subtle" size={16} fill="currentColor" />
                         )}
                         <span className="text-sm font-medium text-foreground">
                           {player.name}
                         </span>
                       </div>
                       {player.age && (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="text-xs transition-all duration-200 hover:scale-110">
                           {player.age}y
                         </Badge>
                       )}
@@ -125,7 +126,7 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
           })}
 
           {team.players?.length === 0 && (
-            <p className="text-center text-muted-foreground py-8">
+            <p className="text-center text-muted-foreground py-8 animate-fade-in">
               Squad to be announced
             </p>
           )}

@@ -61,73 +61,75 @@ const Index = () => {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="relative z-10 bg-gradient-hero py-16 px-4">
+      <section className="relative z-10 bg-gradient-hero py-16 px-4 overflow-hidden">
         <div className="container mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 animate-slide-in">
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 animate-fade-in-down">
             LBPL SEASON 3
           </h1>
-          <p className="text-xl md:text-2xl text-secondary mb-2">
+          <p className="text-xl md:text-2xl text-secondary mb-2 animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
             Lad Brahmin Premiere League • 2026
           </p>
-          <p className="text-lg text-white/90 mb-6">
+          <p className="text-lg text-white/90 mb-6 animate-fade-in-up" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
             18 Teams • One Champion
           </p>
           
           {/* Watch Live Button - Always Visible with Fallback URL */}
-          <Button
-            asChild
-            variant="destructive"
-            size="lg"
-            className="relative z-10 font-bold px-8 py-4 shadow-glow transition-all duration-300 hover:scale-105"
-          >
-            <a
-              href={liveMatch?.youtube_stream_url || import.meta.env.VITE_YOUTUBE_LIVE_URL || "https://www.youtube.com/"}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Watch Live on YouTube"
-              className="flex items-center gap-2"
+          <div className="animate-scale-in" style={{ animationDelay: '0.4s', animationFillMode: 'both' }}>
+            <Button
+              asChild
+              variant="destructive"
+              size="lg"
+              className="relative z-10 font-bold px-8 py-4 shadow-glow transition-all duration-300 hover:scale-110 hover:shadow-xl"
             >
-              <span className="animate-pulse">🔴</span>
-              <span>Click Here to Watch Live</span>
-            </a>
-          </Button>
+              <a
+                href={liveMatch?.youtube_stream_url || import.meta.env.VITE_YOUTUBE_LIVE_URL || "https://www.youtube.com/"}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Watch Live on YouTube"
+                className="flex items-center gap-2"
+              >
+                <span className="animate-pulse">🔴</span>
+                <span>Click Here to Watch Live</span>
+              </a>
+            </Button>
+          </div>
         </div>
       </section>
 
       {/* Stats Cards */}
       <section className="container mx-auto px-4 py-8 mb-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-6 bg-white shadow-card hover:shadow-glow transition-all duration-300">
+          <Card className="p-6 bg-white shadow-card hover:shadow-glow hover:-translate-y-1 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-lg">
+              <div className="p-3 bg-primary/10 rounded-lg transition-transform duration-300 hover:scale-110">
                 <Users className="text-primary" size={28} />
               </div>
               <div>
-                <p className="text-3xl font-bold text-primary">18</p>
+                <p className="text-3xl font-bold text-primary animate-count-up">18</p>
                 <p className="text-sm text-muted-foreground">Teams</p>
               </div>
             </div>
           </Card>
 
-          <Card className="p-6 bg-white shadow-card hover:shadow-glow transition-all duration-300">
+          <Card className="p-6 bg-white shadow-card hover:shadow-gold hover:-translate-y-1 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-secondary/10 rounded-lg">
+              <div className="p-3 bg-secondary/10 rounded-lg transition-transform duration-300 hover:scale-110">
                 <Trophy className="text-secondary" size={28} />
               </div>
               <div>
-                <p className="text-3xl font-bold text-secondary">33</p>
+                <p className="text-3xl font-bold text-secondary animate-count-up" style={{ animationDelay: '0.1s' }}>33</p>
                 <p className="text-sm text-muted-foreground">Matches</p>
               </div>
             </div>
           </Card>
 
-          <Card className="p-6 bg-white shadow-card hover:shadow-glow transition-all duration-300">
+          <Card className="p-6 bg-white shadow-card hover:shadow-glow hover:-translate-y-1 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-success/10 rounded-lg">
+              <div className="p-3 bg-success/10 rounded-lg transition-transform duration-300 hover:scale-110">
                 <Calendar className="text-success" size={28} />
               </div>
               <div>
-                <p className="text-3xl font-bold text-success">2026</p>
+                <p className="text-3xl font-bold text-success animate-count-up" style={{ animationDelay: '0.2s' }}>2026</p>
                 <p className="text-sm text-muted-foreground">Season</p>
               </div>
             </div>

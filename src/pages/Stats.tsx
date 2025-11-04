@@ -90,35 +90,39 @@ const Stats = () => {
   };
 
   const StatCard = ({ title, players, stat, icon: Icon }: any) => (
-    <Card className="p-6 bg-gradient-card shadow-card">
+    <Card className="p-6 bg-gradient-card shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-1 animate-fade-in-up">
       <div className="flex items-center gap-3 mb-6">
-        <Icon className="text-secondary" size={28} />
+        <Icon className="text-secondary animate-bounce-subtle" size={28} />
         <h3 className="text-2xl font-bold text-primary">{title}</h3>
       </div>
       <div className="space-y-3">
         {players.map((player: PlayerStats, index: number) => (
           <div
             key={player.id}
-            className="flex items-center justify-between p-3 bg-background/50 rounded-lg hover:bg-background/80 transition-all"
+            className="flex items-center justify-between p-3 bg-background/50 rounded-lg hover:bg-background/80 hover:scale-[1.02] transition-all duration-300 animate-fade-in-up"
+            style={{ animationDelay: `${index * 0.05}s`, animationFillMode: 'both' }}
           >
             <div className="flex items-center gap-3">
-              <Badge variant={index < 3 ? "default" : "outline"} className="w-8 h-8 flex items-center justify-center">
+              <Badge 
+                variant={index < 3 ? "default" : "outline"} 
+                className={`w-8 h-8 flex items-center justify-center transition-all duration-300 hover:scale-110 ${index === 0 ? 'animate-pulse-glow' : ''}`}
+              >
                 {index + 1}
               </Badge>
               <div>
                 <p className="font-semibold text-foreground">{player.name}</p>
                 <div className="flex items-center gap-2">
                   {player.teams?.logo_url && (
-                    <img src={player.teams.logo_url} alt="" className="w-4 h-4 object-contain" />
+                    <img src={player.teams.logo_url} alt="" className="w-4 h-4 object-contain transition-transform duration-300 hover:scale-125" />
                   )}
                   <p className="text-sm text-muted-foreground">{player.teams?.name}</p>
                 </div>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-xl font-bold text-secondary">{stat(player)}</p>
+              <p className="text-xl font-bold text-secondary animate-count-up" style={{ animationDelay: `${index * 0.05 + 0.2}s` }}>{stat(player)}</p>
               {player.role && (
-                <Badge variant="outline" className="text-xs mt-1">
+                <Badge variant="outline" className="text-xs mt-1 transition-all duration-200 hover:scale-105">
                   {player.role}
                 </Badge>
               )}
@@ -148,16 +152,16 @@ const Stats = () => {
       <Navigation />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-3 mb-8 animate-slide-in-left">
           <Trophy className="text-secondary" size={32} />
           <h1 className="text-4xl font-bold text-primary">Player Statistics</h1>
         </div>
 
         <Tabs defaultValue="batting" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
-            <TabsTrigger value="batting">Batting</TabsTrigger>
-            <TabsTrigger value="bowling">Bowling</TabsTrigger>
-            <TabsTrigger value="fielding">Fielding</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
+            <TabsTrigger value="batting" className="transition-all duration-300 hover:scale-105">Batting</TabsTrigger>
+            <TabsTrigger value="bowling" className="transition-all duration-300 hover:scale-105">Bowling</TabsTrigger>
+            <TabsTrigger value="fielding" className="transition-all duration-300 hover:scale-105">Fielding</TabsTrigger>
           </TabsList>
 
           <TabsContent value="batting" className="space-y-6">

@@ -43,12 +43,12 @@ const PointsTable = () => {
       <Navigation />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-3 mb-8 animate-slide-in-left">
           <Trophy className="text-secondary" size={32} />
           <h1 className="text-4xl font-bold text-primary">Points Table</h1>
         </div>
 
-        <div className="bg-card rounded-xl shadow-card overflow-hidden">
+        <div className="bg-card rounded-xl shadow-card overflow-hidden animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
           <Table>
             <TableHeader>
               <TableRow className="bg-gradient-hero">
@@ -67,15 +67,16 @@ const PointsTable = () => {
                   <TableRow 
                     key={row.id} 
                     className={`
-                      hover:bg-muted/50 transition-colors
+                      hover:bg-muted/50 transition-all duration-300 hover:scale-[1.01] animate-fade-in-up
                       ${index < 4 ? 'bg-success/5' : ''}
                     `}
+                    style={{ animationDelay: `${0.3 + index * 0.05}s`, animationFillMode: 'both' }}
                   >
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-lg">{index + 1}</span>
-                        {index === 0 && <Award className="text-secondary" size={16} />}
-                        {index < 4 && <Badge variant="outline" className="text-xs">Q</Badge>}
+                        <span className="font-bold text-lg animate-count-up" style={{ animationDelay: `${0.5 + index * 0.05}s` }}>{index + 1}</span>
+                        {index === 0 && <Award className="text-secondary animate-bounce-subtle" size={16} />}
+                        {index < 4 && <Badge variant="outline" className="text-xs transition-all duration-300 hover:scale-110">Q</Badge>}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -96,7 +97,7 @@ const PointsTable = () => {
                       {row.net_run_rate.toFixed(2)}
                     </TableCell>
                     <TableCell className="text-center">
-                      <Badge className="bg-primary font-bold">
+                      <Badge className="bg-primary font-bold transition-all duration-300 hover:scale-110 hover:shadow-glow">
                         {row.points}
                       </Badge>
                     </TableCell>
@@ -113,7 +114,7 @@ const PointsTable = () => {
           </Table>
         </div>
 
-        <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+        <div className="mt-6 p-4 bg-muted/50 rounded-lg animate-fade-in" style={{ animationDelay: '0.8s', animationFillMode: 'both' }}>
           <p className="text-sm text-muted-foreground">
             <strong>Note:</strong> Teams highlighted in green qualify for the next stage. 
             Top 4 teams proceed to semi-finals.
