@@ -55,7 +55,7 @@ export const Navigation = () => {
     { path: "/points-table", label: "Points Table" },
     { path: "/teams", label: "Teams" },
     { path: "/stats", label: "Stats" },
-    { path: "/rules", label: "Rules" },
+    // { path: "/rules", label: "Rules" },
   ];
 
   const navLinks = isAdmin 

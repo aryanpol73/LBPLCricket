@@ -329,31 +329,37 @@ export type Database = {
       }
       points_table: {
         Row: {
+          group_name: string | null
           id: string
           losses: number | null
           matches_played: number | null
           net_run_rate: number | null
           points: number | null
+          round: number | null
           team_id: string
           updated_at: string | null
           wins: number | null
         }
         Insert: {
+          group_name?: string | null
           id?: string
           losses?: number | null
           matches_played?: number | null
           net_run_rate?: number | null
           points?: number | null
+          round?: number | null
           team_id: string
           updated_at?: string | null
           wins?: number | null
         }
         Update: {
+          group_name?: string | null
           id?: string
           losses?: number | null
           matches_played?: number | null
           net_run_rate?: number | null
           points?: number | null
+          round?: number | null
           team_id?: string
           updated_at?: string | null
           wins?: number | null
