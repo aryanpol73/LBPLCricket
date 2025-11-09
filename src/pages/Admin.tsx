@@ -733,14 +733,14 @@ const MatchForm = ({ match, teams, onSave, onCancel }: any) => {
       <div>
         <Label>Winner</Label>
         <Select
-          value={formData.winner_id || ''}
-          onValueChange={(value) => setFormData({ ...formData, winner_id: value })}
+          value={formData.winner_id || 'none'}
+          onValueChange={(value) => setFormData({ ...formData, winner_id: value === 'none' ? null : value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select winner (optional)" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">No winner</SelectItem>
+            <SelectItem value="none">No winner</SelectItem>
             {teams.map((team: any) => (
               <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
             ))}
