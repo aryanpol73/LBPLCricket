@@ -6,6 +6,7 @@ import { YouTubeLiveStream } from "@/components/YouTubeLiveStream";
 import { PlayerOfMatchVoting } from "@/components/PlayerOfMatchVoting";
 import { MatchTimeline } from "@/components/MatchTimeline";
 import { SponsorsSection } from "@/components/SponsorsSection";
+import { GallerySection } from "@/components/GallerySection";
 import { LiveScoreboard } from "@/components/LiveScoreboard";
 import { LiveTicker } from "@/components/LiveTicker";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
@@ -205,6 +206,9 @@ const Index = () => {
 
       {/* Live Scoreboard */}
       <LiveScoreboard title="Live Scoreboard" />
+
+      {/* Gallery Section */}
+      <GallerySection />
 
       {/* Sponsors Section */}
       <SponsorsSection />

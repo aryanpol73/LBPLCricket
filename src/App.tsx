@@ -12,6 +12,7 @@ import Teams from "./pages/Teams";
 import Stats from "./pages/Stats";
 import Rules from "./pages/Rules";
 import FanZone from "./pages/FanZone";
+import Gallery from "./pages/Gallery";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/points-table" element={<PointsTable />} />
           <Route path="/teams" element={<Teams />} />
           <Route path="/stats" element={<Stats />} />
+          <Route path="/gallery" element={<Gallery />} />
           {/* <Route path="/rules" element={<Rules />} /> */}
           {/* <Route path="/fan-zone" element={<FanZone />} /> */}
           <Route path="/auth" element={<Auth />} />
