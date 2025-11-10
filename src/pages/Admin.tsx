@@ -2,7 +2,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Shield, Lock, Plus, Edit, Trash2, Save } from "lucide-react";
+import { Shield, Lock, Plus, Edit, Trash2, Save, Upload, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +31,15 @@ const Admin = () => {
   const [matches, setMatches] = useState<any[]>([]);
   const [editingMatch, setEditingMatch] = useState<any>(null);
   const [matchDialogOpen, setMatchDialogOpen] = useState(false);
+
+  // Gallery state
+  const [galleryImages, setGalleryImages] = useState<any[]>([]);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Stats state
+  const [stats, setStats] = useState<any[]>([]);
+  const [editingStat, setEditingStat] = useState<any>(null);
+  const [statDialogOpen, setStatDialogOpen] = useState(false);
 
   useEffect(() => {
     const adminToken = sessionStorage.getItem('adminToken');
@@ -75,7 +84,7 @@ const Admin = () => {
   };
 
   const loadAllData = async () => {
-    await Promise.all([loadTeams(), loadPointsTable(), loadMatches()]);
+    await Promise.all([loadTeams(), loadPointsTable(), loadMatches(), loadGalleryImages(), loadStats()]);
   };
 
   const loadTeams = async () => {
@@ -198,6 +207,100 @@ const Admin = () => {
     }
   };
 
+  // Gallery CRUD
+  const loadGalleryImages = async () => {
+    const { data } = await supabase
+      .from('gallery_images')
+      .select('*')
+      .order('display_order')
+      .order('created_at', { ascending: false });
+    setGalleryImages(data || []);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('gallery')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('gallery')
+        .getPublicUrl(filePath);
+
+      const { error: insertError } = await supabase
+        .from('gallery_images')
+        .insert({ image_url: publicUrl, display_order: galleryImages.length });
+
+      if (insertError) throw insertError;
+
+      toast.success("Image uploaded!");
+      loadGalleryImages();
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const deleteGalleryImage = async (id: string, imageUrl: string) => {
+    if (!confirm("Delete this image?")) return;
+    
+    try {
+      // Extract file path from URL
+      const urlParts = imageUrl.split('/');
+      const filePath = urlParts[urlParts.length - 1];
+
+      // Delete from storage
+      await supabase.storage.from('gallery').remove([filePath]);
+
+      // Delete from database
+      const { error } = await supabase.from('gallery_images').delete().eq('id', id);
+      if (error) throw error;
+
+      toast.success("Image deleted!");
+      loadGalleryImages();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
+  // Stats CRUD
+  const loadStats = async () => {
+    const { data } = await supabase
+      .from('site_stats')
+      .select('*')
+      .order('display_order');
+    setStats(data || []);
+  };
+
+  const saveStat = async (stat: any) => {
+    try {
+      if (stat.id) {
+        const { error } = await supabase
+          .from('site_stats')
+          .update({ stat_value: stat.stat_value, stat_label: stat.stat_label })
+          .eq('id', stat.id);
+        if (error) throw error;
+        toast.success("Stat updated!");
+      }
+      loadStats();
+      setStatDialogOpen(false);
+      setEditingStat(null);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -246,10 +349,12 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="teams" className="w-full">
-          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-8">
+          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-5 mb-8">
             <TabsTrigger value="teams">Teams</TabsTrigger>
-            <TabsTrigger value="points">Points Table</TabsTrigger>
+            <TabsTrigger value="points">Points</TabsTrigger>
             <TabsTrigger value="matches">Matches</TabsTrigger>
+            <TabsTrigger value="gallery">Gallery</TabsTrigger>
+            <TabsTrigger value="stats">Stats</TabsTrigger>
           </TabsList>
 
           {/* Teams Tab */}
@@ -454,6 +559,107 @@ const Admin = () => {
                         >
                           <Trash2 size={14} />
                         </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
+          </TabsContent>
+
+          {/* Gallery Tab */}
+          <TabsContent value="gallery">
+            <Card className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">Manage Gallery</h2>
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="gallery-upload"
+                  />
+                  <Button asChild disabled={uploadingImage}>
+                    <label htmlFor="gallery-upload" className="cursor-pointer">
+                      <Upload className="mr-2" size={16} />
+                      {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                    </label>
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {galleryImages.map((image) => (
+                  <Card key={image.id} className="overflow-hidden">
+                    <img
+                      src={image.image_url}
+                      alt={image.title || 'Gallery image'}
+                      className="w-full aspect-video object-cover"
+                    />
+                    <div className="p-2 flex justify-between items-center">
+                      <span className="text-xs text-muted-foreground truncate">
+                        {image.title || 'Untitled'}
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => deleteGalleryImage(image.id, image.image_url)}
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </Card>
+          </TabsContent>
+
+          {/* Stats Tab */}
+          <TabsContent value="stats">
+            <Card className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">Manage Stats</h2>
+              </div>
+
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Label</TableHead>
+                    <TableHead>Value</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {stats.map((stat) => (
+                    <TableRow key={stat.id}>
+                      <TableCell>{stat.stat_label}</TableCell>
+                      <TableCell>{stat.stat_value}</TableCell>
+                      <TableCell>
+                        <Dialog open={statDialogOpen && editingStat?.id === stat.id} onOpenChange={setStatDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setEditingStat(stat)}
+                            >
+                              <Edit size={14} />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Edit Stat</DialogTitle>
+                            </DialogHeader>
+                            <StatForm
+                              stat={editingStat}
+                              onSave={saveStat}
+                              onCancel={() => {
+                                setStatDialogOpen(false);
+                                setEditingStat(null);
+                              }}
+                            />
+                          </DialogContent>
+                        </Dialog>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -753,6 +959,38 @@ const MatchForm = ({ match, teams, onSave, onCancel }: any) => {
           value={formData.youtube_stream_url || ''}
           onChange={(e) => setFormData({ ...formData, youtube_stream_url: e.target.value })}
           placeholder="https://youtube.com/..."
+        />
+      </div>
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button onClick={() => onSave(formData)}>
+          <Save className="mr-2" size={16} />
+          Save
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// Stat Form Component
+const StatForm = ({ stat, onSave, onCancel }: any) => {
+  const [formData, setFormData] = useState(stat || {});
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label>Label</Label>
+        <Input
+          value={formData.stat_label || ''}
+          onChange={(e) => setFormData({ ...formData, stat_label: e.target.value })}
+        />
+      </div>
+      <div>
+        <Label>Value</Label>
+        <Input
+          type="number"
+          value={formData.stat_value || 0}
+          onChange={(e) => setFormData({ ...formData, stat_value: parseInt(e.target.value) })}
         />
       </div>
       <div className="flex gap-2 justify-end">

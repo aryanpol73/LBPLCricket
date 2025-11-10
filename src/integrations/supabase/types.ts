@@ -143,6 +143,36 @@ export type Database = {
         }
         Relationships: []
       }
+      gallery_images: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          id: string
+          image_url: string
+          is_featured: boolean | null
+          title: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_featured?: boolean | null
+          title?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_featured?: boolean | null
+          title?: string | null
+        }
+        Relationships: []
+      }
       match_predictions: {
         Row: {
           created_at: string | null
@@ -412,6 +442,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      site_stats: {
+        Row: {
+          display_order: number | null
+          id: string
+          stat_key: string
+          stat_label: string
+          stat_value: number
+          updated_at: string | null
+        }
+        Insert: {
+          display_order?: number | null
+          id?: string
+          stat_key: string
+          stat_label: string
+          stat_value: number
+          updated_at?: string | null
+        }
+        Update: {
+          display_order?: number | null
+          id?: string
+          stat_key?: string
+          stat_label?: string
+          stat_value?: number
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       teams: {
         Row: {

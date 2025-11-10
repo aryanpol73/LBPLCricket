@@ -4,17 +4,18 @@ export const useCountUp = (end: number, duration: number = 2000, start: number =
   const [count, setCount] = useState(start);
   const [hasAnimated, setHasAnimated] = useState(false);
 
-  const startCounting = () => {
+  const startCounting = (targetEnd?: number) => {
     if (hasAnimated) return;
     
+    const finalEnd = targetEnd ?? end;
     setHasAnimated(true);
-    const increment = end / (duration / 16);
+    const increment = finalEnd / (duration / 16);
     let current = start;
 
     const timer = setInterval(() => {
       current += increment;
-      if (current >= end) {
-        setCount(end);
+      if (current >= finalEnd) {
+        setCount(finalEnd);
         clearInterval(timer);
       } else {
         setCount(Math.floor(current));

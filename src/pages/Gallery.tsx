@@ -1,27 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { X } from "lucide-react";
-
-// Extended gallery with more images
-const allGalleryImages = [
-  "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1624526267942-ab0ff8a3e972?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1546608235-3310a2494cdf?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1593766787879-e8c78e09cec6?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1567564911892-81c2b90d5f17?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1611268906276-fa61ed582837?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1624526267942-ab0ff8a3e972?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&h=600&fit=crop",
-];
+import { supabase } from "@/integrations/supabase/client";
 
 const Gallery = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [allGalleryImages, setAllGalleryImages] = useState<any[]>([]);
+
+  useEffect(() => {
+    loadGalleryImages();
+  }, []);
+
+  const loadGalleryImages = async () => {
+    const { data } = await supabase
+      .from('gallery_images')
+      .select('*')
+      .order('display_order')
+      .order('created_at', { ascending: false });
+    setAllGalleryImages(data || []);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -37,15 +36,15 @@ const Gallery = () => {
 
         {/* Gallery Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {allGalleryImages.map((image, index) => (
+          {allGalleryImages.map((image) => (
             <Card
-              key={index}
+              key={image.id}
               className="overflow-hidden cursor-pointer hover:shadow-glow transition-all duration-300 hover:scale-105"
-              onClick={() => setSelectedImage(image)}
+              onClick={() => setSelectedImage(image.image_url)}
             >
               <img
-                src={image}
-                alt={`Gallery image ${index + 1}`}
+                src={image.image_url}
+                alt={image.title || 'Gallery image'}
                 className="w-full aspect-video object-cover"
                 loading="lazy"
               />

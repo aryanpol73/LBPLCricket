@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -6,26 +6,28 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Link } from "react-router-dom";
 import Autoplay from "embla-carousel-autoplay";
 import { X } from "lucide-react";
-
-// Placeholder images - replace with actual gallery images
-const carouselImages = [
-  "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&h=450&fit=crop",
-  "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800&h=450&fit=crop",
-  "https://images.unsplash.com/photo-1624526267942-ab0ff8a3e972?w=800&h=450&fit=crop",
-  "https://images.unsplash.com/photo-1546608235-3310a2494cdf?w=800&h=450&fit=crop",
-  "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=450&fit=crop",
-  "https://images.unsplash.com/photo-1593766787879-e8c78e09cec6?w=800&h=450&fit=crop",
-];
-
-const gridImages = [
-  "https://images.unsplash.com/photo-1567564911892-81c2b90d5f17?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1611268906276-fa61ed582837?w=400&h=400&fit=crop",
-];
+import { supabase } from "@/integrations/supabase/client";
 
 export const GallerySection = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [galleryImages, setGalleryImages] = useState<any[]>([]);
+
+  useEffect(() => {
+    loadGalleryImages();
+  }, []);
+
+  const loadGalleryImages = async () => {
+    const { data } = await supabase
+      .from('gallery_images')
+      .select('*')
+      .order('display_order')
+      .order('created_at', { ascending: false })
+      .limit(10);
+    setGalleryImages(data || []);
+  };
+
+  const carouselImages = galleryImages.slice(0, 6);
+  const gridImages = galleryImages.slice(6, 10);
 
   return (
     <section className="container mx-auto px-4 py-16">
@@ -49,15 +51,15 @@ export const GallerySection = () => {
           className="w-full"
         >
           <CarouselContent>
-            {carouselImages.map((image, index) => (
-              <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+            {carouselImages.map((image) => (
+              <CarouselItem key={image.id} className="md:basis-1/2 lg:basis-1/3">
                 <Card 
                   className="overflow-hidden cursor-pointer hover:shadow-glow transition-all duration-300 hover:scale-105"
-                  onClick={() => setSelectedImage(image)}
+                  onClick={() => setSelectedImage(image.image_url)}
                 >
                   <img
-                    src={image}
-                    alt={`Gallery image ${index + 1}`}
+                    src={image.image_url}
+                    alt={image.title || 'Gallery image'}
                     className="w-full aspect-video object-cover"
                   />
                 </Card>
@@ -70,21 +72,23 @@ export const GallerySection = () => {
       </div>
 
       {/* 2x2 Grid Preview */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
-        {gridImages.map((image, index) => (
-          <Card
-            key={index}
-            className="overflow-hidden cursor-pointer hover:shadow-glow transition-all duration-300 hover:scale-105"
-            onClick={() => setSelectedImage(image)}
-          >
-            <img
-              src={image}
-              alt={`Grid image ${index + 1}`}
-              className="w-full aspect-square object-cover"
-            />
-          </Card>
-        ))}
-      </div>
+      {gridImages.length > 0 && (
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          {gridImages.map((image) => (
+            <Card
+              key={image.id}
+              className="overflow-hidden cursor-pointer hover:shadow-glow transition-all duration-300 hover:scale-105"
+              onClick={() => setSelectedImage(image.image_url)}
+            >
+              <img
+                src={image.image_url}
+                alt={image.title || 'Gallery image'}
+                className="w-full aspect-square object-cover"
+              />
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* View Full Gallery Button */}
       <div className="text-center">

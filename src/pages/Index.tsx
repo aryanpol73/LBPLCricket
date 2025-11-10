@@ -22,23 +22,29 @@ const Index = () => {
   const [liveMatch, setLiveMatch] = useState<any>(null);
   const [upcomingMatch, setUpcomingMatch] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<any[]>([]);
   
   const statsRef = useScrollAnimation();
-  const { count: teamsCount, startCounting: startTeamsCount } = useCountUp(18, 2000);
-  const { count: matchesCount, startCounting: startMatchesCount } = useCountUp(33, 2000);
-  const { count: seasonCount, startCounting: startSeasonCount } = useCountUp(2026, 2000);
+  const { count: teamsCount, startCounting: startTeamsCount } = useCountUp(0, 2000);
+  const { count: matchesCount, startCounting: startMatchesCount } = useCountUp(0, 2000);
+  const { count: seasonCount, startCounting: startSeasonCount } = useCountUp(0, 2000);
 
   useEffect(() => {
     loadMatches();
+    loadStats();
   }, []);
 
   useEffect(() => {
-    if (statsRef.isVisible) {
-      startTeamsCount();
-      startMatchesCount();
-      startSeasonCount();
+    if (statsRef.isVisible && stats.length > 0) {
+      const teamsStat = stats.find(s => s.stat_key === 'teams_count');
+      const matchesStat = stats.find(s => s.stat_key === 'matches_count');
+      const seasonStat = stats.find(s => s.stat_key === 'season_year');
+      
+      if (teamsStat) startTeamsCount(teamsStat.stat_value);
+      if (matchesStat) startMatchesCount(matchesStat.stat_value);
+      if (seasonStat) startSeasonCount(seasonStat.stat_value);
     }
-  }, [statsRef.isVisible]);
+  }, [statsRef.isVisible, stats]);
 
   const loadMatches = async () => {
     // Get live match
@@ -70,6 +76,14 @@ const Index = () => {
     setLiveMatch(live);
     setUpcomingMatch(upcoming);
     setLoading(false);
+  };
+
+  const loadStats = async () => {
+    const { data } = await supabase
+      .from('site_stats')
+      .select('*')
+      .order('display_order');
+    setStats(data || []);
   };
 
   const currentMatch = liveMatch || upcomingMatch;
