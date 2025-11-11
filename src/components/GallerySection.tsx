@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { Link } from "react-router-dom";
 import Autoplay from "embla-carousel-autoplay";
 import { X } from "lucide-react";
@@ -11,6 +11,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const GallerySection = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [galleryImages, setGalleryImages] = useState<any[]>([]);
+  const plugin = useRef(
+    Autoplay({ delay: 2000, stopOnInteraction: true })
+  );
 
   useEffect(() => {
     loadGalleryImages();
@@ -22,12 +25,9 @@ export const GallerySection = () => {
       .select('*')
       .order('display_order')
       .order('created_at', { ascending: false })
-      .limit(10);
+      .limit(12);
     setGalleryImages(data || []);
   };
-
-  const carouselImages = galleryImages.slice(0, 6);
-  const gridImages = galleryImages.slice(6, 10);
 
   return (
     <section className="container mx-auto px-4 py-16">
@@ -39,20 +39,18 @@ export const GallerySection = () => {
       {/* Auto-sliding Carousel */}
       <div className="mb-8">
         <Carousel
+          plugins={[plugin.current]}
+          className="w-full"
           opts={{
             align: "start",
             loop: true,
           }}
-          plugins={[
-            Autoplay({
-              delay: 3000,
-            }),
-          ]}
-          className="w-full"
+          onMouseEnter={() => plugin.current.stop()}
+          onMouseLeave={() => plugin.current.play()}
         >
-          <CarouselContent>
-            {carouselImages.map((image) => (
-              <CarouselItem key={image.id} className="md:basis-1/2 lg:basis-1/3">
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {galleryImages.map((image) => (
+              <CarouselItem key={image.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
                 <Card 
                   className="overflow-hidden cursor-pointer hover:shadow-glow transition-all duration-300 hover:scale-105"
                   onClick={() => setSelectedImage(image.image_url)}
@@ -60,35 +58,14 @@ export const GallerySection = () => {
                   <img
                     src={image.image_url}
                     alt={image.title || 'Gallery image'}
-                    className="w-full aspect-video object-cover"
+                    className="w-full h-32 md:h-40 object-cover"
                   />
                 </Card>
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="left-2" />
-          <CarouselNext className="right-2" />
         </Carousel>
       </div>
-
-      {/* 2x2 Grid Preview */}
-      {gridImages.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          {gridImages.map((image) => (
-            <Card
-              key={image.id}
-              className="overflow-hidden cursor-pointer hover:shadow-glow transition-all duration-300 hover:scale-105"
-              onClick={() => setSelectedImage(image.image_url)}
-            >
-              <img
-                src={image.image_url}
-                alt={image.title || 'Gallery image'}
-                className="w-full aspect-square object-cover"
-              />
-            </Card>
-          ))}
-        </div>
-      )}
 
       {/* View Full Gallery Button */}
       <div className="text-center">

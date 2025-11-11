@@ -36,11 +36,6 @@ const Admin = () => {
   const [galleryImages, setGalleryImages] = useState<any[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  // Stats state
-  const [stats, setStats] = useState<any[]>([]);
-  const [editingStat, setEditingStat] = useState<any>(null);
-  const [statDialogOpen, setStatDialogOpen] = useState(false);
-
   useEffect(() => {
     const adminToken = sessionStorage.getItem('adminToken');
     if (adminToken) {
@@ -84,7 +79,7 @@ const Admin = () => {
   };
 
   const loadAllData = async () => {
-    await Promise.all([loadTeams(), loadPointsTable(), loadMatches(), loadGalleryImages(), loadStats()]);
+    await Promise.all([loadTeams(), loadPointsTable(), loadMatches(), loadGalleryImages()]);
   };
 
   const loadTeams = async () => {
@@ -274,32 +269,6 @@ const Admin = () => {
     }
   };
 
-  // Stats CRUD
-  const loadStats = async () => {
-    const { data } = await supabase
-      .from('site_stats')
-      .select('*')
-      .order('display_order');
-    setStats(data || []);
-  };
-
-  const saveStat = async (stat: any) => {
-    try {
-      if (stat.id) {
-        const { error } = await supabase
-          .from('site_stats')
-          .update({ stat_value: stat.stat_value, stat_label: stat.stat_label })
-          .eq('id', stat.id);
-        if (error) throw error;
-        toast.success("Stat updated!");
-      }
-      loadStats();
-      setStatDialogOpen(false);
-      setEditingStat(null);
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
 
   if (!isAuthenticated) {
     return (
@@ -349,12 +318,11 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="teams" className="w-full">
-          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-5 mb-8">
+          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-4 mb-8">
             <TabsTrigger value="teams">Teams</TabsTrigger>
             <TabsTrigger value="points">Points</TabsTrigger>
             <TabsTrigger value="matches">Matches</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
-            <TabsTrigger value="stats">Stats</TabsTrigger>
           </TabsList>
 
           {/* Teams Tab */}
@@ -615,58 +583,6 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
-          {/* Stats Tab */}
-          <TabsContent value="stats">
-            <Card className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">Manage Stats</h2>
-              </div>
-
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Label</TableHead>
-                    <TableHead>Value</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {stats.map((stat) => (
-                    <TableRow key={stat.id}>
-                      <TableCell>{stat.stat_label}</TableCell>
-                      <TableCell>{stat.stat_value}</TableCell>
-                      <TableCell>
-                        <Dialog open={statDialogOpen && editingStat?.id === stat.id} onOpenChange={setStatDialogOpen}>
-                          <DialogTrigger asChild>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setEditingStat(stat)}
-                            >
-                              <Edit size={14} />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Edit Stat</DialogTitle>
-                            </DialogHeader>
-                            <StatForm
-                              stat={editingStat}
-                              onSave={saveStat}
-                              onCancel={() => {
-                                setStatDialogOpen(false);
-                                setEditingStat(null);
-                              }}
-                            />
-                          </DialogContent>
-                        </Dialog>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Card>
-          </TabsContent>
         </Tabs>
       </div>
     </div>
@@ -959,38 +875,6 @@ const MatchForm = ({ match, teams, onSave, onCancel }: any) => {
           value={formData.youtube_stream_url || ''}
           onChange={(e) => setFormData({ ...formData, youtube_stream_url: e.target.value })}
           placeholder="https://youtube.com/..."
-        />
-      </div>
-      <div className="flex gap-2 justify-end">
-        <Button variant="outline" onClick={onCancel}>Cancel</Button>
-        <Button onClick={() => onSave(formData)}>
-          <Save className="mr-2" size={16} />
-          Save
-        </Button>
-      </div>
-    </div>
-  );
-};
-
-// Stat Form Component
-const StatForm = ({ stat, onSave, onCancel }: any) => {
-  const [formData, setFormData] = useState(stat || {});
-
-  return (
-    <div className="space-y-4">
-      <div>
-        <Label>Label</Label>
-        <Input
-          value={formData.stat_label || ''}
-          onChange={(e) => setFormData({ ...formData, stat_label: e.target.value })}
-        />
-      </div>
-      <div>
-        <Label>Value</Label>
-        <Input
-          type="number"
-          value={formData.stat_value || 0}
-          onChange={(e) => setFormData({ ...formData, stat_value: parseInt(e.target.value) })}
         />
       </div>
       <div className="flex gap-2 justify-end">

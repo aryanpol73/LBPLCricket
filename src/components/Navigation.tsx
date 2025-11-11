@@ -55,6 +55,7 @@ export const Navigation = () => {
     { path: "/points-table", label: "Points Table" },
     { path: "/teams", label: "Teams" },
     { path: "/stats", label: "Stats" },
+    { path: "/gallery", label: "Gallery" },
     // { path: "/rules", label: "Rules" },
   ];
 
