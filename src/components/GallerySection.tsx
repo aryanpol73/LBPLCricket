@@ -30,49 +30,51 @@ export const GallerySection = () => {
   };
 
   return (
-    <section className="container mx-auto px-4 py-16">
-      <div className="text-center mb-10">
-        <h2 className="text-4xl font-bold text-foreground mb-3">Gallery</h2>
-        <p className="text-muted-foreground">Capturing the best moments of LBPL</p>
-      </div>
+    <>
+      <section className="bg-muted/30 py-12">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-foreground mb-2">Gallery</h2>
+            <p className="text-muted-foreground">Capturing the best moments of LBPL</p>
+          </div>
 
-      {/* Auto-sliding Carousel */}
-      <div className="mb-8">
+        {/* Auto-scrolling horizontal carousel */}
         <Carousel
           plugins={[plugin.current]}
-          className="w-full"
+          className="w-full mb-6"
           opts={{
             align: "start",
             loop: true,
           }}
-          onMouseEnter={() => plugin.current.stop()}
-          onMouseLeave={() => plugin.current.play()}
         >
-          <CarouselContent className="-ml-2 md:-ml-4">
+          <CarouselContent>
             {galleryImages.map((image) => (
-              <CarouselItem key={image.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
+              <CarouselItem key={image.id} className="basis-1/2 md:basis-1/3 lg:basis-1/4">
                 <Card 
-                  className="overflow-hidden cursor-pointer hover:shadow-glow transition-all duration-300 hover:scale-105"
+                  className="overflow-hidden cursor-pointer hover:shadow-glow transition-all duration-300 hover:scale-105 group"
                   onClick={() => setSelectedImage(image.image_url)}
+                  onMouseEnter={() => plugin.current.stop()}
+                  onMouseLeave={() => plugin.current.play()}
                 >
                   <img
                     src={image.image_url}
                     alt={image.title || 'Gallery image'}
-                    className="w-full h-32 md:h-40 object-cover"
+                    className="w-full h-32 sm:h-40 object-cover"
                   />
                 </Card>
               </CarouselItem>
             ))}
           </CarouselContent>
         </Carousel>
-      </div>
 
-      {/* View Full Gallery Button */}
-      <div className="text-center">
-        <Button asChild size="lg" className="font-semibold">
-          <Link to="/gallery">View Full Gallery</Link>
-        </Button>
-      </div>
+          {/* View Full Gallery Button */}
+          <div className="text-center">
+            <Button asChild size="lg" className="font-semibold">
+              <Link to="/gallery">View Full Gallery</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
 
       {/* Lightbox Modal */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
@@ -93,6 +95,6 @@ export const GallerySection = () => {
           )}
         </DialogContent>
       </Dialog>
-    </section>
+    </>
   );
 };
