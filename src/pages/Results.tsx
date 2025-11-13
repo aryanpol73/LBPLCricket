@@ -56,7 +56,8 @@ const Results = () => {
           <Table>
             <TableHeader>
               <TableRow className="bg-primary/5">
-                <TableHead className="font-bold">Date</TableHead>
+                <TableHead className="font-bold">Round No.</TableHead>
+                <TableHead className="font-bold">Match No.</TableHead>
                 <TableHead className="font-bold">Teams</TableHead>
                 <TableHead className="font-bold">Score</TableHead>
                 <TableHead className="font-bold">Winner</TableHead>
@@ -68,8 +69,15 @@ const Results = () => {
               {results.length > 0 ? (
                 results.map((match) => (
                   <TableRow key={match.id} className="hover:bg-muted/50 transition-colors">
-                    <TableCell className="text-muted-foreground">
-                      {format(new Date(match.match_date), "PP")}
+                    <TableCell className="text-center">
+                      <span className="font-semibold text-primary">
+                        {match.round_no || '-'}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <span className="font-semibold">
+                        {match.match_no || '-'}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <div className="font-medium">
@@ -77,7 +85,7 @@ const Results = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="font-mono">
+                      <div className="font-mono font-semibold">
                         {match.team_a_score} - {match.team_b_score}
                       </div>
                     </TableCell>
@@ -108,7 +116,7 @@ const Results = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     No completed matches yet
                   </TableCell>
                 </TableRow>

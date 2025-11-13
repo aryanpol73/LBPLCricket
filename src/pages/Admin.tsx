@@ -32,6 +32,9 @@ const Admin = () => {
   const [editingMatch, setEditingMatch] = useState<any>(null);
   const [matchDialogOpen, setMatchDialogOpen] = useState(false);
 
+  // Players state
+  const [players, setPlayers] = useState<any[]>([]);
+
   // Gallery state
   const [galleryImages, setGalleryImages] = useState<any[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -79,7 +82,7 @@ const Admin = () => {
   };
 
   const loadAllData = async () => {
-    await Promise.all([loadTeams(), loadPointsTable(), loadMatches(), loadGalleryImages()]);
+    await Promise.all([loadTeams(), loadPointsTable(), loadMatches(), loadPlayers(), loadGalleryImages()]);
   };
 
   const loadTeams = async () => {
@@ -103,10 +106,16 @@ const Admin = () => {
         *,
         team_a:teams!matches_team_a_id_fkey(id, name),
         team_b:teams!matches_team_b_id_fkey(id, name),
-        winner:teams!matches_winner_id_fkey(id, name)
+        winner:teams!matches_winner_id_fkey(id, name),
+        player_of_match:players(id, name)
       `)
       .order('match_date', { ascending: false });
     setMatches(data || []);
+  };
+
+  const loadPlayers = async () => {
+    const { data } = await supabase.from('players').select('*').order('name');
+    setPlayers(data || []);
   };
 
   // Team CRUD
@@ -483,6 +492,7 @@ const Admin = () => {
                     <MatchForm
                       match={editingMatch}
                       teams={teams}
+                      players={players}
                       onSave={saveMatch}
                       onCancel={() => setMatchDialogOpen(false)}
                     />
@@ -738,7 +748,7 @@ const PointsForm = ({ points, teams, onSave, onCancel }: any) => {
 };
 
 // Match Form Component
-const MatchForm = ({ match, teams, onSave, onCancel }: any) => {
+const MatchForm = ({ match, teams, players, onSave, onCancel }: any) => {
   const [formData, setFormData] = useState(match || {});
 
   return (
@@ -792,31 +802,49 @@ const MatchForm = ({ match, teams, onSave, onCancel }: any) => {
           onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
         />
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div>
-          <Label>Match Phase</Label>
-          <Select
-            value={formData.match_phase || 'league1'}
-            onValueChange={(value) => setFormData({ ...formData, match_phase: value })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="league1">League 1</SelectItem>
-              <SelectItem value="league2">League 2</SelectItem>
-              <SelectItem value="semi-final">Semi-Final</SelectItem>
-              <SelectItem value="final">Final</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label>Round No.</Label>
+          <Input
+            type="number"
+            value={formData.round_no || ''}
+            onChange={(e) => setFormData({ ...formData, round_no: parseInt(e.target.value) })}
+            placeholder="1, 2, 3..."
+          />
+        </div>
+        <div>
+          <Label>Match No.</Label>
+          <Input
+            type="number"
+            value={formData.match_no || ''}
+            onChange={(e) => setFormData({ ...formData, match_no: parseInt(e.target.value) })}
+            placeholder="1, 2, 3..."
+          />
         </div>
         <div>
           <Label>Group</Label>
           <Input
             value={formData.group_name || ''}
             onChange={(e) => setFormData({ ...formData, group_name: e.target.value })}
+            placeholder="A, B, C..."
           />
         </div>
+      </div>
+      <div>
+        <Label>Match Phase</Label>
+        <Select
+          value={formData.match_phase || 'league'}
+          onValueChange={(value) => setFormData({ ...formData, match_phase: value })}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="league">League</SelectItem>
+            <SelectItem value="semi-final">Semi-Final</SelectItem>
+            <SelectItem value="final">Final</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <div>
         <Label>Status</Label>
@@ -852,22 +880,41 @@ const MatchForm = ({ match, teams, onSave, onCancel }: any) => {
           />
         </div>
       </div>
-      <div>
-        <Label>Winner</Label>
-        <Select
-          value={formData.winner_id || 'none'}
-          onValueChange={(value) => setFormData({ ...formData, winner_id: value === 'none' ? null : value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select winner (optional)" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">No winner</SelectItem>
-            {teams.map((team: any) => (
-              <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Winner</Label>
+          <Select
+            value={formData.winner_id || 'none'}
+            onValueChange={(value) => setFormData({ ...formData, winner_id: value === 'none' ? null : value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select winner (optional)" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No winner</SelectItem>
+              {teams.map((team: any) => (
+                <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label>Player of the Match</Label>
+          <Select
+            value={formData.player_of_match_id || 'none'}
+            onValueChange={(value) => setFormData({ ...formData, player_of_match_id: value === 'none' ? null : value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select player (optional)" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No player</SelectItem>
+              {players.map((player: any) => (
+                <SelectItem key={player.id} value={player.id}>{player.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
       <div>
         <Label>YouTube Stream URL (optional)</Label>

@@ -218,8 +218,10 @@ export type Database = {
           group_name: string | null
           id: string
           match_date: string
+          match_no: number | null
           match_phase: string | null
           player_of_match_id: string | null
+          round_no: number | null
           status: string | null
           team_a_id: string
           team_a_score: string | null
@@ -234,8 +236,10 @@ export type Database = {
           group_name?: string | null
           id?: string
           match_date: string
+          match_no?: number | null
           match_phase?: string | null
           player_of_match_id?: string | null
+          round_no?: number | null
           status?: string | null
           team_a_id: string
           team_a_score?: string | null
@@ -250,8 +254,10 @@ export type Database = {
           group_name?: string | null
           id?: string
           match_date?: string
+          match_no?: number | null
           match_phase?: string | null
           player_of_match_id?: string | null
+          round_no?: number | null
           status?: string | null
           team_a_id?: string
           team_a_score?: string | null

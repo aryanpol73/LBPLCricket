@@ -12,7 +12,7 @@ export const GallerySection = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [galleryImages, setGalleryImages] = useState<any[]>([]);
   const plugin = useRef(
-    Autoplay({ delay: 2000, stopOnInteraction: true })
+    Autoplay({ delay: 3500, stopOnInteraction: true })
   );
 
   useEffect(() => {
@@ -49,9 +49,9 @@ export const GallerySection = () => {
         >
           <CarouselContent>
             {galleryImages.map((image) => (
-              <CarouselItem key={image.id} className="basis-1/2 md:basis-1/3 lg:basis-1/4">
+              <CarouselItem key={image.id} className="basis-1/2 md:basis-1/3 lg:basis-1/5 xl:basis-1/6">
                 <Card 
-                  className="overflow-hidden cursor-pointer hover:shadow-glow transition-all duration-300 hover:scale-105 group"
+                  className="overflow-hidden cursor-pointer shadow-sm hover:shadow-glow transition-all duration-300 hover:scale-105 group rounded-lg"
                   onClick={() => setSelectedImage(image.image_url)}
                   onMouseEnter={() => plugin.current.stop()}
                   onMouseLeave={() => plugin.current.play()}
@@ -59,7 +59,7 @@ export const GallerySection = () => {
                   <img
                     src={image.image_url}
                     alt={image.title || 'Gallery image'}
-                    className="w-full h-32 sm:h-40 object-cover"
+                    className="w-full h-32 sm:h-40 object-cover rounded-lg"
                   />
                 </Card>
               </CarouselItem>
