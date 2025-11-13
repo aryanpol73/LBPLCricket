@@ -100,11 +100,7 @@ const PointsTable = () => {
                               style={{ animationDelay: `${0.4 + groupIndex * 0.1 + index * 0.05}s`, animationFillMode: 'both' }}
                             >
                               <TableCell>
-                                <div className="flex items-center gap-2">
-                                  <span className="font-bold animate-count-up" style={{ animationDelay: `${0.5 + groupIndex * 0.1 + index * 0.05}s` }}>{index + 1}</span>
-                                  {index === 0 && <Award className="text-secondary animate-bounce-subtle" size={14} />}
-                                  {index < 2 && <Badge variant="outline" className="text-xs">Q</Badge>}
-                                </div>
+                                <span className="font-bold animate-count-up" style={{ animationDelay: `${0.5 + groupIndex * 0.1 + index * 0.05}s` }}>{index + 1}</span>
                               </TableCell>
                               <TableCell>
                                 <div className="font-bold text-foreground text-sm">
