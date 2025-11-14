@@ -1,12 +1,39 @@
 import { Navigation } from "@/components/Navigation";
-import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LiveScoreboard } from "@/components/LiveScoreboard";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, MapPin } from "lucide-react";
 import { format } from "date-fns";
+
+// Team name mapping from T1-T18 to actual names
+const TEAM_MAPPING: Record<string, string> = {
+  "T1": "Akot Avengers",
+  "T2": "Puneri Paltan",
+  "T3": "Damdar Dongaon",
+  "T4": "Jagadamb Sakharkherda",
+  "T5": "Nagpur Tigers",
+  "T6": "Shree Balaji Mehkar",
+  "T7": "Wardha Reloaded 3.0",
+  "T8": "Dhamakedar Mumbai",
+  "T9": "Buldhana Blasters",
+  "T10": "Ajeya Akola",
+  "T11": "Nagpur Gladiators",
+  "T12": "Puneri Katta",
+  "T13": "Aflatoon Akola",
+  "T14": "DeulgaonRaja Warriors",
+  "T15": "Sharangdhar Mehkar",
+  "T16": "Shandaar Chikhali",
+  "T17": "Malkapur Risers",
+  "T18": "Dhurandhar SambhajiNagar",
+};
+
+// Round color mapping
+const ROUND_COLORS: Record<string, string> = {
+  "1": "#009688", // Teal
+  "2": "#8E24AA", // Purple
+  "3": "#FB8C00", // Orange - Semi Finals
+  "4": "#F9A825", // Gold - Final
+};
 
 const Matches = () => {
   const [matches, setMatches] = useState<any[]>([]);
@@ -22,149 +49,168 @@ const Matches = () => {
       .select(`
         *,
         team_a:teams!matches_team_a_id_fkey(*),
-        team_b:teams!matches_team_b_id_fkey(*),
-        winner:teams!matches_winner_id_fkey(*),
-        player_of_match:players(*)
+        team_b:teams!matches_team_b_id_fkey(*)
       `)
-      .order('match_date', { ascending: true });
+      .order('match_date', { ascending: true })
+      .order('match_no', { ascending: true });
 
     setMatches(data || []);
     setLoading(false);
   };
 
-  const filterMatches = (status: string) => {
-    return matches.filter(m => m.status === status);
+  // Map team name through TEAM_MAPPING if it exists
+  const getTeamName = (team: any) => {
+    if (!team) return "TBD";
+    const mappedName = TEAM_MAPPING[team.short_name || team.name];
+    return mappedName || team.name || "TBD";
   };
 
-  const MatchCard = ({ match }: { match: any }) => (
-    <Card className="p-6 bg-gradient-card shadow-card hover:shadow-glow transition-all duration-300">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Calendar size={16} className="text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">
-            {format(new Date(match.match_date), "PPP")}
-          </span>
+  // Get round number from match_phase
+  const getRoundNumber = (match: any) => {
+    if (match.match_phase?.includes('league1')) return "1";
+    if (match.match_phase?.includes('league2')) return "2";
+    if (match.match_phase?.includes('semi')) return "3";
+    if (match.match_phase?.includes('final')) return "4";
+    return match.round_no?.toString() || "1";
+  };
+
+  // Get status text
+  const getStatusText = (match: any) => {
+    const status = match.status?.toUpperCase();
+    if (status === 'LIVE') return 'Live Now';
+    if (status === 'UPCOMING') return 'Match yet to begin';
+    if (match.match_phase?.includes('semi')) return 'Semi Final';
+    if (match.match_phase?.includes('final')) return 'Final';
+    return 'Upcoming';
+  };
+
+  // Check if match is on Day 1 or Day 2
+  const getMatchDay = (match: any) => {
+    const matchDate = new Date(match.match_date);
+    const day = format(matchDate, 'yyyy-MM-dd');
+    // You can adjust these dates based on actual tournament dates
+    // For now, we'll use round_no: Round 1 = Day 1, Round 2+ = Day 2
+    const roundNo = getRoundNumber(match);
+    return roundNo === "1" ? 1 : 2;
+  };
+
+  const filterMatchesByDay = (day: number) => {
+    return matches.filter(m => getMatchDay(m) === day);
+  };
+
+  const FixtureCard = ({ match }: { match: any }) => {
+    const roundNo = getRoundNumber(match);
+    const roundColor = ROUND_COLORS[roundNo] || ROUND_COLORS["1"];
+    const isLive = match.status?.toUpperCase() === 'LIVE';
+    const teamAName = getTeamName(match.team_a);
+    const teamBName = getTeamName(match.team_b);
+    const statusText = getStatusText(match);
+
+    return (
+      <div 
+        className={`flex items-stretch border-b border-border/20 hover:bg-muted/5 transition-colors ${
+          isLive ? 'bg-red-50/30' : 'bg-background'
+        }`}
+      >
+        {/* Left colored strip for Round */}
+        <div 
+          className="w-1.5 flex-shrink-0"
+          style={{ backgroundColor: roundColor }}
+        />
+
+        {/* Main content area */}
+        <div className="flex-1 flex items-center justify-between py-4 px-6">
+          {/* Left side - Teams and Status */}
+          <div className="flex-1">
+            <div className="space-y-1">
+              <div className="font-semibold text-foreground text-base">
+                {teamAName}
+                {match.team_a_score && isLive && (
+                  <span className="ml-3 text-sm font-medium">{match.team_a_score}</span>
+                )}
+              </div>
+              <div className="font-semibold text-foreground text-base">
+                {teamBName}
+                {match.team_b_score && isLive && (
+                  <span className="ml-3 text-sm font-medium">{match.team_b_score}</span>
+                )}
+              </div>
+              <div className="text-sm text-muted-foreground mt-2">
+                {statusText}
+              </div>
+            </div>
+          </div>
+
+          {/* Right side - Time, Match No, and LIVE badge */}
+          <div className="flex flex-col items-end gap-1 ml-8">
+            {isLive && (
+              <Badge className="bg-red-600 text-white hover:bg-red-700 mb-1 animate-pulse">
+                ● LIVE
+              </Badge>
+            )}
+            <div className="text-2xl font-bold text-foreground">
+              {format(new Date(match.match_date), 'h:mm a')}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Match {match.match_no || '—'}
+            </div>
+          </div>
         </div>
-        <Badge 
-          variant={
-            match.status === 'live' ? 'destructive' : 
-            match.status === 'completed' ? 'default' : 
-            'secondary'
-          }
-          className={match.status === 'live' ? 'animate-blink bg-live' : ''}
-        >
-          {match.status === 'live' ? '● LIVE' : match.status.toUpperCase()}
-        </Badge>
       </div>
-
-      <div className="flex items-center justify-between gap-4 mb-4">
-        <div className="flex-1 text-center">
-          <h3 className="font-bold text-primary mb-1">{match.team_a?.name}</h3>
-          {match.team_a_score && (
-            <p className="text-2xl font-bold text-foreground">{match.team_a_score}</p>
-          )}
-        </div>
-
-        <div className="text-2xl font-bold text-secondary">VS</div>
-
-        <div className="flex-1 text-center">
-          <h3 className="font-bold text-primary mb-1">{match.team_b?.name}</h3>
-          {match.team_b_score && (
-            <p className="text-2xl font-bold text-foreground">{match.team_b_score}</p>
-          )}
-        </div>
-      </div>
-
-      {match.venue && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-          <MapPin size={14} />
-          <span>{match.venue}</span>
-        </div>
-      )}
-
-      {match.status === 'completed' && (
-        <div className="mt-4 pt-4 border-t border-border">
-          {match.winner && (
-            <p className="text-sm text-foreground mb-1">
-              <span className="font-bold text-success">Winner:</span> {match.winner.name}
-            </p>
-          )}
-          {match.player_of_match && (
-            <p className="text-sm text-foreground">
-              <span className="font-bold text-secondary">Player of Match:</span> {match.player_of_match.name}
-            </p>
-          )}
-        </div>
-      )}
-
-      <Badge variant="outline" className="mt-3">
-        {match.match_phase?.toUpperCase()} • {match.group_name || 'N/A'}
-      </Badge>
-    </Card>
-  );
+    );
+  };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
         <div className="container mx-auto px-4 py-8 text-center">
-          <p>Loading matches...</p>
+          <p>Loading fixtures...</p>
         </div>
       </div>
     );
   }
+
+  const day1Matches = filterMatchesByDay(1);
+  const day2Matches = filterMatchesByDay(2);
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
 
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-primary mb-8">Matches</h1>
+        <h1 className="text-4xl font-bold text-primary mb-8">Fixtures</h1>
 
-        <Tabs defaultValue="upcoming" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-3 mb-8">
-            <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-            <TabsTrigger value="live">Live</TabsTrigger>
-            <TabsTrigger value="completed">Completed</TabsTrigger>
+        <Tabs defaultValue="day1" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
+            <TabsTrigger value="day1">Day 1 Fixtures</TabsTrigger>
+            <TabsTrigger value="day2">Day 2 Fixtures</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="upcoming">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filterMatches('upcoming').length > 0 ? (
-                filterMatches('upcoming').map(match => (
-                  <MatchCard key={match.id} match={match} />
+          <TabsContent value="day1">
+            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
+              {day1Matches.length > 0 ? (
+                day1Matches.map((match) => (
+                  <FixtureCard key={match.id} match={match} />
                 ))
               ) : (
-                <p className="col-span-full text-center text-muted-foreground">No upcoming matches</p>
+                <div className="p-8 text-center text-muted-foreground">
+                  No Day 1 fixtures available
+                </div>
               )}
             </div>
           </TabsContent>
 
-          <TabsContent value="live">
-            <LiveScoreboard 
-              title="Live Match Score" 
-              height="300px" 
-              className="!px-0 mb-6"
-            />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filterMatches('live').length > 0 ? (
-                filterMatches('live').map(match => (
-                  <MatchCard key={match.id} match={match} />
+          <TabsContent value="day2">
+            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
+              {day2Matches.length > 0 ? (
+                day2Matches.map((match) => (
+                  <FixtureCard key={match.id} match={match} />
                 ))
               ) : (
-                <p className="col-span-full text-center text-muted-foreground">No live matches</p>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="completed">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filterMatches('completed').length > 0 ? (
-                filterMatches('completed').map(match => (
-                  <MatchCard key={match.id} match={match} />
-                ))
-              ) : (
-                <p className="col-span-full text-center text-muted-foreground">No completed matches</p>
+                <div className="p-8 text-center text-muted-foreground">
+                  No Day 2 fixtures available
+                </div>
               )}
             </div>
           </TabsContent>
