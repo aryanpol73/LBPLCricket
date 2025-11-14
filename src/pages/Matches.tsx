@@ -143,7 +143,7 @@ const Matches = () => {
 
     return (
       <div 
-        className="rounded-lg shadow-md mb-6 overflow-hidden transition-all hover:shadow-lg"
+        className="rounded-lg shadow-md mb-8 overflow-hidden transition-all hover:shadow-lg"
         style={{ 
           backgroundColor: roundColor,
         }}
