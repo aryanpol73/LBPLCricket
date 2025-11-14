@@ -1,8 +1,9 @@
 import { Navigation } from "@/components/Navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { differenceInSeconds, format, isToday, isTomorrow } from "date-fns";
 
 // Team name mapping from T1-T18 to actual names
 const TEAM_MAPPING: Record<string, string> = {
@@ -77,6 +78,26 @@ const Matches = () => {
 
   useEffect(() => {
     loadMatches();
+
+    // Set up realtime subscription
+    const channel = supabase
+      .channel('matches-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'matches'
+        },
+        () => {
+          loadMatches();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const loadMatches = async () => {
@@ -87,6 +108,7 @@ const Matches = () => {
         team_a:teams!matches_team_a_id_fkey(*),
         team_b:teams!matches_team_b_id_fkey(*)
       `)
+      .in('status', ['live', 'upcoming'])
       .order('match_no', { ascending: true });
 
     setMatches(data || []);
@@ -141,9 +163,44 @@ const Matches = () => {
     const statusText = getStatusText(match);
     const timeRange = MATCH_TIMES[match.match_no] || "TBD";
 
+    // Countdown timer for today's matches
+    const [timeLeft, setTimeLeft] = useState<string>("");
+    const matchDate = new Date(match.match_date);
+    const isTodayMatch = isToday(matchDate);
+
+    useEffect(() => {
+      if (!isTodayMatch || isLive) return;
+
+      const updateCountdown = () => {
+        const now = new Date();
+        const diff = differenceInSeconds(matchDate, now);
+
+        if (diff <= 0) {
+          setTimeLeft("");
+          return;
+        }
+
+        const hours = Math.floor(diff / 3600);
+        const minutes = Math.floor((diff % 3600) / 60);
+        const seconds = diff % 60;
+
+        setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
+      };
+
+      updateCountdown();
+      const interval = setInterval(updateCountdown, 1000);
+
+      return () => clearInterval(interval);
+    }, [isTodayMatch, matchDate, isLive]);
+
     return (
       <div 
-        className="rounded-lg shadow-md overflow-hidden transition-all hover:shadow-lg"
+        className={`
+          rounded-lg shadow-md overflow-hidden 
+          transition-all duration-300 ease-out
+          hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02]
+          ${isLive ? 'animate-pulse-glow ring-2 ring-red-500/50' : ''}
+        `}
         style={{ 
           backgroundColor: roundColor,
         }}
@@ -152,13 +209,13 @@ const Matches = () => {
           {/* Left side - Teams and Status */}
           <div className="flex-1">
             <div className="space-y-2">
-              <div className="font-bold text-white text-xl">
+              <div className="font-bold text-white text-xl transition-transform duration-200 hover:scale-105">
                 {teamAName}
                 {match.team_a_score && isLive && (
                   <span className="ml-3 text-base font-semibold">{match.team_a_score}</span>
                 )}
               </div>
-              <div className="font-bold text-white text-xl">
+              <div className="font-bold text-white text-xl transition-transform duration-200 hover:scale-105">
                 {teamBName}
                 {match.team_b_score && isLive && (
                   <span className="ml-3 text-base font-semibold">{match.team_b_score}</span>
@@ -167,6 +224,11 @@ const Matches = () => {
               <div className="text-sm text-white/90 mt-3 font-medium">
                 {statusText}
               </div>
+              {timeLeft && (
+                <div className="text-xs text-white/80 font-mono bg-white/10 rounded px-2 py-1 inline-block mt-2">
+                  Starts in: {timeLeft}
+                </div>
+              )}
             </div>
           </div>
 
@@ -174,7 +236,7 @@ const Matches = () => {
           <div className="flex flex-col items-end gap-2 ml-8">
             {isLive && (
               <Badge className="bg-red-600 text-white hover:bg-red-700 mb-1 animate-pulse font-bold">
-                ● LIVE
+                🔴 LIVE
               </Badge>
             )}
             <div className="text-lg font-bold text-white">
@@ -218,9 +280,15 @@ const Matches = () => {
 
           <TabsContent value="day1">
             {day1Matches.length > 0 ? (
-              <div className="space-y-8">
-                {day1Matches.map((match) => (
-                  <FixtureCard key={match.id} match={match} />
+              <div className="space-y-8 animate-fade-in">
+                {day1Matches.map((match, index) => (
+                  <div 
+                    key={match.id}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <FixtureCard match={match} />
+                  </div>
                 ))}
               </div>
             ) : (
@@ -232,9 +300,15 @@ const Matches = () => {
 
           <TabsContent value="day2">
             {day2Matches.length > 0 ? (
-              <div className="space-y-8">
-                {day2Matches.map((match) => (
-                  <FixtureCard key={match.id} match={match} />
+              <div className="space-y-8 animate-fade-in">
+                {day2Matches.map((match, index) => (
+                  <div 
+                    key={match.id}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <FixtureCard match={match} />
+                  </div>
                 ))}
               </div>
             ) : (
