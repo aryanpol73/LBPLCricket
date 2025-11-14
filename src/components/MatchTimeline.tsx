@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { format, isToday, isTomorrow, differenceInSeconds } from "date-fns";
-import useEmblaCarousel from "embla-carousel-react";
 
 interface Match {
   id: string;
@@ -36,13 +35,6 @@ export const MatchTimeline = () => {
   const [teamBPlayers, setTeamBPlayers] = useState<Player[]>([]);
   const [iframeUrl, setIframeUrl] = useState("");
   const [highlightedMatchId, setHighlightedMatchId] = useState<string | null>(null);
-  const [emblaRef] = useEmblaCarousel({ 
-    dragFree: true, 
-    containScroll: "trimSnaps",
-    breakpoints: {
-      '(min-width: 768px)': { active: false }
-    }
-  });
   const nextMatchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -243,18 +235,11 @@ export const MatchTimeline = () => {
     <section className="container mx-auto px-4 py-12">
       <h2 className="text-3xl font-bold text-center mb-8 text-foreground">Match Timeline</h2>
       
-      {/* Match Cards Grid - Desktop */}
-      <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {matches.map((match) => (
-          <MatchCard key={match.id} match={match} />
-        ))}
-      </div>
-
-      {/* Match Cards Carousel - Mobile */}
-      <div className="md:hidden overflow-hidden" ref={emblaRef}>
-        <div className="flex gap-4 touch-pan-x">
+      {/* Horizontal Scrollable Row - Desktop & Mobile */}
+      <div className="overflow-x-auto scrollbar-hide">
+        <div className="flex gap-4 pb-4 min-w-max">
           {matches.map((match) => (
-            <div key={match.id} className="flex-[0_0_80%] min-w-0">
+            <div key={match.id} className="w-64 flex-shrink-0">
               <MatchCard match={match} />
             </div>
           ))}
