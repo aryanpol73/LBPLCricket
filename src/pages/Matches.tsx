@@ -28,7 +28,7 @@ const TEAM_MAPPING: Record<string, string> = {
 
 // Round color mapping
 const ROUND_COLORS: Record<string, string> = {
-  "1": "#009688", // Teal
+  "1": "#4169E1", // Royal Blue
   "2": "#8E24AA", // Purple
   "3": "#FB8C00", // Orange - Semi Finals
   "4": "#F9A825", // Gold - Final
