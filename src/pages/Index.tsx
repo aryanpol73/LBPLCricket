@@ -174,6 +174,16 @@ const Index = () => {
       {/* Match Timeline */}
       <MatchTimeline />
 
+      {/* Countdown Timer */}
+      {upcomingMatch && (
+        <section className="container mx-auto px-4 mb-12">
+          <CountdownTimer 
+            targetDate={new Date(upcomingMatch.match_date)} 
+            matchLabel="Match starts in"
+          />
+        </section>
+      )}
+
       {/* Live Match Section */}
       {!loading && currentMatch && (
         <section className="container mx-auto px-4 mb-12">
