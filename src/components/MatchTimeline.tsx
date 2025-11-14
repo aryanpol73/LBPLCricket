@@ -182,49 +182,54 @@ export const MatchTimeline = () => {
       >
         <Card 
           className={`
-            group p-4 cursor-pointer transition-all duration-300 bg-card border
-            hover:shadow-2xl hover:-translate-y-2 hover:scale-105 hover:border-primary/50
-            ${isLive ? 'border-destructive/50 shadow-lg shadow-destructive/20 animate-pulse-glow' : 'border-border'}
-            ${highlightedMatchId === match.id ? 'ring-2 ring-primary animate-highlight-flash' : ''}
+            group p-6 cursor-pointer transition-all duration-300
+            bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700
+            border-none rounded-xl shadow-lg shadow-purple-500/30
+            hover:shadow-2xl hover:shadow-purple-500/50 hover:-translate-y-2 hover:scale-[1.02]
+            ${isLive ? 'ring-2 ring-red-500/50 animate-pulse-glow' : ''}
+            ${highlightedMatchId === match.id ? 'animate-highlight-flash' : ''}
           `}
           onClick={() => openMatchDetails(match)}
         >
-          <div className="flex flex-col gap-3">
-            {/* Match Number */}
-            <div className="text-xs font-medium text-primary">
-              Match {match.match_no || 'TBD'}
+          <div className="flex flex-col gap-3 relative">
+            {/* Match Number Badge */}
+            <div className="inline-flex w-fit">
+              <span className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-bold rounded-full shadow-md border border-white/30">
+                Match {match.match_no || 'TBD'}
+              </span>
             </div>
 
-            {/* Teams */}
-            <div className="space-y-1">
-              <div className="text-sm font-semibold text-foreground">
+            {/* Live Badge */}
+            {isLive && (
+              <div className="absolute top-0 right-0">
+                <span className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-full shadow-md flex items-center gap-1 animate-pulse">
+                  🔴 LIVE
+                </span>
+              </div>
+            )}
+
+            {/* Teams - Stacked Vertically */}
+            <div className="space-y-2 text-center mt-2">
+              <div className="text-lg font-bold text-white transition-transform duration-200 hover:scale-105">
                 {match.team_a?.name || 'TBD'}
               </div>
-              <div className="text-xs text-muted-foreground">vs</div>
-              <div className="text-sm font-semibold text-foreground">
+              <div className="text-sm font-semibold text-white/80">vs</div>
+              <div className="text-lg font-bold text-white transition-transform duration-200 hover:scale-105">
                 {match.team_b?.name || 'TBD'}
               </div>
             </div>
 
             {/* Time and Status */}
-            <div className="flex flex-col gap-1">
-              {isLive ? (
-                <div className="flex items-center gap-1.5">
-                  <span className="text-destructive font-bold">LIVE</span>
-                  <span className="relative flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive"></span>
-                  </span>
-                </div>
-              ) : (
-                <span className="text-xs text-muted-foreground group-hover:text-primary transition-colors duration-300">
+            <div className="flex flex-col gap-1 items-center text-center mt-2">
+              {!isLive && (
+                <span className="text-sm text-white/80 font-medium">
                   {formatMatchTime(match.match_date)}
                 </span>
               )}
               
               {isTodayMatch && !isLive && countdown && (
-                <div className="text-xs font-medium text-primary animate-pulse">
-                  Starts in {countdown}
+                <div className="text-xs font-mono text-white/90 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-white/20">
+                  Starts in: {countdown}
                 </div>
               )}
             </div>
