@@ -143,7 +143,7 @@ const Matches = () => {
 
     return (
       <div 
-        className="rounded-lg shadow-md mb-8 overflow-hidden transition-all hover:shadow-lg"
+        className="rounded-lg shadow-md overflow-hidden transition-all hover:shadow-lg"
         style={{ 
           backgroundColor: roundColor,
         }}
@@ -218,7 +218,7 @@ const Matches = () => {
 
           <TabsContent value="day1">
             {day1Matches.length > 0 ? (
-              <div className="space-y-0">
+              <div className="space-y-8">
                 {day1Matches.map((match) => (
                   <FixtureCard key={match.id} match={match} />
                 ))}
@@ -232,7 +232,7 @@ const Matches = () => {
 
           <TabsContent value="day2">
             {day2Matches.length > 0 ? (
-              <div className="space-y-0">
+              <div className="space-y-8">
                 {day2Matches.map((match) => (
                   <FixtureCard key={match.id} match={match} />
                 ))}
