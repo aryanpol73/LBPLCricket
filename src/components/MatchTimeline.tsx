@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card } from "./ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { format, isToday, isTomorrow } from "date-fns";
+import { format, isToday, isTomorrow, differenceInSeconds } from "date-fns";
+import useEmblaCarousel from "embla-carousel-react";
 
 interface Match {
   id: string;
@@ -34,9 +35,38 @@ export const MatchTimeline = () => {
   const [teamAPlayers, setTeamAPlayers] = useState<Player[]>([]);
   const [teamBPlayers, setTeamBPlayers] = useState<Player[]>([]);
   const [iframeUrl, setIframeUrl] = useState("");
+  const [highlightedMatchId, setHighlightedMatchId] = useState<string | null>(null);
+  const [emblaRef] = useEmblaCarousel({ 
+    dragFree: true, 
+    containScroll: "trimSnaps",
+    breakpoints: {
+      '(min-width: 768px)': { active: false }
+    }
+  });
+  const nextMatchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadMatches();
+    
+    // Set up realtime subscription for match updates
+    const channel = supabase
+      .channel('match-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'matches'
+        },
+        () => {
+          loadMatches();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
@@ -53,11 +83,28 @@ export const MatchTimeline = () => {
         team_a:teams!matches_team_a_id_fkey(*),
         team_b:teams!matches_team_b_id_fkey(*)
       `)
-      .in('status', ['live', 'upcoming', 'completed'])
+      .in('status', ['live', 'upcoming'])
       .order('match_date', { ascending: true })
       .limit(20);
 
-    setMatches(data as any || []);
+    const loadedMatches = (data as any || []);
+    setMatches(loadedMatches);
+    
+    // Auto-highlight next match after load
+    if (loadedMatches.length > 0) {
+      const nextMatch = loadedMatches.find((m: Match) => 
+        isToday(new Date(m.match_date)) || new Date(m.match_date) > new Date()
+      );
+      if (nextMatch) {
+        setHighlightedMatchId(nextMatch.id);
+        setTimeout(() => setHighlightedMatchId(null), 1000);
+        
+        // Scroll to next match after a brief delay
+        setTimeout(() => {
+          nextMatchRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
+    }
   };
 
   const loadSquads = async (teamAId: string, teamBId: string) => {
@@ -96,44 +143,94 @@ export const MatchTimeline = () => {
 
   const MatchCard = ({ match }: { match: Match }) => {
     const isLive = match.status === 'live';
+    const matchDate = new Date(match.match_date);
+    const isTodayMatch = isToday(matchDate);
+    const isNextMatch = matches.findIndex(m => 
+      isToday(new Date(m.match_date)) || new Date(m.match_date) > new Date()
+    ) === matches.findIndex(m => m.id === match.id);
+    const [countdown, setCountdown] = useState<string>("");
+
+    useEffect(() => {
+      if (!isTodayMatch || isLive) return;
+      
+      const updateCountdown = () => {
+        const now = new Date();
+        const diff = differenceInSeconds(matchDate, now);
+        
+        if (diff <= 0) {
+          setCountdown("Starting soon...");
+          return;
+        }
+        
+        const hours = Math.floor(diff / 3600);
+        const minutes = Math.floor((diff % 3600) / 60);
+        const seconds = diff % 60;
+        
+        setCountdown(`${hours}h ${minutes}m ${seconds}s`);
+      };
+      
+      updateCountdown();
+      const interval = setInterval(updateCountdown, 1000);
+      
+      return () => clearInterval(interval);
+    }, [isTodayMatch, matchDate, isLive]);
 
     return (
-      <Card 
-        className="p-4 cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-card border border-border"
-        onClick={() => openMatchDetails(match)}
+      <div
+        ref={isNextMatch ? nextMatchRef : null}
+        className="animate-fade-in"
       >
-        <div className="flex flex-col gap-3">
-          {/* Match Number */}
-          <div className="text-xs font-medium text-primary">
-            Match {match.match_no || 'TBD'}
-          </div>
-
-          {/* Teams */}
-          <div className="space-y-1">
-            <div className="text-sm font-semibold text-foreground">
-              {match.team_a?.name || 'TBD'}
+        <Card 
+          className={`
+            group p-4 cursor-pointer transition-all duration-300 bg-card border
+            hover:shadow-2xl hover:-translate-y-2 hover:scale-105 hover:border-primary/50
+            ${isLive ? 'border-destructive/50 shadow-lg shadow-destructive/20 animate-pulse-glow' : 'border-border'}
+            ${highlightedMatchId === match.id ? 'ring-2 ring-primary animate-highlight-flash' : ''}
+          `}
+          onClick={() => openMatchDetails(match)}
+        >
+          <div className="flex flex-col gap-3">
+            {/* Match Number */}
+            <div className="text-xs font-medium text-primary">
+              Match {match.match_no || 'TBD'}
             </div>
-            <div className="text-xs text-muted-foreground">vs</div>
-            <div className="text-sm font-semibold text-foreground">
-              {match.team_b?.name || 'TBD'}
-            </div>
-          </div>
 
-          {/* Time and Status */}
-          <div className="flex items-center gap-2 text-xs">
-            {isLive ? (
-              <div className="flex items-center gap-1.5">
-                <span className="text-destructive font-bold">LIVE</span>
-                <span className="animate-pulse text-destructive">🔴</span>
+            {/* Teams */}
+            <div className="space-y-1">
+              <div className="text-sm font-semibold text-foreground">
+                {match.team_a?.name || 'TBD'}
               </div>
-            ) : (
-              <span className="text-muted-foreground">
-                {formatMatchTime(match.match_date)}
-              </span>
-            )}
+              <div className="text-xs text-muted-foreground">vs</div>
+              <div className="text-sm font-semibold text-foreground">
+                {match.team_b?.name || 'TBD'}
+              </div>
+            </div>
+
+            {/* Time and Status */}
+            <div className="flex flex-col gap-1">
+              {isLive ? (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-destructive font-bold">LIVE</span>
+                  <span className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive"></span>
+                  </span>
+                </div>
+              ) : (
+                <span className="text-xs text-muted-foreground group-hover:text-primary transition-colors duration-300">
+                  {formatMatchTime(match.match_date)}
+                </span>
+              )}
+              
+              {isTodayMatch && !isLive && countdown && (
+                <div className="text-xs font-medium text-primary animate-pulse">
+                  Starts in {countdown}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
     );
   };
 
@@ -141,11 +238,22 @@ export const MatchTimeline = () => {
     <section className="container mx-auto px-4 py-12">
       <h2 className="text-3xl font-bold text-center mb-8 text-foreground">Match Timeline</h2>
       
-      {/* Match Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {/* Match Cards Grid - Desktop */}
+      <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {matches.map((match) => (
           <MatchCard key={match.id} match={match} />
         ))}
+      </div>
+
+      {/* Match Cards Carousel - Mobile */}
+      <div className="md:hidden overflow-hidden" ref={emblaRef}>
+        <div className="flex gap-4 touch-pan-x">
+          {matches.map((match) => (
+            <div key={match.id} className="flex-[0_0_80%] min-w-0">
+              <MatchCard match={match} />
+            </div>
+          ))}
+        </div>
       </div>
 
       {matches.length === 0 && (
