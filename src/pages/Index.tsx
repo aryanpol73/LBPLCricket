@@ -174,13 +174,28 @@ const Index = () => {
       {/* Match Timeline */}
       <MatchTimeline />
 
-      {/* Countdown Timer */}
-      {upcomingMatch && (
+      {/* Countdown Timer and Match Prediction */}
+      {currentMatch && (
         <section className="container mx-auto px-4 mb-12">
-          <CountdownTimer 
-            targetDate={new Date(upcomingMatch.match_date)} 
-            matchLabel="Match starts in"
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {upcomingMatch && (
+              <div>
+                <CountdownTimer 
+                  targetDate={new Date(upcomingMatch.match_date)} 
+                  matchLabel="Match starts in"
+                />
+              </div>
+            )}
+            <div className={!upcomingMatch ? "lg:col-span-2 max-w-2xl mx-auto" : ""}>
+              <MatchPredictionPoll
+                matchId={currentMatch.id}
+                teamAId={currentMatch.team_a.id}
+                teamBId={currentMatch.team_b.id}
+                teamAName={currentMatch.team_a.name}
+                teamBName={currentMatch.team_b.name}
+              />
+            </div>
+          </div>
         </section>
       )}
 

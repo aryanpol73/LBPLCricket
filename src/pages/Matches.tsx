@@ -94,8 +94,15 @@ const Matches = () => {
   };
 
   // Map team name through TEAM_MAPPING if it exists
-  const getTeamName = (team: any) => {
+  const getTeamName = (team: any, match: any) => {
     if (!team) return "TBD";
+    
+    // Check if this is a Round 2+ match that hasn't been determined yet
+    const roundNo = getRoundNumber(match);
+    if (roundNo !== "1" && match.team_a_id === match.team_b_id) {
+      return "TBD";
+    }
+    
     const mappedName = TEAM_MAPPING[team.short_name || team.name];
     return mappedName || team.name || "TBD";
   };
@@ -136,8 +143,8 @@ const Matches = () => {
     const roundNo = getRoundNumber(match);
     const roundColor = ROUND_COLORS[roundNo] || ROUND_COLORS["1"];
     const isLive = match.status?.toUpperCase() === 'LIVE';
-    const teamAName = getTeamName(match.team_a);
-    const teamBName = getTeamName(match.team_b);
+    const teamAName = getTeamName(match.team_a, match);
+    const teamBName = getTeamName(match.team_b, match);
     const statusText = getStatusText(match);
     const timeRange = MATCH_TIMES[match.match_no] || "TBD";
 
