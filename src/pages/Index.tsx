@@ -184,43 +184,6 @@ const Index = () => {
         </section>
       )}
 
-      {/* Live Match Section */}
-      {!loading && currentMatch && (
-        <section className="container mx-auto px-4 mb-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-6">
-              <LiveMatchCard
-                teamA={currentMatch.team_a?.name || "TBD"}
-                teamB={currentMatch.team_b?.name || "TBD"}
-                teamALogo={currentMatch.team_a?.logo_url}
-                teamBLogo={currentMatch.team_b?.logo_url}
-                isLive={currentMatch.status === 'live'}
-                teamAScore={currentMatch.team_a_score}
-                teamBScore={currentMatch.team_b_score}
-              />
-
-              {currentMatch.status === 'live' && currentMatch.youtube_stream_url && (
-                <YouTubeLiveStream streamUrl={currentMatch.youtube_stream_url} />
-              )}
-            </div>
-
-            <div className="space-y-6">
-              <MatchPredictionPoll
-                matchId={currentMatch.id}
-                teamAId={currentMatch.team_a_id}
-                teamBId={currentMatch.team_b_id}
-                teamAName={currentMatch.team_a?.name || "TBD"}
-                teamBName={currentMatch.team_b?.name || "TBD"}
-              />
-
-              {currentMatch.status === 'live' && (
-                <PlayerOfMatchVoting matchId={currentMatch.id} />
-              )}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Gallery Section */}
       <GallerySection />
 
