@@ -171,6 +171,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Match Timeline */}
+      <MatchTimeline />
+
       {/* Live Match Section */}
       {!loading && currentMatch && (
         <section className="container mx-auto px-4 mb-12">
@@ -185,13 +188,6 @@ const Index = () => {
                 teamAScore={currentMatch.team_a_score}
                 teamBScore={currentMatch.team_b_score}
               />
-
-              {currentMatch.status === 'upcoming' && (
-                <CountdownTimer
-                  targetDate={new Date(currentMatch.match_date)}
-                  matchLabel="Match starts in"
-                />
-              )}
 
               {currentMatch.status === 'live' && currentMatch.youtube_stream_url && (
                 <YouTubeLiveStream streamUrl={currentMatch.youtube_stream_url} />
@@ -214,12 +210,6 @@ const Index = () => {
           </div>
         </section>
       )}
-
-      {/* Match Timeline */}
-      <MatchTimeline />
-
-      {/* Live Scoreboard */}
-      <LiveScoreboard title="Live Scoreboard" />
 
       {/* Gallery Section */}
       <GallerySection />
