@@ -27,28 +27,12 @@ const TEAM_MAPPING: Record<string, string> = {
   "T18": "Dhurandhar SambhajiNagar",
 };
 
-// Round color mapping with transparency
-const ROUND_COLORS: Record<string, { bg: string; text: string; liveBg: string }> = {
-  "1": { 
-    bg: "rgba(0, 150, 136, 0.12)", // Teal with transparency
-    text: "text-[#00796B]",
-    liveBg: "rgba(0, 150, 136, 0.20)"
-  },
-  "2": { 
-    bg: "rgba(142, 36, 170, 0.12)", // Purple with transparency
-    text: "text-[#6A1B9A]",
-    liveBg: "rgba(142, 36, 170, 0.20)"
-  },
-  "3": { 
-    bg: "rgba(251, 140, 0, 0.12)", // Orange with transparency
-    text: "text-[#E65100]",
-    liveBg: "rgba(251, 140, 0, 0.20)"
-  },
-  "4": { 
-    bg: "rgba(249, 168, 37, 0.12)", // Gold with transparency
-    text: "text-[#F57F17]",
-    liveBg: "rgba(249, 168, 37, 0.20)"
-  },
+// Round color mapping
+const ROUND_COLORS: Record<string, string> = {
+  "1": "#009688", // Teal
+  "2": "#8E24AA", // Purple
+  "3": "#FB8C00", // Orange - Semi Finals
+  "4": "#F9A825", // Gold - Final
 };
 
 const Matches = () => {
@@ -102,6 +86,10 @@ const Matches = () => {
 
   // Check if match is on Day 1 or Day 2
   const getMatchDay = (match: any) => {
+    const matchDate = new Date(match.match_date);
+    const day = format(matchDate, 'yyyy-MM-dd');
+    // You can adjust these dates based on actual tournament dates
+    // For now, we'll use round_no: Round 1 = Day 1, Round 2+ = Day 2
     const roundNo = getRoundNumber(match);
     return roundNo === "1" ? 1 : 2;
   };
@@ -118,50 +106,53 @@ const Matches = () => {
     const teamBName = getTeamName(match.team_b);
     const statusText = getStatusText(match);
 
-    const backgroundColor = isLive ? roundColor.liveBg : roundColor.bg;
-
     return (
       <div 
-        className="mb-3 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg"
-        style={{ backgroundColor }}
+        className={`flex items-stretch border-b border-border/20 hover:bg-muted/5 transition-colors ${
+          isLive ? 'bg-red-50/30' : 'bg-background'
+        }`}
       >
-        <div className="flex items-stretch">
-          {/* Main content area */}
-          <div className="flex-1 flex items-center justify-between py-5 px-6">
-            {/* Left side - Teams and Status */}
-            <div className="flex-1">
-              <div className="space-y-1">
-                <div className={`font-bold text-lg ${roundColor.text}`}>
-                  {teamAName}
-                  {match.team_a_score && isLive && (
-                    <span className="ml-3 text-base font-semibold">{match.team_a_score}</span>
-                  )}
-                </div>
-                <div className={`font-bold text-lg ${roundColor.text}`}>
-                  {teamBName}
-                  {match.team_b_score && isLive && (
-                    <span className="ml-3 text-base font-semibold">{match.team_b_score}</span>
-                  )}
-                </div>
-                <div className={`text-sm mt-3 ${roundColor.text} opacity-80`}>
-                  {statusText}
-                </div>
+        {/* Left colored strip for Round */}
+        <div 
+          className="w-1.5 flex-shrink-0"
+          style={{ backgroundColor: roundColor }}
+        />
+
+        {/* Main content area */}
+        <div className="flex-1 flex items-center justify-between py-4 px-6">
+          {/* Left side - Teams and Status */}
+          <div className="flex-1">
+            <div className="space-y-1">
+              <div className="font-semibold text-foreground text-base">
+                {teamAName}
+                {match.team_a_score && isLive && (
+                  <span className="ml-3 text-sm font-medium">{match.team_a_score}</span>
+                )}
+              </div>
+              <div className="font-semibold text-foreground text-base">
+                {teamBName}
+                {match.team_b_score && isLive && (
+                  <span className="ml-3 text-sm font-medium">{match.team_b_score}</span>
+                )}
+              </div>
+              <div className="text-sm text-muted-foreground mt-2">
+                {statusText}
               </div>
             </div>
+          </div>
 
-            {/* Right side - Time, Match No, and LIVE badge */}
-            <div className="flex flex-col items-end gap-1 ml-8">
-              {isLive && (
-                <Badge className="bg-red-600 text-white hover:bg-red-700 mb-2 animate-pulse font-bold">
-                  ● LIVE
-                </Badge>
-              )}
-              <div className={`text-3xl font-bold ${roundColor.text}`}>
-                {format(new Date(match.match_date), 'h:mm a')}
-              </div>
-              <div className={`text-xs ${roundColor.text} opacity-70 mt-1`}>
-                Match {match.match_no || '—'}
-              </div>
+          {/* Right side - Time, Match No, and LIVE badge */}
+          <div className="flex flex-col items-end gap-1 ml-8">
+            {isLive && (
+              <Badge className="bg-red-600 text-white hover:bg-red-700 mb-1 animate-pulse">
+                ● LIVE
+              </Badge>
+            )}
+            <div className="text-2xl font-bold text-foreground">
+              {format(new Date(match.match_date), 'h:mm a')}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Match {match.match_no || '—'}
             </div>
           </div>
         </div>
@@ -197,13 +188,13 @@ const Matches = () => {
           </TabsList>
 
           <TabsContent value="day1">
-            <div className="space-y-0">
+            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
               {day1Matches.length > 0 ? (
                 day1Matches.map((match) => (
                   <FixtureCard key={match.id} match={match} />
                 ))
               ) : (
-                <div className="p-8 text-center text-muted-foreground bg-card border border-border rounded-lg">
+                <div className="p-8 text-center text-muted-foreground">
                   No Day 1 fixtures available
                 </div>
               )}
@@ -211,13 +202,13 @@ const Matches = () => {
           </TabsContent>
 
           <TabsContent value="day2">
-            <div className="space-y-0">
+            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
               {day2Matches.length > 0 ? (
                 day2Matches.map((match) => (
                   <FixtureCard key={match.id} match={match} />
                 ))
               ) : (
-                <div className="p-8 text-center text-muted-foreground bg-card border border-border rounded-lg">
+                <div className="p-8 text-center text-muted-foreground">
                   No Day 2 fixtures available
                 </div>
               )}
