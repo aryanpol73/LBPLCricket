@@ -96,8 +96,12 @@ export const SponsorsSection = () => {
               return (
                 <CarouselItem 
                   key={index} 
-                  className="pl-4 basis-1/3 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 animate-fade-in"
-                  style={{ animationDelay: `${index * 0.1}s` }}
+                  className="pl-4 animate-fade-in"
+                  style={{ 
+                    animationDelay: `${index * 0.1}s`,
+                    minWidth: '260px',
+                    flexShrink: 0
+                  }}
                 >
                 <Card
                     className="overflow-hidden transition-all duration-300 hover:scale-105 h-full rounded-3xl"
@@ -154,25 +158,29 @@ export const SponsorsSection = () => {
                       }}
                     >
                       <h3 
-                        className="font-bold text-2xl text-white leading-tight"
+                        className="font-bold text-xl text-white leading-tight break-words"
                         style={{
                           textShadow: `
                             0 3px 6px rgba(0, 0, 0, 0.8),
                             0 1px 2px rgba(0, 0, 0, 0.6),
                             0 -1px 1px rgba(255, 255, 255, 0.3)
                           `,
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word',
                         }}
                       >
                         {sponsor.name}
                       </h3>
                       {sponsor.firmName && (
                         <p 
-                          className="text-white/95 text-sm font-medium"
+                          className="text-white/95 text-sm font-medium break-words"
                           style={{
                             textShadow: `
                               0 2px 4px rgba(0, 0, 0, 0.7),
                               0 1px 2px rgba(0, 0, 0, 0.5)
                             `,
+                            wordWrap: 'break-word',
+                            overflowWrap: 'break-word',
                           }}
                         >
                           {sponsor.firmName}
