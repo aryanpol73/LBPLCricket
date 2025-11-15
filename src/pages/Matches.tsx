@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { MatchDetailsDialog } from "@/components/MatchDetailsDialog";
 
 // Team name mapping from T1-T18 to actual names
 const TEAM_MAPPING: Record<string, string> = {
@@ -74,6 +75,8 @@ const MATCH_TIMES: Record<number, string> = {
 const Matches = () => {
   const [matches, setMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedMatch, setSelectedMatch] = useState<any | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     loadMatches();
@@ -139,7 +142,33 @@ const Matches = () => {
     return matches.filter(m => getMatchDay(m) === day);
   };
 
-  const FixtureCard = ({ match }: { match: any }) => {
+  // Format match time for dialog
+  const formatMatchTime = (matchDate: string, matchNo: number) => {
+    const date = new Date(matchDate);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const dateStr = date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric' 
+    });
+
+    if (date.toDateString() === today.toDateString()) {
+      return `Today • ${MATCH_TIMES[matchNo] || "Time TBD"}`;
+    } else if (date.toDateString() === tomorrow.toDateString()) {
+      return `Tomorrow • ${MATCH_TIMES[matchNo] || "Time TBD"}`;
+    }
+    
+    return dateStr;
+  };
+
+  const handleMatchClick = (match: any) => {
+    setSelectedMatch(match);
+    setIsDialogOpen(true);
+  };
+
+  const FixtureCard = ({ match, onClick }: { match: any; onClick: () => void }) => {
     const roundNo = getRoundNumber(match);
     const roundColor = ROUND_COLORS[roundNo] || ROUND_COLORS["1"];
     const isLive = match.status?.toUpperCase() === 'LIVE';
@@ -150,10 +179,11 @@ const Matches = () => {
 
     return (
       <div 
-        className="rounded-lg shadow-md overflow-hidden transition-all hover:shadow-lg"
+        className="rounded-lg shadow-md overflow-hidden transition-all hover:shadow-lg cursor-pointer"
         style={{ 
           backgroundColor: roundColor,
         }}
+        onClick={onClick}
       >
         <div className="flex items-center justify-between py-5 px-6">
           {/* Left side - Teams and Status */}
@@ -227,7 +257,11 @@ const Matches = () => {
             {day1Matches.length > 0 ? (
               <div className="space-y-8">
                 {day1Matches.map((match) => (
-                  <FixtureCard key={match.id} match={match} />
+                  <FixtureCard 
+                    key={match.id} 
+                    match={match} 
+                    onClick={() => handleMatchClick(match)}
+                  />
                 ))}
               </div>
             ) : (
@@ -241,7 +275,11 @@ const Matches = () => {
             {day2Matches.length > 0 ? (
               <div className="space-y-8">
                 {day2Matches.map((match) => (
-                  <FixtureCard key={match.id} match={match} />
+                  <FixtureCard 
+                    key={match.id} 
+                    match={match} 
+                    onClick={() => handleMatchClick(match)}
+                  />
                 ))}
               </div>
             ) : (
@@ -252,6 +290,14 @@ const Matches = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <MatchDetailsDialog
+        match={selectedMatch}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        getTeamName={getTeamName}
+        formatMatchTime={formatMatchTime}
+      />
     </div>
   );
 };
