@@ -27,12 +27,12 @@ const TEAM_MAPPING: Record<string, string> = {
   "T18": "Dhurandhar SambhajiNagar",
 };
 
-// Round color mapping
-const ROUND_COLORS: Record<string, string> = {
-  "1": "#1E3A8A", // Dark Blue
-  "2": "#8E24AA", // Purple
-  "3": "#FB8C00", // Orange - Semi Finals
-  "4": "#F9A825", // Gold - Final
+// Round color mapping (HSL format for consistency with design system)
+const ROUND_COLORS: Record<string, { bg: string; text: string }> = {
+  "1": { bg: "hsl(180 100% 35%)", text: "hsl(0 0% 100%)" }, // Teal for Round 1
+  "2": { bg: "hsl(275 59% 41%)", text: "hsl(0 0% 100%)" }, // Purple for Day 2
+  "3": { bg: "hsl(28 100% 50%)", text: "hsl(0 0% 100%)" }, // Orange for Semi Finals
+  "4": { bg: "hsl(45 95% 55%)", text: "hsl(220 25% 15%)" }, // Gold for Final
 };
 
 // Time ranges for matches
@@ -209,7 +209,7 @@ export const MatchTimeline = () => {
   const MatchCard = ({ match }: { match: Match }) => {
     const isLive = match.status?.toLowerCase() === 'live';
     const roundNo = getRoundNumber(match);
-    const roundColor = ROUND_COLORS[roundNo] || ROUND_COLORS["1"];
+    const roundColorScheme = ROUND_COLORS[roundNo] || ROUND_COLORS["1"];
     const teamAName = getTeamName(match.team_a, match);
     const teamBName = getTeamName(match.team_b, match);
     
@@ -226,15 +226,18 @@ export const MatchTimeline = () => {
       <Card 
         onClick={() => openMatchDetails(match)} 
         className={`
-          flex-shrink-0 w-72 cursor-pointer transition-all duration-300 overflow-hidden
+          flex-shrink-0 w-72 cursor-pointer transition-all duration-300 overflow-hidden border-none
           ${isLive 
-            ? 'border-2 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.4)] animate-pulse-slow' 
-            : 'hover:shadow-xl hover:-translate-y-1 border-border'
+            ? 'shadow-[0_0_30px_rgba(239,68,68,0.4)] animate-pulse-slow' 
+            : 'hover:shadow-xl hover:-translate-y-1'
           }
         `}
-        style={{ borderTopColor: roundColor, borderTopWidth: '4px' }}
+        style={{ 
+          backgroundColor: roundColorScheme.bg,
+          color: roundColorScheme.text
+        }}
       >
-        <div className="p-4">
+        <div className="p-4" style={{ color: roundColorScheme.text }}>
           {/* Live Badge or Status */}
           {isLive ? (
             <div className="flex items-center gap-2 mb-3">
@@ -248,7 +251,13 @@ export const MatchTimeline = () => {
             </div>
           ) : (
             <div className="mb-3">
-              <span className="text-xs font-semibold px-2 py-1 rounded" style={{ backgroundColor: `${roundColor}20`, color: roundColor }}>
+              <span 
+                className="text-xs font-semibold px-2 py-1 rounded" 
+                style={{ 
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  color: roundColorScheme.text
+                }}
+              >
                 {getStatusText()}
               </span>
             </div>
@@ -256,10 +265,10 @@ export const MatchTimeline = () => {
 
           {/* Match Number & Time */}
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold text-primary">
+            <span className="text-xs font-semibold" style={{ opacity: 0.9 }}>
               Match {match.match_no}
             </span>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs" style={{ opacity: 0.8 }}>
               {formatMatchTime(match)}
             </span>
           </div>
@@ -278,16 +287,16 @@ export const MatchTimeline = () => {
               <div className="flex-1">
                 <p className="font-semibold text-sm">{teamAName}</p>
                 {match.team_a_score && (
-                  <p className="text-xs text-muted-foreground">{match.team_a_score}</p>
+                  <p className="text-xs" style={{ opacity: 0.8 }}>{match.team_a_score}</p>
                 )}
               </div>
             </div>
 
             {/* VS Divider */}
             <div className="flex items-center gap-2">
-              <div className="h-px flex-1 bg-border"></div>
-              <span className="text-xs font-bold text-muted-foreground px-2">VS</span>
-              <div className="h-px flex-1 bg-border"></div>
+              <div className="h-px flex-1" style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}></div>
+              <span className="text-xs font-bold px-2" style={{ opacity: 0.9 }}>VS</span>
+              <div className="h-px flex-1" style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}></div>
             </div>
 
             {/* Team B */}
@@ -302,7 +311,7 @@ export const MatchTimeline = () => {
               <div className="flex-1">
                 <p className="font-semibold text-sm">{teamBName}</p>
                 {match.team_b_score && (
-                  <p className="text-xs text-muted-foreground">{match.team_b_score}</p>
+                  <p className="text-xs" style={{ opacity: 0.8 }}>{match.team_b_score}</p>
                 )}
               </div>
             </div>

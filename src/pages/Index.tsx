@@ -131,7 +131,7 @@ const Index = () => {
       </section>
 
       {/* Stats Cards */}
-      <section className="container mx-auto px-4 py-8 mb-12" ref={statsRef.elementRef}>
+      <section className="container mx-auto px-4 py-8 mb-4" ref={statsRef.elementRef}>
         <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 transition-all duration-700 ${statsRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <Card className="p-6 bg-white shadow-card hover:shadow-glow hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
             <div className="flex items-center gap-4">
@@ -181,7 +181,8 @@ const Index = () => {
             {upcomingMatch && (
               <div>
                 <CountdownTimer 
-                  targetDate={new Date(upcomingMatch.match_date)} 
+                  targetDate={new Date(upcomingMatch.match_date)}
+                  matchNo={upcomingMatch.match_no}
                   matchLabel="Match starts in"
                 />
               </div>
