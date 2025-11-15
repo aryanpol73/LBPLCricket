@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { Card } from "./ui/card";
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { MatchDetailsDialog } from "@/components/MatchDetailsDialog";
 import { format, isToday, isTomorrow } from "date-fns";
 
 // Team name mapping from T1-T18 to actual names
@@ -98,10 +98,7 @@ interface Player {
 export const MatchTimeline = () => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [teamAPlayers, setTeamAPlayers] = useState<Player[]>([]);
-  const [teamBPlayers, setTeamBPlayers] = useState<Player[]>([]);
-  const [iframeUrl, setIframeUrl] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     loadMatches();
@@ -127,11 +124,6 @@ export const MatchTimeline = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (selectedMatch && selectedMatch.team_a_id !== selectedMatch.team_b_id) {
-      loadSquads(selectedMatch.team_a_id, selectedMatch.team_b_id);
-    }
-  }, [selectedMatch]);
 
   const loadMatches = async () => {
     const { data } = await supabase
@@ -147,20 +139,6 @@ export const MatchTimeline = () => {
     setMatches((data as any) || []);
   };
 
-  const loadSquads = async (teamAId: string, teamBId: string) => {
-    const { data: playersA } = await supabase
-      .from('players')
-      .select('*')
-      .eq('team_id', teamAId);
-    
-    const { data: playersB } = await supabase
-      .from('players')
-      .select('*')
-      .eq('team_id', teamBId);
-
-    setTeamAPlayers(playersA || []);
-    setTeamBPlayers(playersB || []);
-  };
 
   // Get team name with TBD logic
   const getTeamName = (team: any, match: Match) => {
@@ -186,10 +164,9 @@ export const MatchTimeline = () => {
     return "1";
   };
 
-  const formatMatchTime = (match: Match) => {
-    const matchNo = match.match_no || 0;
+  const formatMatchTime = (matchDate: string, matchNo: number) => {
     const timeRange = MATCH_TIMES[matchNo] || "TBD";
-    const date = new Date(match.match_date);
+    const date = new Date(matchDate);
 
     if (isToday(date)) {
       return `Today • ${timeRange}`;
@@ -202,8 +179,7 @@ export const MatchTimeline = () => {
 
   const openMatchDetails = (match: Match) => {
     setSelectedMatch(match);
-    setIframeUrl("");
-    setDialogOpen(true);
+    setIsDialogOpen(true);
   };
 
   const MatchCard = ({ match }: { match: Match }) => {
@@ -269,7 +245,7 @@ export const MatchTimeline = () => {
               Match {match.match_no}
             </span>
             <span className="text-xs" style={{ opacity: 0.8 }}>
-              {formatMatchTime(match)}
+              {formatMatchTime(match.match_date, match.match_no || 0)}
             </span>
           </div>
 
@@ -335,104 +311,13 @@ export const MatchTimeline = () => {
       </div>
 
       {/* Match Details Dialog */}
-      {selectedMatch && (
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                Match {selectedMatch.match_no} - {getTeamName(selectedMatch.team_a, selectedMatch)} vs {getTeamName(selectedMatch.team_b, selectedMatch)}
-              </DialogTitle>
-              <DialogDescription>
-                {formatMatchTime(selectedMatch)} • {selectedMatch.venue || 'Venue TBD'}
-              </DialogDescription>
-            </DialogHeader>
-
-            <Tabs defaultValue="squad" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="squad">Squad</TabsTrigger>
-                <TabsTrigger value="score">Score</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="squad" className="mt-4">
-                {getTeamName(selectedMatch.team_a, selectedMatch) === "TBD" ? (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">Teams will be determined based on previous round results</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Team A Squad */}
-                    <div>
-                      <h3 className="font-bold text-lg mb-3">{getTeamName(selectedMatch.team_a, selectedMatch)}</h3>
-                      {teamAPlayers.length > 0 ? (
-                        <div className="space-y-2">
-                          {teamAPlayers.map((player) => (
-                            <div key={player.id} className="p-3 bg-muted rounded-lg">
-                              <p className="font-semibold">{player.name}</p>
-                              <p className="text-sm text-muted-foreground">{player.role || 'Player'}</p>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground">No squad information available</p>
-                      )}
-                    </div>
-
-                    {/* Team B Squad */}
-                    <div>
-                      <h3 className="font-bold text-lg mb-3">{getTeamName(selectedMatch.team_b, selectedMatch)}</h3>
-                      {teamBPlayers.length > 0 ? (
-                        <div className="space-y-2">
-                          {teamBPlayers.map((player) => (
-                            <div key={player.id} className="p-3 bg-muted rounded-lg">
-                              <p className="font-semibold">{player.name}</p>
-                              <p className="text-sm text-muted-foreground">{player.role || 'Player'}</p>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground">No squad information available</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </TabsContent>
-
-              <TabsContent value="score" className="mt-4">
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Paste Score iframe URL
-                    </label>
-                    <input
-                      type="text"
-                      value={iframeUrl}
-                      onChange={(e) => setIframeUrl(e.target.value)}
-                      placeholder="Enter iframe URL here..."
-                      className="w-full p-2 border rounded-md"
-                    />
-                  </div>
-                  {iframeUrl && (
-                    <div className="border rounded-lg overflow-hidden" style={{ height: '500px' }}>
-                      <iframe
-                        src={iframeUrl}
-                        className="w-full h-full"
-                        title="Match Score"
-                        frameBorder="0"
-                        allowFullScreen
-                      />
-                    </div>
-                  )}
-                  {!iframeUrl && (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <p>Enter an iframe URL above to view live scores</p>
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
-          </DialogContent>
-        </Dialog>
-      )}
+      <MatchDetailsDialog
+        match={selectedMatch}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        getTeamName={getTeamName}
+        formatMatchTime={(matchDate: string, matchNo: number) => formatMatchTime(matchDate, matchNo)}
+      />
     </section>
   );
 };
