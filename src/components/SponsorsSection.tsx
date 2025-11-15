@@ -19,27 +19,27 @@ interface Sponsor {
 const tierStyles = {
   "Titanium": {
     gradient: "linear-gradient(135deg, #0038A8, #0090FF)",
-    badgeColor: "#0038A8",
+    badgeColor: "#1E3A5F",
   },
   "Platinum": {
     gradient: "linear-gradient(135deg, #E63AFF, #A900C2)",
-    badgeColor: "#E63AFF",
+    badgeColor: "#87CEEB",
   },
   "Gold": {
     gradient: "linear-gradient(135deg, #FFD44D, #FFB800)",
-    badgeColor: "#FFD44D",
+    badgeColor: "#8B6F47",
   },
   "Silver Plus": {
     gradient: "linear-gradient(135deg, #E0E0E0, #CFCFCF)",
-    badgeColor: "#E0E0E0",
+    badgeColor: "#5A5A5A",
   },
   "Silver": {
     gradient: "linear-gradient(135deg, #D2D2D2, #BEBEBE)",
-    badgeColor: "#D2D2D2",
+    badgeColor: "#9E9E9E",
   },
   "Advertiser": {
     gradient: "linear-gradient(135deg, #3BFFAB, #00D56F)",
-    badgeColor: "#3BFFAB",
+    badgeColor: "#4A7C59",
   },
 };
 
