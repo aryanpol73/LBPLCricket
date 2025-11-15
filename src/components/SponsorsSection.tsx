@@ -18,28 +18,34 @@ interface Sponsor {
 
 const tierStyles = {
   "Titanium": {
-    gradient: "linear-gradient(135deg, #0038A8, #0090FF)",
-    badgeColor: "#2C4A6B",
+    gradient: "linear-gradient(180deg, #4CA1AF 0%, #2C3E50 100%)",
+    badgeColor: "#1A252F",
+    borderColor: "#4CA1AF",
   },
   "Platinum": {
-    gradient: "linear-gradient(135deg, #E63AFF, #A900C2)",
-    badgeColor: "#90C4E0",
+    gradient: "linear-gradient(180deg, #DCE9F5 0%, #B8C7D9 100%)",
+    badgeColor: "#8FA8C0",
+    borderColor: "#B8C7D9",
   },
   "Gold": {
-    gradient: "linear-gradient(135deg, #FFD44D, #FFB800)",
-    badgeColor: "#6B4E2C",
+    gradient: "linear-gradient(180deg, #F6C645 0%, #D9A12C 100%)",
+    badgeColor: "#B8841F",
+    borderColor: "#D9A12C",
   },
   "Silver Plus": {
-    gradient: "linear-gradient(135deg, #E0E0E0, #CFCFCF)",
-    badgeColor: "#4D4D4D",
+    gradient: "linear-gradient(180deg, #B0B4B8 0%, #8F9AA0 100%)",
+    badgeColor: "#6B7278",
+    borderColor: "#8F9AA0",
   },
   "Silver": {
-    gradient: "linear-gradient(135deg, #D2D2D2, #BEBEBE)",
-    badgeColor: "#8B8B8B",
+    gradient: "linear-gradient(180deg, #E0E0E0 0%, #CFCFCF 100%)",
+    badgeColor: "#A8A8A8",
+    borderColor: "#CFCFCF",
   },
   "Advertiser": {
-    gradient: "linear-gradient(135deg, #3BFFAB, #00D56F)",
-    badgeColor: "#5A8F6B",
+    gradient: "linear-gradient(180deg, #3BFFAB 0%, #00D56F 100%)",
+    badgeColor: "#009F52",
+    borderColor: "#00D56F",
   },
 };
 
@@ -93,87 +99,112 @@ export const SponsorsSection = () => {
                   className="pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 animate-fade-in"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <Card
-                    className="overflow-hidden transition-all duration-300 hover:scale-105 border-[3px] rounded-2xl h-full"
+                <Card
+                    className="overflow-hidden transition-all duration-300 hover:scale-105 h-full rounded-3xl"
                     style={{
                       background: style.gradient,
+                      border: `6px solid ${style.borderColor}`,
                       boxShadow: `
-                        0 8px 16px rgba(0, 0, 0, 0.3),
-                        0 4px 8px rgba(0, 0, 0, 0.2),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                        inset 0 -1px 2px rgba(0, 0, 0, 0.3)
+                        0 12px 24px rgba(0, 0, 0, 0.5),
+                        0 6px 12px rgba(0, 0, 0, 0.3),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                        inset 0 -2px 4px rgba(0, 0, 0, 0.4)
                       `,
-                      borderColor: style.badgeColor,
-                      borderStyle: 'solid',
                     }}
                   >
-                    {/* Embossed Title Bar */}
+                    {/* Embossed Title Badge */}
                     <div 
-                      className="px-6 py-3 border-b-2"
+                      className="px-6 py-4 flex justify-center"
                       style={{
-                        background: `linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.2))`,
-                        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(0, 0, 0, 0.4)',
-                        borderBottomColor: 'rgba(0, 0, 0, 0.3)',
+                        background: `linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5))`,
+                        boxShadow: `
+                          inset 0 2px 4px rgba(0, 0, 0, 0.6),
+                          inset 0 -1px 2px rgba(255, 255, 255, 0.2)
+                        `,
+                        borderBottom: '2px solid rgba(0, 0, 0, 0.4)',
                       }}
                     >
                       <Badge
-                        className="font-bold text-sm px-3 py-1 shadow-lg"
+                        className="font-bold text-sm px-4 py-1.5 rounded-full"
                         style={{
                           backgroundColor: style.badgeColor,
                           color: '#FFFFFF',
-                          textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
+                          textShadow: '0 2px 4px rgba(0, 0, 0, 0.8), 0 1px 2px rgba(0, 0, 0, 0.6)',
                           boxShadow: `
-                            0 2px 4px rgba(0, 0, 0, 0.3),
-                            inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                            inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+                            0 3px 6px rgba(0, 0, 0, 0.5),
+                            inset 0 1px 2px rgba(255, 255, 255, 0.3),
+                            inset 0 -2px 4px rgba(0, 0, 0, 0.4)
                           `,
+                          border: '1px solid rgba(0, 0, 0, 0.4)',
                         }}
                       >
-                        {sponsor.tier}
+                        {sponsor.tier} Sponsor
                       </Badge>
                     </div>
                     
-                    {/* Card Content with Inner Shadow */}
+                    {/* Card Content with Metallic Inner Panel */}
                     <div 
                       className="p-6 space-y-2"
                       style={{
-                        boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.2)',
+                        boxShadow: `
+                          inset 0 4px 8px rgba(0, 0, 0, 0.3),
+                          inset 0 -2px 4px rgba(255, 255, 255, 0.2)
+                        `,
+                        background: `linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.1) 100%)`,
                       }}
                     >
                       <h3 
-                        className="font-bold text-xl text-white"
+                        className="font-bold text-2xl text-white leading-tight"
                         style={{
-                          textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
+                          textShadow: `
+                            0 3px 6px rgba(0, 0, 0, 0.8),
+                            0 1px 2px rgba(0, 0, 0, 0.6),
+                            0 -1px 1px rgba(255, 255, 255, 0.3)
+                          `,
                         }}
                       >
                         {sponsor.name}
                       </h3>
                       {sponsor.firmName && (
                         <p 
-                          className="text-white/90 text-sm font-medium"
+                          className="text-white/95 text-sm font-medium"
                           style={{
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
+                            textShadow: `
+                              0 2px 4px rgba(0, 0, 0, 0.7),
+                              0 1px 2px rgba(0, 0, 0, 0.5)
+                            `,
                           }}
                         >
                           {sponsor.firmName}
                         </p>
                       )}
                       <p 
-                        className="text-white/80 text-sm"
+                        className="text-white/90 text-sm"
                         style={{
-                          textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                          textShadow: '0 2px 3px rgba(0, 0, 0, 0.6)',
                         }}
                       >
                         📍 {sponsor.city}
                       </p>
-                      <p 
-                        className="text-white font-semibold text-lg pt-2"
+                      <div 
+                        className="pt-3 mt-2"
                         style={{
-                          textShadow: '0 2px 3px rgba(0, 0, 0, 0.4)',
+                          borderTop: '1px solid rgba(255, 255, 255, 0.2)',
                         }}
                       >
-                        {sponsor.amount}
-                      </p>
+                        <p 
+                          className="text-white font-bold text-2xl"
+                          style={{
+                            textShadow: `
+                              0 3px 6px rgba(0, 0, 0, 0.8),
+                              0 1px 2px rgba(0, 0, 0, 0.6),
+                              0 -1px 1px rgba(255, 255, 255, 0.3)
+                            `,
+                          }}
+                        >
+                          {sponsor.amount}
+                        </p>
+                      </div>
                     </div>
                   </Card>
                 </CarouselItem>
