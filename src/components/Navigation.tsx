@@ -1,14 +1,17 @@
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Moon, Sun } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import lbplLogo from "@/assets/lbpl-logo-new.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -99,6 +102,26 @@ export const Navigation = () => {
                       {link.label}
                     </Link>
                   ))}
+                  
+                  {/* Dark Mode Toggle */}
+                  <Button
+                    variant="ghost"
+                    size="lg"
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="px-4 py-3 rounded-lg font-medium transition-all duration-300 text-white hover:bg-white/10 justify-start"
+                  >
+                    {theme === "dark" ? (
+                      <>
+                        <Sun className="h-5 w-5 mr-2" />
+                        Light Mode
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="h-5 w-5 mr-2" />
+                        Dark Mode
+                      </>
+                    )}
+                  </Button>
                 </div>
               </SheetContent>
             </Sheet>
