@@ -96,11 +96,9 @@ export const SponsorsSection = () => {
               return (
                 <CarouselItem 
                   key={index} 
-                  className="pl-4 animate-fade-in"
+                  className="pl-4 animate-fade-in basis-1/2 md:basis-1/4"
                   style={{ 
                     animationDelay: `${index * 0.1}s`,
-                    minWidth: '260px',
-                    flexShrink: 0
                   }}
                 >
                 <Card

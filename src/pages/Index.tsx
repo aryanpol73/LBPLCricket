@@ -25,9 +25,9 @@ const Index = () => {
   const [stats, setStats] = useState<any[]>([]);
   
   const statsRef = useScrollAnimation();
-  const { count: teamsCount, startCounting: startTeamsCount } = useCountUp(0, 2000);
-  const { count: matchesCount, startCounting: startMatchesCount } = useCountUp(0, 2000);
-  const { count: seasonCount, startCounting: startSeasonCount } = useCountUp(0, 2000);
+  const { count: teamsCount, startCounting: startTeamsCount } = useCountUp(0, 500);
+  const { count: matchesCount, startCounting: startMatchesCount } = useCountUp(0, 500);
+  const { count: seasonCount, startCounting: startSeasonCount } = useCountUp(0, 500);
 
   useEffect(() => {
     loadMatches();
