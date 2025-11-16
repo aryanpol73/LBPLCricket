@@ -2,7 +2,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Shield, Lock, Plus, Edit, Trash2, Save, Upload, Image as ImageIcon } from "lucide-react";
+import { Shield, Plus, Edit, Trash2, Save, Upload, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,12 +11,46 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { z } from "zod";
+
+// Validation schemas
+const teamSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name too long"),
+  short_name: z.string().trim().min(1, "Short name is required").max(10, "Short name too long"),
+  logo_url: z.string().url("Invalid URL").max(500, "URL too long").nullable().optional(),
+  home_city: z.string().trim().max(100, "City name too long").nullable().optional(),
+  fun_fact: z.string().trim().max(500, "Fun fact too long").nullable().optional()
+});
+
+const pointsSchema = z.object({
+  team_id: z.string().uuid("Invalid team"),
+  matches_played: z.number().int().min(0, "Must be 0 or more").max(100, "Too many matches"),
+  wins: z.number().int().min(0, "Must be 0 or more"),
+  losses: z.number().int().min(0, "Must be 0 or more"),
+  points: z.number().int().min(0, "Must be 0 or more"),
+  net_run_rate: z.number().min(-99, "Invalid NRR").max(99, "Invalid NRR"),
+  round: z.number().int().min(1, "Round must be at least 1").max(10, "Round too high"),
+  group_name: z.string().trim().max(50, "Group name too long").nullable().optional()
+});
+
+const matchSchema = z.object({
+  team_a_id: z.string().uuid("Invalid team A"),
+  team_b_id: z.string().uuid("Invalid team B"),
+  match_date: z.string().min(1, "Match date is required"),
+  venue: z.string().trim().max(200, "Venue name too long").nullable().optional(),
+  round_no: z.number().int().min(1, "Round must be at least 1").max(50, "Round too high").nullable().optional(),
+  match_no: z.number().int().min(1, "Match number must be at least 1").max(500, "Match number too high").nullable().optional(),
+  status: z.enum(['upcoming', 'live', 'completed']).nullable().optional(),
+  team_a_score: z.string().trim().max(50, "Score too long").nullable().optional(),
+  team_b_score: z.string().trim().max(50, "Score too long").nullable().optional(),
+  winner_id: z.string().uuid("Invalid winner").nullable().optional(),
+  player_of_match_id: z.string().uuid("Invalid player").nullable().optional(),
+  match_phase: z.string().trim().max(50, "Phase name too long").nullable().optional(),
+  group_name: z.string().trim().max(50, "Group name too long").nullable().optional(),
+  youtube_stream_url: z.string().url("Invalid YouTube URL").max(500, "URL too long").nullable().optional()
+});
 
 const Admin = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-
   // Teams state
   const [teams, setTeams] = useState<any[]>([]);
   const [editingTeam, setEditingTeam] = useState<any>(null);
@@ -40,46 +74,8 @@ const Admin = () => {
   const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
-    const adminToken = sessionStorage.getItem('adminToken');
-    if (adminToken) {
-      setIsAuthenticated(true);
-      loadAllData();
-    }
+    loadAllData();
   }, []);
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const { data, error } = await supabase.functions.invoke('admin-login', {
-        body: { password }
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        sessionStorage.setItem('adminToken', data.token);
-        setIsAuthenticated(true);
-        toast.success("Login successful!");
-        loadAllData();
-      } else {
-        toast.error(data.message || "Invalid password");
-      }
-    } catch (error: any) {
-      console.error('Login error:', error);
-      toast.error("Login failed. Please try again.");
-    } finally {
-      setLoading(false);
-      setPassword("");
-    }
-  };
-
-  const handleLogout = () => {
-    sessionStorage.removeItem('adminToken');
-    setIsAuthenticated(false);
-    toast.info("Logged out successfully");
-  };
 
   const loadAllData = async () => {
     await Promise.all([loadTeams(), loadPointsTable(), loadMatches(), loadPlayers(), loadGalleryImages()]);
@@ -121,12 +117,20 @@ const Admin = () => {
   // Team CRUD
   const saveTeam = async (team: any) => {
     try {
+      const validatedTeam = teamSchema.parse({
+        name: team.name,
+        short_name: team.short_name,
+        logo_url: team.logo_url || null,
+        home_city: team.home_city || null,
+        fun_fact: team.fun_fact || null
+      }) as any;
+
       if (team.id) {
-        const { error } = await supabase.from('teams').update(team).eq('id', team.id);
+        const { error } = await supabase.from('teams').update(validatedTeam).eq('id', team.id);
         if (error) throw error;
         toast.success("Team updated!");
       } else {
-        const { error } = await supabase.from('teams').insert(team);
+        const { error } = await supabase.from('teams').insert([validatedTeam]);
         if (error) throw error;
         toast.success("Team created!");
       }
@@ -134,7 +138,11 @@ const Admin = () => {
       setTeamDialogOpen(false);
       setEditingTeam(null);
     } catch (error: any) {
-      toast.error(error.message);
+      if (error instanceof z.ZodError) {
+        toast.error(`Validation error: ${error.errors[0].message}`);
+      } else {
+        toast.error(error.message);
+      }
     }
   };
 
@@ -152,12 +160,23 @@ const Admin = () => {
   // Points Table CRUD
   const savePoints = async (points: any) => {
     try {
+      const validatedPoints = pointsSchema.parse({
+        team_id: points.team_id,
+        matches_played: Number(points.matches_played) || 0,
+        wins: Number(points.wins) || 0,
+        losses: Number(points.losses) || 0,
+        points: Number(points.points) || 0,
+        net_run_rate: Number(points.net_run_rate) || 0,
+        round: Number(points.round) || 1,
+        group_name: points.group_name || null
+      }) as any;
+
       if (points.id) {
-        const { error } = await supabase.from('points_table').update(points).eq('id', points.id);
+        const { error } = await supabase.from('points_table').update(validatedPoints).eq('id', points.id);
         if (error) throw error;
         toast.success("Points updated!");
       } else {
-        const { error } = await supabase.from('points_table').insert(points);
+        const { error } = await supabase.from('points_table').insert([validatedPoints]);
         if (error) throw error;
         toast.success("Points entry created!");
       }
@@ -165,7 +184,11 @@ const Admin = () => {
       setPointsDialogOpen(false);
       setEditingPoints(null);
     } catch (error: any) {
-      toast.error(error.message);
+      if (error instanceof z.ZodError) {
+        toast.error(`Validation error: ${error.errors[0].message}`);
+      } else {
+        toast.error(error.message);
+      }
     }
   };
 
@@ -183,12 +206,29 @@ const Admin = () => {
   // Match CRUD
   const saveMatch = async (match: any) => {
     try {
+      const validatedMatch = matchSchema.parse({
+        team_a_id: match.team_a_id,
+        team_b_id: match.team_b_id,
+        match_date: match.match_date,
+        venue: match.venue || null,
+        round_no: match.round_no ? Number(match.round_no) : null,
+        match_no: match.match_no ? Number(match.match_no) : null,
+        status: match.status || null,
+        team_a_score: match.team_a_score || null,
+        team_b_score: match.team_b_score || null,
+        winner_id: match.winner_id || null,
+        player_of_match_id: match.player_of_match_id || null,
+        match_phase: match.match_phase || null,
+        group_name: match.group_name || null,
+        youtube_stream_url: match.youtube_stream_url || null
+      }) as any;
+
       if (match.id) {
-        const { error } = await supabase.from('matches').update(match).eq('id', match.id);
+        const { error } = await supabase.from('matches').update(validatedMatch).eq('id', match.id);
         if (error) throw error;
         toast.success("Match updated!");
       } else {
-        const { error } = await supabase.from('matches').insert(match);
+        const { error } = await supabase.from('matches').insert([validatedMatch]);
         if (error) throw error;
         toast.success("Match created!");
       }
@@ -196,7 +236,11 @@ const Admin = () => {
       setMatchDialogOpen(false);
       setEditingMatch(null);
     } catch (error: any) {
-      toast.error(error.message);
+      if (error instanceof z.ZodError) {
+        toast.error(`Validation error: ${error.errors[0].message}`);
+      } else {
+        toast.error(error.message);
+      }
     }
   };
 
@@ -224,6 +268,19 @@ const Admin = () => {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Validate file
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error("File too large. Maximum size is 5MB.");
+      return;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Invalid file type. Only JPG, PNG, WebP, and GIF are allowed.");
+      return;
+    }
 
     setUploadingImage(true);
     try {
@@ -279,51 +336,14 @@ const Admin = () => {
   };
 
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="p-8 max-w-md w-full">
-          <div className="flex items-center gap-3 mb-6 justify-center">
-            <Shield className="text-secondary" size={32} />
-            <h1 className="text-2xl font-bold text-primary">Admin Login</h1>
-          </div>
-          
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter admin password"
-                required
-              />
-            </div>
-            
-            <Button type="submit" disabled={loading} className="w-full">
-              <Lock className="mr-2" size={16} />
-              {loading ? "Logging in..." : "Login"}
-            </Button>
-          </form>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <Shield className="text-secondary" size={32} />
-            <h1 className="text-4xl font-bold text-primary">Admin Panel</h1>
-          </div>
-          <Button onClick={handleLogout} variant="outline">
-            Logout
-          </Button>
+        <div className="flex items-center gap-3">
+          <Shield className="text-secondary" size={32} />
+          <h1 className="text-4xl font-bold text-primary">Admin Panel</h1>
         </div>
 
         <Tabs defaultValue="teams" className="w-full">

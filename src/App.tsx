@@ -38,7 +38,7 @@ const App = () => (
             {/* <Route path="/rules" element={<Rules />} /> */}
             {/* <Route path="/fan-zone" element={<FanZone />} /> */}
             <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
