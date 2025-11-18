@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Star } from "lucide-react";
+import { Users } from "lucide-react";
 import { TeamDetailDialog } from "@/components/TeamDetailDialog";
 
 const Teams = () => {
@@ -93,31 +93,10 @@ const Teams = () => {
                 </div>
               )}
 
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 mb-2">
-                  <Star className="text-secondary animate-bounce-subtle" size={16} />
-                  <h4 className="font-bold text-sm text-primary">Key Players</h4>
-                </div>
-                
-                {team.players && team.players.length > 0 ? (
-                  <div className="space-y-1">
-                    {team.players
-                      .filter((p: any) => p.is_key_player)
-                      .slice(0, 5)
-                      .map((player: any) => (
-                        <div key={player.id} className="flex items-center justify-between transition-all duration-200 hover:translate-x-1">
-                          <span className="text-sm text-foreground">{player.name}</span>
-                          {player.role && (
-                            <Badge variant="outline" className="text-xs border-primary/30 transition-colors duration-200 hover:border-primary hover:bg-primary/5">
-                              {player.role}
-                            </Badge>
-                          )}
-                        </div>
-                      ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">Squad to be announced</p>
-                )}
+              <div className="mt-4 pt-4 border-t border-border/50">
+                <p className="text-sm text-muted-foreground text-center">
+                  Click to view complete squad
+                </p>
               </div>
             </Card>
           ))}
