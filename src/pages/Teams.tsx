@@ -59,7 +59,7 @@ const Teams = () => {
           {teams.map((team, index) => (
             <Card 
               key={team.id} 
-              className="p-6 bg-gradient-team-card shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer border-2 border-primary/20 animate-fade-in-up"
+              className="p-6 bg-gradient-team-card shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer border-2 border-primary/20 animate-fade-in-up bg-blue-500/5"
               style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
               onClick={() => handleTeamClick(team)}
             >
