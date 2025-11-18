@@ -104,40 +104,52 @@ export const MatchDetailsDialog = ({
       );
     }
 
-    const captain = players.find(p => p.role === 'Captain');
-    const otherPlayers = players.filter(p => p.role !== 'Captain');
+    const captains = players.filter(p => p.role === 'Captain');
+    const viceCaptains = players.filter(p => p.role === 'Vice-Captain');
+    const otherPlayers = players.filter(p => !p.role || (p.role !== 'Captain' && p.role !== 'Vice-Captain'));
 
     return (
       <div className="space-y-4">
         <h3 className="font-semibold text-lg">{teamName}</h3>
-        {captain && (
+        
+        {captains.length > 0 && (
           <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-card border">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                <span className="font-medium">{captain.name}</span>
+            <h4 className="text-xs font-semibold text-yellow-500 uppercase">{captains.length > 1 ? 'Captains' : 'Captain'}</h4>
+            {captains.map((player) => (
+              <div key={player.id} className="flex items-center justify-between p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                  <span className="font-medium">{player.name}</span>
+                </div>
               </div>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getRoleColor(captain.role)}`}>
-                {captain.role}
-              </span>
-            </div>
+            ))}
           </div>
         )}
-        <div className="space-y-2">
-          {otherPlayers.map((player) => (
-            <div key={player.id} className="flex items-center justify-between p-3 rounded-lg bg-card/50 border border-border/50">
-              <div className="flex items-center gap-3">
-                {player.is_key_player && (
-                  <div className="w-2 h-2 rounded-full bg-primary" />
-                )}
-                <span className={player.is_key_player ? "font-medium" : ""}>{player.name}</span>
+
+        {viceCaptains.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-xs font-semibold text-orange-500 uppercase">{viceCaptains.length > 1 ? 'Vice-Captains' : 'Vice-Captain'}</h4>
+            {viceCaptains.map((player) => (
+              <div key={player.id} className="flex items-center justify-between p-3 rounded-lg bg-orange-500/10 border border-orange-500/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-orange-500" />
+                  <span className="font-medium">{player.name}</span>
+                </div>
               </div>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getRoleColor(player.role || '')}`}>
-                {player.role}
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
+
+        {otherPlayers.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase">Squad Members</h4>
+            {otherPlayers.map((player) => (
+              <div key={player.id} className="flex items-center p-3 rounded-lg bg-card/50 border border-border/50">
+                <span>{player.name}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     );
   };

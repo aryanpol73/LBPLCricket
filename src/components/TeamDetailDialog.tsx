@@ -33,18 +33,10 @@ interface TeamDetailDialogProps {
 export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogProps) => {
   if (!team) return null;
 
-  // Group players by role
-  const playersByRole: Record<string, Player[]> = {};
-  team.players?.forEach((player) => {
-    const role = player.role || "Other";
-    if (!playersByRole[role]) {
-      playersByRole[role] = [];
-    }
-    playersByRole[role].push(player);
-  });
-
-  // Role order for display
-  const roleOrder = ["Captain", "Batsman", "Bowler", "All-Rounder", "Wicket-Keeper", "Other"];
+  // Separate players by role
+  const captains = team.players?.filter(p => p.role === 'Captain') || [];
+  const viceCaptains = team.players?.filter(p => p.role === 'Vice-Captain') || [];
+  const otherPlayers = team.players?.filter(p => !p.role || (p.role !== 'Captain' && p.role !== 'Vice-Captain')) || [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -85,45 +77,77 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
             <h3 className="font-bold text-lg text-foreground">Complete Squad</h3>
           </div>
 
-          {roleOrder.map((role, roleIndex) => {
-            const players = playersByRole[role];
-            if (!players || players.length === 0) return null;
-
-            return (
-              <div key={role} className="space-y-2 animate-fade-in-up" style={{ animationDelay: `${0.5 + roleIndex * 0.1}s`, animationFillMode: 'both' }}>
-                <h4 className="font-bold text-primary text-sm uppercase tracking-wide">
-                  {role}
-                  {role === "All-Rounder" && "s"}
-                  {role === "Batsman" && "s"}
-                  {role === "Bowler" && "s"}
-                  {role === "Wicket-Keeper" && "s"}
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {players.map((player, playerIndex) => (
-                    <div
-                      key={player.id}
-                      className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted hover:scale-[1.02] transition-all duration-300 animate-fade-in"
-                      style={{ animationDelay: `${0.5 + roleIndex * 0.1 + playerIndex * 0.05}s`, animationFillMode: 'both' }}
-                    >
-                      <div className="flex items-center gap-2">
-                        {player.is_key_player && (
-                          <Star className="text-secondary animate-bounce-subtle" size={16} fill="currentColor" />
-                        )}
-                        <span className="text-sm font-medium text-foreground">
-                          {player.name}
-                        </span>
-                      </div>
-                      {player.age && (
-                        <Badge variant="outline" className="text-xs transition-all duration-200 hover:scale-110">
-                          {player.age}y
-                        </Badge>
-                      )}
+          {/* Captains */}
+          {captains.length > 0 && (
+            <div className="space-y-2 animate-fade-in-up" style={{ animationDelay: '0.5s', animationFillMode: 'both' }}>
+              <h4 className="font-bold text-primary text-sm uppercase tracking-wide">
+                {captains.length > 1 ? 'Captains' : 'Captain'}
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {captains.map((player, index) => (
+                  <div
+                    key={player.id}
+                    className="flex items-center justify-between p-3 bg-yellow-500/10 rounded-lg hover:bg-yellow-500/20 hover:scale-[1.02] transition-all duration-300 animate-fade-in border border-yellow-500/30"
+                    style={{ animationDelay: `${0.5 + index * 0.05}s`, animationFillMode: 'both' }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Star className="text-yellow-500 animate-bounce-subtle" size={16} fill="currentColor" />
+                      <span className="text-sm font-medium text-foreground">
+                        {player.name}
+                      </span>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
-            );
-          })}
+            </div>
+          )}
+
+          {/* Vice-Captains */}
+          {viceCaptains.length > 0 && (
+            <div className="space-y-2 animate-fade-in-up" style={{ animationDelay: '0.6s', animationFillMode: 'both' }}>
+              <h4 className="font-bold text-primary text-sm uppercase tracking-wide">
+                {viceCaptains.length > 1 ? 'Vice-Captains' : 'Vice-Captain'}
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {viceCaptains.map((player, index) => (
+                  <div
+                    key={player.id}
+                    className="flex items-center justify-between p-3 bg-orange-500/10 rounded-lg hover:bg-orange-500/20 hover:scale-[1.02] transition-all duration-300 animate-fade-in border border-orange-500/30"
+                    style={{ animationDelay: `${0.6 + index * 0.05}s`, animationFillMode: 'both' }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Star className="text-orange-500" size={16} fill="currentColor" />
+                      <span className="text-sm font-medium text-foreground">
+                        {player.name}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Other Players */}
+          {otherPlayers.length > 0 && (
+            <div className="space-y-2 animate-fade-in-up" style={{ animationDelay: '0.7s', animationFillMode: 'both' }}>
+              <h4 className="font-bold text-primary text-sm uppercase tracking-wide">
+                Squad Members
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {otherPlayers.map((player, index) => (
+                  <div
+                    key={player.id}
+                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted hover:scale-[1.02] transition-all duration-300 animate-fade-in"
+                    style={{ animationDelay: `${0.7 + index * 0.05}s`, animationFillMode: 'both' }}
+                  >
+                    <span className="text-sm font-medium text-foreground">
+                      {player.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {team.players?.length === 0 && (
             <p className="text-center text-muted-foreground py-8 animate-fade-in">
