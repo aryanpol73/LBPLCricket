@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Card } from "./ui/card";
 import { Clock } from "lucide-react";
 
@@ -47,7 +47,7 @@ interface CountdownTimerProps {
 
 export const CountdownTimer = ({ targetDate, matchNo, matchLabel }: CountdownTimerProps) => {
   // Calculate the actual countdown target based on match number and date
-  const getCountdownTarget = () => {
+  const countdownTarget = useMemo(() => {
     if (!matchNo || !MATCH_TIMES[matchNo]) return targetDate;
     
     const matchDate = new Date(targetDate);
@@ -63,9 +63,7 @@ export const CountdownTimer = ({ targetDate, matchNo, matchLabel }: CountdownTim
     
     matchDate.setHours(adjustedHours, minutes, 0, 0);
     return matchDate;
-  };
-
-  const countdownTarget = getCountdownTarget();
+  }, [targetDate, matchNo]);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
