@@ -14,6 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
+      fan_leaderboard: {
+        Row: {
+          created_at: string | null
+          display_name: string
+          id: string
+          points: number | null
+          updated_at: string | null
+          user_identifier: string
+        }
+        Insert: {
+          created_at?: string | null
+          display_name: string
+          id?: string
+          points?: number | null
+          updated_at?: string | null
+          user_identifier: string
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string
+          id?: string
+          points?: number | null
+          updated_at?: string | null
+          user_identifier?: string
+        }
+        Relationships: []
+      }
+      fan_poll_options: {
+        Row: {
+          created_at: string | null
+          id: string
+          option_text: string
+          poll_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          option_text: string
+          poll_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          option_text?: string
+          poll_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fan_poll_options_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "fan_polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fan_poll_votes: {
+        Row: {
+          created_at: string | null
+          id: string
+          option_id: string
+          poll_id: string
+          user_identifier: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          option_id: string
+          poll_id: string
+          user_identifier: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          option_id?: string
+          poll_id?: string
+          user_identifier?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fan_poll_votes_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "fan_poll_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fan_poll_votes_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "fan_polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fan_polls: {
+        Row: {
+          created_at: string | null
+          ends_at: string
+          id: string
+          is_active: boolean | null
+          question: string
+        }
+        Insert: {
+          created_at?: string | null
+          ends_at: string
+          id?: string
+          is_active?: boolean | null
+          question: string
+        }
+        Update: {
+          created_at?: string | null
+          ends_at?: string
+          id?: string
+          is_active?: boolean | null
+          question?: string
+        }
+        Relationships: []
+      }
       gallery_images: {
         Row: {
           created_at: string | null
