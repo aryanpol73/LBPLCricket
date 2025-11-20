@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Trophy, TrendingUp, Target, Award } from "lucide-react";
+import { PlayerProfileDialog } from "@/components/PlayerProfileDialog";
 
 interface PlayerStats {
   id: string;
@@ -29,6 +30,13 @@ interface PlayerStats {
 const Stats = () => {
   const [players, setPlayers] = useState<PlayerStats[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
+
+  const handlePlayerClick = (playerId: string) => {
+    setSelectedPlayerId(playerId);
+    setPlayerDialogOpen(true);
+  };
 
   useEffect(() => {
     loadPlayerStats();
@@ -110,7 +118,12 @@ const Stats = () => {
                 {index + 1}
               </Badge>
               <div>
-                <p className="font-semibold text-foreground">{player.name}</p>
+                <p 
+                  className="font-semibold text-foreground hover:text-primary transition-colors cursor-pointer"
+                  onClick={() => handlePlayerClick(player.id)}
+                >
+                  {player.name}
+                </p>
                 <div className="flex items-center gap-2">
                   {player.teams?.logo_url && (
                     <img src={player.teams.logo_url} alt="" className="w-4 h-4 object-contain transition-transform duration-300 hover:scale-125" />
@@ -214,6 +227,12 @@ const Stats = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <PlayerProfileDialog 
+        playerId={selectedPlayerId}
+        open={playerDialogOpen}
+        onOpenChange={setPlayerDialogOpen}
+      />
     </div>
   );
 };
