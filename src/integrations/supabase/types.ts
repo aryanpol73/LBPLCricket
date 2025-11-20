@@ -14,135 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      fan_leaderboard: {
-        Row: {
-          correct_predictions: number | null
-          created_at: string | null
-          id: string
-          points: number | null
-          total_predictions: number | null
-          user_identifier: string
-          username: string | null
-        }
-        Insert: {
-          correct_predictions?: number | null
-          created_at?: string | null
-          id?: string
-          points?: number | null
-          total_predictions?: number | null
-          user_identifier: string
-          username?: string | null
-        }
-        Update: {
-          correct_predictions?: number | null
-          created_at?: string | null
-          id?: string
-          points?: number | null
-          total_predictions?: number | null
-          user_identifier?: string
-          username?: string | null
-        }
-        Relationships: []
-      }
-      fan_poll_options: {
-        Row: {
-          id: string
-          option_text: string
-          poll_id: string
-          team_id: string | null
-        }
-        Insert: {
-          id?: string
-          option_text: string
-          poll_id: string
-          team_id?: string | null
-        }
-        Update: {
-          id?: string
-          option_text?: string
-          poll_id?: string
-          team_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fan_poll_options_poll_id_fkey"
-            columns: ["poll_id"]
-            isOneToOne: false
-            referencedRelation: "fan_polls"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fan_poll_options_team_id_fkey"
-            columns: ["team_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      fan_poll_votes: {
-        Row: {
-          created_at: string | null
-          id: string
-          option_id: string
-          poll_id: string
-          user_identifier: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          option_id: string
-          poll_id: string
-          user_identifier: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          option_id?: string
-          poll_id?: string
-          user_identifier?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fan_poll_votes_option_id_fkey"
-            columns: ["option_id"]
-            isOneToOne: false
-            referencedRelation: "fan_poll_options"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fan_poll_votes_poll_id_fkey"
-            columns: ["poll_id"]
-            isOneToOne: false
-            referencedRelation: "fan_polls"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      fan_polls: {
-        Row: {
-          created_at: string | null
-          ends_at: string | null
-          id: string
-          is_active: boolean | null
-          question: string
-        }
-        Insert: {
-          created_at?: string | null
-          ends_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          question: string
-        }
-        Update: {
-          created_at?: string | null
-          ends_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          question?: string
-        }
-        Relationships: []
-      }
       gallery_images: {
         Row: {
           created_at: string | null
@@ -373,6 +244,7 @@ export type Database = {
           points: number | null
           round: number | null
           team_id: string
+          team_name: string | null
           updated_at: string | null
           wins: number | null
         }
@@ -385,6 +257,7 @@ export type Database = {
           points?: number | null
           round?: number | null
           team_id: string
+          team_name?: string | null
           updated_at?: string | null
           wins?: number | null
         }
@@ -397,6 +270,7 @@ export type Database = {
           points?: number | null
           round?: number | null
           team_id?: string
+          team_name?: string | null
           updated_at?: string | null
           wins?: number | null
         }
