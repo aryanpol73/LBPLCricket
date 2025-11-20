@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { PlayerProfileDialog } from "./PlayerProfileDialog";
 
 interface Player {
   id: string;
@@ -57,6 +58,13 @@ export const MatchDetailsDialog = ({
   const [teamASquad, setTeamASquad] = useState<Player[]>([]);
   const [teamBSquad, setTeamBSquad] = useState<Player[]>([]);
   const [scoreIframeUrl, setScoreIframeUrl] = useState("");
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
+
+  const handlePlayerClick = (playerId: string) => {
+    setSelectedPlayerId(playerId);
+    setPlayerDialogOpen(true);
+  };
 
   useEffect(() => {
     if (match && open) {
@@ -116,10 +124,14 @@ export const MatchDetailsDialog = ({
           <div className="space-y-2">
             <h4 className="text-xs font-semibold text-yellow-500 uppercase">{captains.length > 1 ? 'Captains' : 'Captain'}</h4>
             {captains.map((player) => (
-              <div key={player.id} className="flex items-center justify-between p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+              <div 
+                key={player.id} 
+                onClick={() => handlePlayerClick(player.id)}
+                className="flex items-center justify-between p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 transition-all cursor-pointer"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                  <span className="font-medium">{player.name}</span>
+                  <span className="font-medium hover:text-primary transition-colors">{player.name}</span>
                 </div>
               </div>
             ))}
@@ -130,10 +142,14 @@ export const MatchDetailsDialog = ({
           <div className="space-y-2">
             <h4 className="text-xs font-semibold text-orange-500 uppercase">{viceCaptains.length > 1 ? 'Vice-Captains' : 'Vice-Captain'}</h4>
             {viceCaptains.map((player) => (
-              <div key={player.id} className="flex items-center justify-between p-3 rounded-lg bg-orange-500/10 border border-orange-500/30">
+              <div 
+                key={player.id} 
+                onClick={() => handlePlayerClick(player.id)}
+                className="flex items-center justify-between p-3 rounded-lg bg-orange-500/10 border border-orange-500/30 hover:bg-orange-500/20 transition-all cursor-pointer"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-orange-500" />
-                  <span className="font-medium">{player.name}</span>
+                  <span className="font-medium hover:text-primary transition-colors">{player.name}</span>
                 </div>
               </div>
             ))}
@@ -144,8 +160,12 @@ export const MatchDetailsDialog = ({
           <div className="space-y-2">
             <h4 className="text-xs font-semibold text-muted-foreground uppercase">Squad Members</h4>
             {otherPlayers.map((player) => (
-              <div key={player.id} className="flex items-center p-3 rounded-lg bg-card/50 border border-border/50">
-                <span>{player.name}</span>
+              <div 
+                key={player.id} 
+                onClick={() => handlePlayerClick(player.id)}
+                className="flex items-center p-3 rounded-lg bg-card/50 border border-border/50 hover:bg-card/80 transition-all cursor-pointer"
+              >
+                <span className="hover:text-primary transition-colors">{player.name}</span>
               </div>
             ))}
           </div>
@@ -227,6 +247,12 @@ export const MatchDetailsDialog = ({
           </TabsContent>
         </Tabs>
       </DialogContent>
+
+      <PlayerProfileDialog 
+        playerId={selectedPlayerId}
+        open={playerDialogOpen}
+        onOpenChange={setPlayerDialogOpen}
+      />
     </Dialog>
   );
 };

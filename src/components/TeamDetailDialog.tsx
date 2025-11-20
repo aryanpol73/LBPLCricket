@@ -6,6 +6,8 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Star, Users } from "lucide-react";
+import { PlayerProfileDialog } from "./PlayerProfileDialog";
+import { useState } from "react";
 
 interface Player {
   id: string;
@@ -31,7 +33,15 @@ interface TeamDetailDialogProps {
 }
 
 export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogProps) => {
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
+
   if (!team) return null;
+
+  const handlePlayerClick = (playerId: string) => {
+    setSelectedPlayerId(playerId);
+    setPlayerDialogOpen(true);
+  };
 
   // Separate players by role
   const captains = team.players?.filter(p => p.role === 'Captain') || [];
@@ -87,12 +97,13 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
                 {captains.map((player, index) => (
                   <div
                     key={player.id}
-                    className="flex items-center justify-between p-3 bg-yellow-500/10 rounded-lg hover:bg-yellow-500/20 hover:scale-[1.02] transition-all duration-300 animate-fade-in border border-yellow-500/30"
+                    onClick={() => handlePlayerClick(player.id)}
+                    className="flex items-center justify-between p-3 bg-yellow-500/10 rounded-lg hover:bg-yellow-500/20 hover:scale-[1.02] transition-all duration-300 animate-fade-in border border-yellow-500/30 cursor-pointer"
                     style={{ animationDelay: `${0.5 + index * 0.05}s`, animationFillMode: 'both' }}
                   >
                     <div className="flex items-center gap-2">
                       <Star className="text-yellow-500 animate-bounce-subtle" size={16} fill="currentColor" />
-                      <span className="text-sm font-medium text-foreground">
+                      <span className="text-sm font-medium text-foreground hover:text-primary transition-colors">
                         {player.name}
                       </span>
                     </div>
@@ -112,12 +123,13 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
                 {viceCaptains.map((player, index) => (
                   <div
                     key={player.id}
-                    className="flex items-center justify-between p-3 bg-orange-500/10 rounded-lg hover:bg-orange-500/20 hover:scale-[1.02] transition-all duration-300 animate-fade-in border border-orange-500/30"
+                    onClick={() => handlePlayerClick(player.id)}
+                    className="flex items-center justify-between p-3 bg-orange-500/10 rounded-lg hover:bg-orange-500/20 hover:scale-[1.02] transition-all duration-300 animate-fade-in border border-orange-500/30 cursor-pointer"
                     style={{ animationDelay: `${0.6 + index * 0.05}s`, animationFillMode: 'both' }}
                   >
                     <div className="flex items-center gap-2">
                       <Star className="text-orange-500" size={16} fill="currentColor" />
-                      <span className="text-sm font-medium text-foreground">
+                      <span className="text-sm font-medium text-foreground hover:text-primary transition-colors">
                         {player.name}
                       </span>
                     </div>
@@ -137,10 +149,11 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
                 {otherPlayers.map((player, index) => (
                   <div
                     key={player.id}
-                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted hover:scale-[1.02] transition-all duration-300 animate-fade-in"
+                    onClick={() => handlePlayerClick(player.id)}
+                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted hover:scale-[1.02] transition-all duration-300 animate-fade-in cursor-pointer"
                     style={{ animationDelay: `${0.7 + index * 0.05}s`, animationFillMode: 'both' }}
                   >
-                    <span className="text-sm font-medium text-foreground">
+                    <span className="text-sm font-medium text-foreground hover:text-primary transition-colors">
                       {player.name}
                     </span>
                   </div>
@@ -156,6 +169,12 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
           )}
         </div>
       </DialogContent>
+
+      <PlayerProfileDialog 
+        playerId={selectedPlayerId}
+        open={playerDialogOpen}
+        onOpenChange={setPlayerDialogOpen}
+      />
     </Dialog>
   );
 };
