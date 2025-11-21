@@ -89,13 +89,17 @@ All colors MUST be HSL.
     /* Gradients */
     --gradient-hero: linear-gradient(135deg, hsl(220 85% 50%), hsl(220 85% 35%));
     --gradient-gold: linear-gradient(135deg, hsl(45 95% 55%), hsl(35 90% 50%));
+    --gradient-gold-soft: linear-gradient(135deg, hsl(45 70% 95%) 0%, hsl(40 80% 90%) 50%, hsl(45 70% 95%) 100%);
+    --gradient-gold-premium: linear-gradient(135deg, hsl(45 90% 88%) 0%, hsl(40 85% 85%) 50%, hsl(45 90% 90%) 100%);
     --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(220 15% 98%));
     --gradient-team-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(220 60% 96%));
     
     /* Shadows */
     --shadow-glow: 0 0 40px hsl(220 85% 50% / 0.3);
     --shadow-gold: 0 4px 20px hsl(45 95% 55% / 0.3);
+    --shadow-gold-soft: 0 8px 32px -8px hsl(45 80% 50% / 0.2);
     --shadow-card: 0 4px 15px hsl(220 15% 20% / 0.1);
+    --shadow-premium: 0 20px 60px -15px rgba(0, 0, 0, 0.3), 0 0 40px -10px hsl(45 90% 60% / 0.15);
     
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

@@ -61,13 +61,17 @@ export default {
       backgroundImage: {
         'gradient-hero': 'var(--gradient-hero)',
         'gradient-gold': 'var(--gradient-gold)',
+        'gradient-gold-soft': 'var(--gradient-gold-soft)',
+        'gradient-gold-premium': 'var(--gradient-gold-premium)',
         'gradient-card': 'var(--gradient-card)',
         'gradient-team-card': 'var(--gradient-team-card)',
       },
       boxShadow: {
         'glow': 'var(--shadow-glow)',
         'gold': 'var(--shadow-gold)',
+        'gold-soft': 'var(--shadow-gold-soft)',
         'card': 'var(--shadow-card)',
+        'premium': 'var(--shadow-premium)',
       },
       borderRadius: {
         lg: "var(--radius)",

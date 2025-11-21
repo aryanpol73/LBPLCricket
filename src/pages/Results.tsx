@@ -1,10 +1,9 @@
 import { Navigation } from "@/components/Navigation";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
-import { Trophy } from "lucide-react";
+import { Trophy, Crown, Award, Star } from "lucide-react";
 
 const Results = () => {
   const [results, setResults] = useState<any[]>([]);
@@ -47,82 +46,109 @@ const Results = () => {
       <Navigation />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-8">
-          <Trophy className="text-secondary" size={32} />
-          <h1 className="text-4xl font-bold text-primary">Match Results</h1>
+        {/* Premium Header */}
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <Trophy className="text-[hsl(45,90%,55%)]" size={40} strokeWidth={2.5} />
+          <h1 className="text-5xl font-bold bg-gradient-gold bg-clip-text text-transparent">
+            Match Results
+          </h1>
+          <Crown className="text-[hsl(45,90%,55%)]" size={40} strokeWidth={2.5} />
         </div>
 
-        <div className="bg-card rounded-xl shadow-card overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-primary/5">
-                <TableHead className="font-bold">Round No.</TableHead>
-                <TableHead className="font-bold">Match No.</TableHead>
-                <TableHead className="font-bold">Teams</TableHead>
-                <TableHead className="font-bold">Score</TableHead>
-                <TableHead className="font-bold">Winner</TableHead>
-                <TableHead className="font-bold">Player of Match</TableHead>
-                <TableHead className="font-bold">Phase</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {results.length > 0 ? (
-                results.map((match) => (
-                  <TableRow key={match.id} className="hover:bg-muted/50 transition-colors">
-                    <TableCell className="text-center">
-                      <span className="font-semibold text-primary">
-                        {match.round_no || '-'}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <span className="font-semibold">
-                        {match.match_no || '-'}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-medium">
-                        {match.team_a?.name} vs {match.team_b?.name}
+        {/* Premium Golden Background Container */}
+        <div className="relative bg-gradient-gold-premium rounded-3xl p-8 shadow-premium">
+          {/* Subtle inner glow */}
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/40 via-transparent to-white/20 pointer-events-none" />
+          
+          <div className="relative space-y-6">
+            {results.length > 0 ? (
+              results.map((match) => (
+                <Card key={match.id} className="bg-card/95 backdrop-blur-sm border-2 border-[hsl(45,70%,75%)] shadow-gold-soft hover:shadow-gold hover:scale-[1.02] transition-all duration-300">
+                  <div className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-center">
+                      {/* Round & Match No */}
+                      <div className="md:col-span-1 flex md:flex-col gap-2 items-center">
+                        <div className="text-center">
+                          <div className="text-xs text-muted-foreground font-medium mb-1">Round</div>
+                          <div className="text-2xl font-bold text-[hsl(45,90%,50%)]">
+                            {match.round_no || '-'}
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-xs text-muted-foreground font-medium mb-1">Match</div>
+                          <div className="text-lg font-semibold text-foreground">
+                            #{match.match_no || '-'}
+                          </div>
+                        </div>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-mono font-semibold">
-                        {match.team_a_score} - {match.team_b_score}
+
+                      {/* Teams */}
+                      <div className="md:col-span-2">
+                        <div className="font-semibold text-lg text-foreground">
+                          {match.team_a?.name}
+                          <span className="text-muted-foreground mx-2">vs</span>
+                          {match.team_b?.name}
+                        </div>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      {match.winner ? (
-                        <Badge variant="default" className="bg-success">
-                          {match.winner.name}
+
+                      {/* Score */}
+                      <div className="md:col-span-1 text-center">
+                        <div className="text-xs text-muted-foreground font-medium mb-1">Score</div>
+                        <div className="font-mono text-2xl font-bold text-foreground bg-muted/50 rounded-lg px-3 py-1 inline-block">
+                          {match.team_a_score} - {match.team_b_score}
+                        </div>
+                      </div>
+
+                      {/* Winner */}
+                      <div className="md:col-span-1 text-center">
+                        <div className="text-xs text-muted-foreground font-medium mb-1">Winner</div>
+                        {match.winner ? (
+                          <div className="flex items-center justify-center gap-1">
+                            <Trophy className="text-[hsl(45,90%,50%)]" size={18} />
+                            <Badge className="bg-gradient-gold text-white border-0 shadow-gold-soft font-semibold px-3 py-1">
+                              {match.winner.name}
+                            </Badge>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </div>
+
+                      {/* Player of Match */}
+                      <div className="md:col-span-1 text-center">
+                        <div className="text-xs text-muted-foreground font-medium mb-1">Player of Match</div>
+                        {match.player_of_match ? (
+                          <div className="flex items-center justify-center gap-1">
+                            <Star className="text-[hsl(45,90%,50%)]" size={16} fill="hsl(45,90%,50%)" />
+                            <Badge variant="outline" className="border-2 border-[hsl(45,80%,60%)] text-[hsl(45,90%,35%)] font-semibold bg-[hsl(45,90%,95%)]">
+                              {match.player_of_match.name}
+                            </Badge>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </div>
+
+                      {/* Phase */}
+                      <div className="md:col-span-1 text-center">
+                        <div className="text-xs text-muted-foreground font-medium mb-1">Phase</div>
+                        <Badge className="bg-primary text-primary-foreground font-semibold">
+                          {match.match_phase?.toUpperCase()}
                         </Badge>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {match.player_of_match ? (
-                        <Badge variant="outline" className="border-secondary text-secondary">
-                          {match.player_of_match.name}
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">
-                        {match.match_phase?.toUpperCase()}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    No completed matches yet
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))
+            ) : (
+              <Card className="bg-card/95 backdrop-blur-sm border-2 border-[hsl(45,70%,75%)] shadow-gold-soft">
+                <div className="p-12 text-center">
+                  <Award className="mx-auto text-[hsl(45,70%,60%)] mb-4" size={48} />
+                  <p className="text-muted-foreground text-lg">No completed matches yet</p>
+                </div>
+              </Card>
+            )}
+          </div>
         </div>
       </div>
     </div>
