@@ -8,7 +8,7 @@ import { MatchTimeline } from "@/components/MatchTimeline";
 import { SponsorsSection } from "@/components/SponsorsSection";
 import { GallerySection } from "@/components/GallerySection";
 import { LiveScoreboard } from "@/components/LiveScoreboard";
-import { LiveTicker } from "@/components/LiveTicker";
+import { WelcomeBar } from "@/components/WelcomeBar";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -92,7 +92,7 @@ const Index = () => {
     <div className="min-h-screen bg-background relative">
       <AnimatedBackground />
       <Navigation />
-      <LiveTicker />
+      <WelcomeBar />
 
       {/* Hero Section */}
       <section className="relative z-10 bg-gradient-hero py-16 px-4 overflow-hidden">
