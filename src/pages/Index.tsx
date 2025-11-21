@@ -187,7 +187,7 @@ const Index = () => {
                 />
               </div>
             )}
-            <div className={!upcomingMatch ? "lg:col-span-2 max-w-2xl mx-auto" : ""}>
+            <div>
               <MatchPredictionPoll
                 matchId={currentMatch.id}
                 teamAId={currentMatch.team_a.id}
