@@ -43,13 +43,13 @@ export const LiveTicker = () => {
   if (!tickerMessage) return null;
   return <div className="bg-gradient-gold border-y border-secondary/20 overflow-hidden">
       <div className="animate-scroll-left whitespace-nowrap py-2">
-        <span className="inline-block px-8 text-sm font-semibold text-foreground">
+        <span className="inline-block px-8 text-sm font-semibold text-[hsl(220,70%,15%)]">
           {tickerMessage}
         </span>
-        <span className="inline-block px-8 text-sm font-semibold text-foreground">
+        <span className="inline-block px-8 text-sm font-semibold text-[hsl(220,70%,15%)]">
           {tickerMessage}
         </span>
-        <span className="inline-block px-8 text-sm font-semibold text-foreground">
+        <span className="inline-block px-8 text-sm font-semibold text-[hsl(220,70%,15%)]">
           {tickerMessage}
         </span>
       </div>
