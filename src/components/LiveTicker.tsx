@@ -36,20 +36,20 @@ export const LiveTicker = () => {
         const matchDate = new Date(upcoming.match_date);
         setTickerMessage(`📅 UPCOMING: ${upcoming.team_a?.name} vs ${upcoming.team_b?.name} • ${matchDate.toLocaleDateString()}`);
       } else {
-        setTickerMessage('🏏 Welcome to LBPL Season 3 • Stay tuned for exciting matches!');
+        setTickerMessage('🏆 Welcome to LBPL Season 3 — The Ultimate Cricket Showdown Begins!');
       }
     }
   };
   if (!tickerMessage) return null;
   return <div className="bg-gradient-gold border-y border-secondary/20 overflow-hidden">
       <div className="animate-scroll-left whitespace-nowrap py-2">
-        <span className="inline-block px-8 text-sm font-semibold text-primary">
+        <span className="inline-block px-8 text-sm font-semibold text-foreground">
           {tickerMessage}
         </span>
-        <span className="inline-block px-8 text-sm font-semibold text-indigo-950">
+        <span className="inline-block px-8 text-sm font-semibold text-foreground">
           {tickerMessage}
         </span>
-        <span className="inline-block px-8 text-sm font-semibold text-primary">
+        <span className="inline-block px-8 text-sm font-semibold text-foreground">
           {tickerMessage}
         </span>
       </div>
