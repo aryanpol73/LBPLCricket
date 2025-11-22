@@ -12,7 +12,6 @@ import PointsTable from "./pages/PointsTable";
 import Teams from "./pages/Teams";
 import Stats from "./pages/Stats";
 import Rules from "./pages/Rules";
-import FanZone from "./pages/FanZone";
 import Gallery from "./pages/Gallery";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
