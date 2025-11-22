@@ -12,6 +12,7 @@ import { LiveTicker } from "@/components/LiveTicker";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Users, Calendar } from "lucide-react";
@@ -19,6 +20,7 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useCountUp } from "@/hooks/useCountUp";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [liveMatch, setLiveMatch] = useState<any>(null);
   const [upcomingMatch, setUpcomingMatch] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -133,7 +135,10 @@ const Index = () => {
       {/* Stats Cards */}
       <section className="container mx-auto px-4 py-8 mb-4" ref={statsRef.elementRef}>
         <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 transition-all duration-700 ${statsRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <Card className="p-6 bg-white shadow-card hover:shadow-glow hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
+          <Card 
+            className="p-6 bg-card shadow-card hover:shadow-glow hover:-translate-y-2 transition-all duration-300 cursor-pointer group"
+            onClick={() => navigate('/teams')}
+          >
             <div className="flex items-center gap-4">
               <div className="p-3 bg-primary/10 rounded-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <Users className="text-primary" size={28} />
@@ -145,7 +150,10 @@ const Index = () => {
             </div>
           </Card>
 
-          <Card className="p-6 bg-white shadow-card hover:shadow-gold hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
+          <Card 
+            className="p-6 bg-card shadow-card hover:shadow-gold hover:-translate-y-2 transition-all duration-300 cursor-pointer group"
+            onClick={() => navigate('/matches')}
+          >
             <div className="flex items-center gap-4">
               <div className="p-3 bg-secondary/10 rounded-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <Trophy className="text-secondary" size={28} />
@@ -157,7 +165,7 @@ const Index = () => {
             </div>
           </Card>
 
-          <Card className="p-6 bg-white shadow-card hover:shadow-glow hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
+          <Card className="p-6 bg-card shadow-card hover:shadow-glow hover:-translate-y-2 transition-all duration-300 group">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-success/10 rounded-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <Calendar className="text-success" size={28} />
