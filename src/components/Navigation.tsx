@@ -84,8 +84,20 @@ export const Navigation = () => {
                 </button>
               </SheetTrigger>
               <SheetContent side="left" className="w-72 bg-gradient-hero border-primary/20">
-                <SheetHeader>
+                <SheetHeader className="flex flex-row items-center justify-between">
                   <SheetTitle className="text-left text-white">Navigate</SheetTitle>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="text-white hover:bg-white/10 rounded-lg transition-all duration-300"
+                  >
+                    {theme === "dark" ? (
+                      <Sun className="h-5 w-5" />
+                    ) : (
+                      <Moon className="h-5 w-5" />
+                    )}
+                  </Button>
                 </SheetHeader>
                 <div className="mt-4 flex flex-col gap-2">
                   {navLinks.map((link) => (
@@ -102,26 +114,6 @@ export const Navigation = () => {
                       {link.label}
                     </Link>
                   ))}
-                  
-                  {/* Dark Mode Toggle */}
-                  <Button
-                    variant="ghost"
-                    size="lg"
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                    className="px-4 py-3 rounded-lg font-medium transition-all duration-300 text-white hover:bg-white/10 justify-start"
-                  >
-                    {theme === "dark" ? (
-                      <>
-                        <Sun className="h-5 w-5 mr-2" />
-                        Light Mode
-                      </>
-                    ) : (
-                      <>
-                        <Moon className="h-5 w-5 mr-2" />
-                        Dark Mode
-                      </>
-                    )}
-                  </Button>
                 </div>
               </SheetContent>
             </Sheet>
