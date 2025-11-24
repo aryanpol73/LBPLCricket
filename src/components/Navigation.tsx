@@ -84,8 +84,8 @@ export const Navigation = () => {
                 </button>
               </SheetTrigger>
               <SheetContent side="left" className="w-72 bg-gradient-hero border-primary/20">
-                <SheetHeader className="flex flex-row items-center justify-between">
-                  <SheetTitle className="text-left text-white">Navigate</SheetTitle>
+                <div className="flex flex-row items-center justify-between pb-4">
+                  <h2 className="text-lg font-semibold text-white">Navigate</h2>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -98,7 +98,7 @@ export const Navigation = () => {
                       <Moon className="h-5 w-5" />
                     )}
                   </Button>
-                </SheetHeader>
+                </div>
                 <div className="mt-4 flex flex-col gap-2">
                   {navLinks.map((link) => (
                     <Link
