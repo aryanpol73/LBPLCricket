@@ -229,42 +229,58 @@ const Stats = () => {
           </TabsList>
 
           <TabsContent value="batting" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <StatCard
-                title="Top Run Scorers"
-                players={getTopBatsmen()}
-                stat={(p: PlayerStats) => `${p.runs_scored} runs`}
-                icon={Trophy}
-              />
-              <StatCard
-                title="Highest Strike Rate"
-                players={getHighestStrikeRate()}
-                stat={(p: PlayerStats) => `${p.strike_rate.toFixed(2)}`}
-                icon={TrendingUp}
-              />
+            <div className="relative">
+              {/* Horizontal Scrollable Container */}
+              <div className="flex gap-6 overflow-x-auto overflow-y-visible pb-4 snap-x snap-mandatory scroll-smooth touch-pan-x scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50 hover:scrollbar-thumb-[#F9C846] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-[#0F1B35]/50 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#F9C846]/50 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#F9C846]">
+                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
+                  <StatCard
+                    title="Top Run Scorers"
+                    players={getTopBatsmen()}
+                    stat={(p: PlayerStats) => `${p.runs_scored} runs`}
+                    icon={Trophy}
+                  />
+                </div>
+                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
+                  <StatCard
+                    title="Highest Strike Rate"
+                    players={getHighestStrikeRate()}
+                    stat={(p: PlayerStats) => `${p.strike_rate.toFixed(2)}`}
+                    icon={TrendingUp}
+                  />
+                </div>
+                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
+                  <StatCard
+                    title="Best Batting Average"
+                    players={getHighestAverage()}
+                    stat={(p: PlayerStats) => `${p.batting_average.toFixed(2)}`}
+                    icon={Award}
+                  />
+                </div>
+              </div>
             </div>
-            <StatCard
-              title="Best Batting Average"
-              players={getHighestAverage()}
-              stat={(p: PlayerStats) => `${p.batting_average.toFixed(2)}`}
-              icon={Award}
-            />
           </TabsContent>
 
           <TabsContent value="bowling" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <StatCard
-                title="Top Wicket Takers"
-                players={getTopBowlers()}
-                stat={(p: PlayerStats) => `${p.wickets_taken} wickets`}
-                icon={Target}
-              />
-              <StatCard
-                title="Best Economy Rate"
-                players={getBestEconomy()}
-                stat={(p: PlayerStats) => `${p.economy_rate.toFixed(2)}`}
-                icon={TrendingUp}
-              />
+            <div className="relative">
+              {/* Horizontal Scrollable Container */}
+              <div className="flex gap-6 overflow-x-auto overflow-y-visible pb-4 snap-x snap-mandatory scroll-smooth touch-pan-x scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50 hover:scrollbar-thumb-[#F9C846] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-[#0F1B35]/50 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#F9C846]/50 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#F9C846]">
+                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
+                  <StatCard
+                    title="Top Wicket Takers"
+                    players={getTopBowlers()}
+                    stat={(p: PlayerStats) => `${p.wickets_taken} wickets`}
+                    icon={Target}
+                  />
+                </div>
+                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
+                  <StatCard
+                    title="Best Economy Rate"
+                    players={getBestEconomy()}
+                    stat={(p: PlayerStats) => `${p.economy_rate.toFixed(2)}`}
+                    icon={TrendingUp}
+                  />
+                </div>
+              </div>
             </div>
           </TabsContent>
 
