@@ -97,57 +97,106 @@ const Stats = () => {
       .slice(0, 10);
   };
 
-  const StatCard = ({ title, players, stat, icon: Icon }: any) => (
-    <Card className="p-6 bg-gradient-card shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-1 animate-fade-in-up">
-      <div className="flex items-center gap-3 mb-6">
-        <Icon className="text-secondary animate-bounce-subtle" size={28} />
-        <h3 className="text-2xl font-bold text-primary">{title}</h3>
-      </div>
-      <div className="space-y-3">
-        {players.map((player: PlayerStats, index: number) => (
-          <div
-            key={player.id}
-            className="flex items-center justify-between p-3 bg-background/50 rounded-lg hover:bg-background/80 hover:scale-[1.02] transition-all duration-300 animate-fade-in-up"
-            style={{ animationDelay: `${index * 0.05}s`, animationFillMode: 'both' }}
-          >
-            <div className="flex items-center gap-3">
-              <Badge 
-                variant={index < 3 ? "default" : "outline"} 
-                className={`w-8 h-8 flex items-center justify-center transition-all duration-300 hover:scale-110 ${index === 0 ? 'animate-pulse-glow' : ''}`}
-              >
-                {index + 1}
-              </Badge>
-              <div>
-                <p 
-                  className="font-semibold text-foreground hover:text-primary transition-colors cursor-pointer"
-                  onClick={() => handlePlayerClick(player.id)}
-                >
-                  {player.name}
-                </p>
-                <div className="flex items-center gap-2">
-                  {player.teams?.logo_url && (
-                    <img src={player.teams.logo_url} alt="" className="w-4 h-4 object-contain transition-transform duration-300 hover:scale-125" />
-                  )}
-                  <p className="text-sm text-muted-foreground">{player.teams?.name}</p>
-                </div>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-xl font-bold text-secondary animate-count-up" style={{ animationDelay: `${index * 0.05 + 0.2}s` }}>{stat(player)}</p>
-              {player.role && (
-                <Badge variant="outline" className="text-xs mt-1 transition-all duration-200 hover:scale-105">
-                  {player.role}
-                </Badge>
-              )}
-            </div>
+  const StatCard = ({ title, players, stat, icon: Icon }: any) => {
+    const topThree = players.slice(0, 3);
+    
+    return (
+      <Card className="p-8 bg-gradient-to-br from-[#2E73FF]/20 via-[#2E73FF]/10 to-transparent border-[#F9C846]/30 shadow-2xl hover:shadow-[0_0_40px_rgba(249,200,70,0.3)] transition-all duration-500 animate-fade-in-up backdrop-blur-sm">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="p-2 rounded-lg bg-[#F9C846]/10 border border-[#F9C846]/30">
+            <Icon className="text-[#F9C846]" size={28} />
           </div>
-        ))}
-        {players.length === 0 && (
-          <p className="text-center text-muted-foreground py-8">No statistics available yet</p>
-        )}
-      </div>
-    </Card>
-  );
+          <h3 className="text-2xl font-bold text-white">{title}</h3>
+        </div>
+        
+        <div className="flex justify-center items-end gap-6 min-h-[320px]">
+          {topThree.length === 0 ? (
+            <p className="text-center text-gray-400 py-12">No statistics available yet</p>
+          ) : (
+            <>
+              {/* Second Place */}
+              {topThree[1] && (
+                <div className="flex flex-col items-center animate-fade-in-up" style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
+                  <div className="relative group">
+                    {/* Shield Badge */}
+                    <div className="relative w-32 h-40 bg-gradient-to-b from-[#0A1325] to-[#0F1B35] rounded-t-full flex flex-col items-center justify-center border-2 border-[#F9C846] shadow-[0_0_20px_rgba(249,200,70,0.4)] transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(249,200,70,0.6)] group-hover:scale-105">
+                      {/* Player Silhouette */}
+                      <div className="w-16 h-16 rounded-full bg-[#2E73FF]/30 border-2 border-[#F9C846]/50 flex items-center justify-center mb-2">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[#F9C846]/40 to-transparent"></div>
+                      </div>
+                      
+                      {/* Rank Badge */}
+                      <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-gray-300 to-gray-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg border-2 border-white">
+                        2
+                      </div>
+                      
+                      {/* Stats */}
+                      <div className="mt-2 text-center">
+                        <p className="text-xl font-bold text-[#F9C846]">{stat(topThree[1])}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* First Place - Larger */}
+              {topThree[0] && (
+                <div className="flex flex-col items-center animate-fade-in-up mb-8" style={{ animationDelay: '0s', animationFillMode: 'both' }}>
+                  <div className="relative group">
+                    {/* Shield Badge */}
+                    <div className="relative w-40 h-48 bg-gradient-to-b from-[#0A1325] to-[#0F1B35] rounded-t-full flex flex-col items-center justify-center border-[3px] border-[#F9C846] shadow-[0_0_30px_rgba(249,200,70,0.5)] transition-all duration-300 group-hover:shadow-[0_0_40px_rgba(249,200,70,0.7)] group-hover:scale-105 animate-pulse-glow">
+                      {/* Player Silhouette */}
+                      <div className="w-20 h-20 rounded-full bg-[#2E73FF]/40 border-2 border-[#F9C846]/60 flex items-center justify-center mb-3">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#F9C846]/50 to-transparent"></div>
+                      </div>
+                      
+                      {/* Rank Badge */}
+                      <div className="absolute -top-4 -right-4 w-12 h-12 bg-gradient-to-br from-[#F9C846] to-[#d4a837] rounded-full flex items-center justify-center text-[#0A1325] font-bold text-xl shadow-xl border-2 border-white">
+                        1
+                      </div>
+                      
+                      {/* Crown */}
+                      <Trophy className="absolute -top-8 text-[#F9C846] animate-bounce-subtle" size={24} />
+                      
+                      {/* Stats */}
+                      <div className="mt-2 text-center">
+                        <p className="text-2xl font-bold text-[#F9C846]">{stat(topThree[0])}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Third Place */}
+              {topThree[2] && (
+                <div className="flex flex-col items-center animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
+                  <div className="relative group">
+                    {/* Shield Badge */}
+                    <div className="relative w-32 h-40 bg-gradient-to-b from-[#0A1325] to-[#0F1B35] rounded-t-full flex flex-col items-center justify-center border-2 border-[#F9C846] shadow-[0_0_20px_rgba(249,200,70,0.4)] transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(249,200,70,0.6)] group-hover:scale-105">
+                      {/* Player Silhouette */}
+                      <div className="w-16 h-16 rounded-full bg-[#2E73FF]/30 border-2 border-[#F9C846]/50 flex items-center justify-center mb-2">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[#F9C846]/40 to-transparent"></div>
+                      </div>
+                      
+                      {/* Rank Badge */}
+                      <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-amber-700 to-amber-900 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg border-2 border-white">
+                        3
+                      </div>
+                      
+                      {/* Stats */}
+                      <div className="mt-2 text-center">
+                        <p className="text-xl font-bold text-[#F9C846]">{stat(topThree[2])}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </Card>
+    );
+  };
 
   if (loading) {
     return (
@@ -161,20 +210,22 @@ const Stats = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-[#0A1325] via-[#0F1B35] to-[#0A1325]">
       <Navigation />
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8 animate-slide-in-left">
-          <Trophy className="text-secondary" size={32} />
-          <h1 className="text-4xl font-bold text-primary">Player Statistics</h1>
+          <div className="p-2 rounded-lg bg-[#F9C846]/10 border border-[#F9C846]/30">
+            <Trophy className="text-[#F9C846]" size={32} />
+          </div>
+          <h1 className="text-4xl font-bold text-white">Player Statistics</h1>
         </div>
 
         <Tabs defaultValue="batting" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
-            <TabsTrigger value="batting" className="transition-all duration-300 hover:scale-105">Batting</TabsTrigger>
-            <TabsTrigger value="bowling" className="transition-all duration-300 hover:scale-105">Bowling</TabsTrigger>
-            <TabsTrigger value="fielding" className="transition-all duration-300 hover:scale-105">Fielding</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid animate-fade-in-up bg-[#0F1B35] border-[#F9C846]/30" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
+            <TabsTrigger value="batting" className="transition-all duration-300 hover:scale-105 data-[state=active]:bg-[#2E73FF] data-[state=active]:text-white">Batting</TabsTrigger>
+            <TabsTrigger value="bowling" className="transition-all duration-300 hover:scale-105 data-[state=active]:bg-[#2E73FF] data-[state=active]:text-white">Bowling</TabsTrigger>
+            <TabsTrigger value="fielding" className="transition-all duration-300 hover:scale-105 data-[state=active]:bg-[#2E73FF] data-[state=active]:text-white">Fielding</TabsTrigger>
           </TabsList>
 
           <TabsContent value="batting" className="space-y-6">
