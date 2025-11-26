@@ -280,29 +280,33 @@ const Index = () => {
       {/* League Stats Section */}
       <section id="league-stats" className="reveal-scale container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-6 bg-card shadow-card hover:shadow-glow hover:-translate-y-2 transition-all duration-300">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <Users className="text-primary" size={28} />
+          <Link to="/teams">
+            <Card className="p-6 bg-card shadow-card hover:shadow-glow hover:-translate-y-2 transition-all duration-300 cursor-pointer">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-primary/10 rounded-lg">
+                  <Users className="text-primary" size={28} />
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-primary">{teamsCount}</p>
+                  <p className="text-sm text-muted-foreground">Teams</p>
+                </div>
               </div>
-              <div>
-                <p className="text-3xl font-bold text-primary">{teamsCount}</p>
-                <p className="text-sm text-muted-foreground">Teams</p>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          </Link>
 
-          <Card className="p-6 bg-card shadow-card hover:shadow-gold hover:-translate-y-2 transition-all duration-300">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-secondary/10 rounded-lg">
-                <Trophy className="text-secondary" size={28} />
+          <Link to="/matches">
+            <Card className="p-6 bg-card shadow-card hover:shadow-gold hover:-translate-y-2 transition-all duration-300 cursor-pointer">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-secondary/10 rounded-lg">
+                  <Trophy className="text-secondary" size={28} />
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-secondary">{matchesCount}</p>
+                  <p className="text-sm text-muted-foreground">Matches</p>
+                </div>
               </div>
-              <div>
-                <p className="text-3xl font-bold text-secondary">{matchesCount}</p>
-                <p className="text-sm text-muted-foreground">Matches</p>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          </Link>
 
           <Card className="p-6 bg-card shadow-card hover:shadow-glow hover:-translate-y-2 transition-all duration-300">
             <div className="flex items-center gap-4">
