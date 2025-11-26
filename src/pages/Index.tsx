@@ -315,7 +315,7 @@ const Index = () => {
                 className="flex items-center gap-2"
               >
                 <span className="animate-pulse">🔴</span>
-                <span>Watch Live</span>
+                <span>Click here to watch live</span>
               </a>
             </Button>
           </div>
@@ -323,7 +323,7 @@ const Index = () => {
       </section>
 
       {/* League Stats Section */}
-      <section id="league-stats" className="reveal container mx-auto px-4 py-12">
+      <section id="league-stats" className="reveal-scale container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6 bg-card shadow-card hover:shadow-glow hover:-translate-y-2 transition-all duration-300">
             <div className="flex items-center gap-4">
@@ -364,12 +364,12 @@ const Index = () => {
       </section>
 
       {/* Match Timeline Section */}
-      <section id="timeline" className="reveal">
+      <section id="timeline" className="reveal-left">
         <MatchTimeline />
       </section>
 
       {/* Points Table Section */}
-      <section id="points" className="reveal container mx-auto px-4 py-12">
+      <section id="points" className="reveal-right container mx-auto px-4 py-12">
         <div className="flex items-center gap-3 mb-8">
           <Trophy className="text-secondary" size={32} />
           <h2 className="text-4xl font-bold text-primary">Points Table - Season 3</h2>
@@ -475,7 +475,7 @@ const Index = () => {
       </section>
 
       {/* Results Section */}
-      <section id="results" className="reveal container mx-auto px-4 py-12">
+      <section id="results" className="reveal-blur container mx-auto px-4 py-12">
         <div className="flex items-center justify-center gap-3 mb-8">
           <Trophy className="text-[hsl(45,90%,55%)]" size={40} strokeWidth={2.5} />
           <h2 className="text-5xl font-bold bg-gradient-gold bg-clip-text text-transparent">
@@ -574,7 +574,7 @@ const Index = () => {
       </section>
 
       {/* Player Stats Section */}
-      <section id="player-stats" className="reveal container mx-auto px-4 py-12">
+      <section id="player-stats" className="reveal-rotate container mx-auto px-4 py-12">
         <div className="flex items-center gap-3 mb-8">
           <div className="p-2 rounded-lg bg-[#F9C846]/10 border border-[#F9C846]/30">
             <Trophy className="text-[#F9C846]" size={32} />
@@ -655,12 +655,12 @@ const Index = () => {
       </section>
 
       {/* Matches Section */}
-      <section id="matches" className="reveal">
+      <section id="matches" className="reveal-scale">
         <MatchesSection />
       </section>
 
       {/* Teams Section */}
-      <section id="teams" className="reveal container mx-auto px-4 py-12">
+      <section id="teams" className="reveal-left container mx-auto px-4 py-12">
         <div className="flex items-center gap-3 mb-8">
           <Users className="text-secondary" size={32} />
           <h2 className="text-4xl font-bold text-primary">All Teams</h2>
@@ -725,12 +725,12 @@ const Index = () => {
       </section>
 
       {/* Sponsors Section */}
-      <section id="sponsors" className="reveal">
+      <section id="sponsors" className="reveal-right">
         <SponsorsSection />
       </section>
 
       {/* Gallery Section */}
-      <section id="gallery" className="reveal">
+      <section id="gallery" className="reveal-blur">
         <GallerySection />
       </section>
 
