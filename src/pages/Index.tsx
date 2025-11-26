@@ -29,12 +29,7 @@ const Index = () => {
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showAllTeams, setShowAllTeams] = useState(false);
-  const [showAllGroupA, setShowAllGroupA] = useState(false);
-  const [showAllGroupB, setShowAllGroupB] = useState(false);
-  const [showAllGroupC, setShowAllGroupC] = useState(false);
-  const [showAllGroupD, setShowAllGroupD] = useState(false);
-  const [showAllGroupE, setShowAllGroupE] = useState(false);
-  const [showAllGroupF, setShowAllGroupF] = useState(false);
+  const [showAllGroups, setShowAllGroups] = useState(false);
   
   const { count: teamsCount, startCounting: startTeamsCount } = useCountUp(0, 500);
   const { count: matchesCount, startCounting: startMatchesCount } = useCountUp(0, 500);
@@ -388,27 +383,8 @@ const Index = () => {
 
           <TabsContent value="round1" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {groups.map((group) => {
+              {(showAllGroups ? groups : groups.slice(0, 2)).map((group) => {
                 const groupStandings = getGroupStandings(group);
-                const showAllMap: Record<string, boolean> = {
-                  'A': showAllGroupA,
-                  'B': showAllGroupB,
-                  'C': showAllGroupC,
-                  'D': showAllGroupD,
-                  'E': showAllGroupE,
-                  'F': showAllGroupF,
-                };
-                const setShowAllMap: Record<string, (val: boolean) => void> = {
-                  'A': setShowAllGroupA,
-                  'B': setShowAllGroupB,
-                  'C': setShowAllGroupC,
-                  'D': setShowAllGroupD,
-                  'E': setShowAllGroupE,
-                  'F': setShowAllGroupF,
-                };
-                const showAll = showAllMap[group];
-                const setShowAll = setShowAllMap[group];
-                const displayedStandings = showAll ? groupStandings : groupStandings.slice(0, 2);
                 
                 return (
                   <div key={group} className="bg-card rounded-xl shadow-card overflow-hidden">
@@ -428,14 +404,14 @@ const Index = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {displayedStandings.length > 0 ? (
-                          displayedStandings.map((row, index) => (
+                        {groupStandings.length > 0 ? (
+                          groupStandings.map((row, index) => (
                             <TableRow 
                               key={row.id} 
                               className={`hover:bg-muted/50 transition-all duration-300 ${index < 2 ? 'bg-success/5' : ''}`}
                             >
                               <TableCell>
-                                <span className="font-bold">{groupStandings.indexOf(row) + 1}</span>
+                                <span className="font-bold">{index + 1}</span>
                               </TableCell>
                               <TableCell>
                                 <div className="font-bold text-foreground text-sm">
@@ -470,20 +446,20 @@ const Index = () => {
                         )}
                       </TableBody>
                     </Table>
-                    {groupStandings.length > 2 && (
-                      <div className="text-center p-4 bg-muted/20">
-                        <button
-                          onClick={() => setShowAll(!showAll)}
-                          className="px-6 py-2 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow text-sm"
-                        >
-                          {showAll ? 'View Less' : `View More (${groupStandings.length - 2} more)`}
-                        </button>
-                      </div>
-                    )}
                   </div>
                 );
               })}
             </div>
+            {groups.length > 2 && (
+              <div className="text-center mt-8">
+                <button
+                  onClick={() => setShowAllGroups(!showAllGroups)}
+                  className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow"
+                >
+                  {showAllGroups ? 'View Less' : `View More (${groups.length - 2} more groups)`}
+                </button>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="round2">
