@@ -31,11 +31,23 @@ const Stats = () => {
   const [players, setPlayers] = useState<PlayerStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<any | null>(null);
   const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
 
-  const handlePlayerClick = (playerId: string) => {
-    setSelectedPlayerId(playerId);
-    setPlayerDialogOpen(true);
+  const handlePlayerClick = async (playerId: string) => {
+    const { data } = await supabase
+      .from('players')
+      .select(`
+        *,
+        teams(name, logo_url)
+      `)
+      .eq('id', playerId)
+      .single();
+    
+    if (data) {
+      setSelectedPlayer(data);
+      setPlayerDialogOpen(true);
+    }
   };
 
   useEffect(() => {
@@ -298,7 +310,7 @@ const Stats = () => {
       </div>
 
       <PlayerProfileDialog 
-        playerId={selectedPlayerId}
+        player={selectedPlayer}
         open={playerDialogOpen}
         onOpenChange={setPlayerDialogOpen}
       />
