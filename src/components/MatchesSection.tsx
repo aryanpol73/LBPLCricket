@@ -1,8 +1,10 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MatchDetailsDialog } from "@/components/MatchDetailsDialog";
+import { Link } from "react-router-dom";
 
 // Team name mapping from T1-T18 to actual names
 const TEAM_MAPPING: Record<string, string> = {
@@ -260,13 +262,20 @@ export const MatchesSection = () => {
                   />
                 ))}
               </div>
-              {day1Matches.length > 3 && (
+              {day1Matches.length > 3 && !showAllDay1 && (
+                <div className="text-center mt-8">
+                  <Button asChild size="lg" className="font-semibold">
+                    <Link to="/matches">View All Matches</Link>
+                  </Button>
+                </div>
+              )}
+              {showAllDay1 && (
                 <div className="text-center mt-8">
                   <button
-                    onClick={() => setShowAllDay1(!showAllDay1)}
+                    onClick={() => setShowAllDay1(false)}
                     className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow"
                   >
-                    {showAllDay1 ? 'View Less' : `View More (${day1Matches.length - 3} more matches)`}
+                    View Less
                   </button>
                 </div>
               )}
@@ -290,13 +299,20 @@ export const MatchesSection = () => {
                   />
                 ))}
               </div>
-              {day2Matches.length > 3 && (
+              {day2Matches.length > 3 && !showAllDay2 && (
+                <div className="text-center mt-8">
+                  <Button asChild size="lg" className="font-semibold">
+                    <Link to="/matches">View All Matches</Link>
+                  </Button>
+                </div>
+              )}
+              {showAllDay2 && (
                 <div className="text-center mt-8">
                   <button
-                    onClick={() => setShowAllDay2(!showAllDay2)}
+                    onClick={() => setShowAllDay2(false)}
                     className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow"
                   >
-                    {showAllDay2 ? 'View Less' : `View More (${day2Matches.length - 3} more matches)`}
+                    View Less
                   </button>
                 </div>
               )}
