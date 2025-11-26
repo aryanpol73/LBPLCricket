@@ -86,12 +86,16 @@ export const Navigation = () => {
     return location.pathname === path;
   };
 
-  const handleNavClick = (path: string, e?: React.MouseEvent) => {
+  const handleNavClick = (path: string, e?: React.MouseEvent<HTMLAnchorElement>) => {
+    // Prevent default anchor behavior for hash links on homepage
+    if (path.startsWith('#') && location.pathname === '/' && e) {
+      e.preventDefault();
+    }
+    
     setIsOpen(false);
     
     // Handle hash navigation on homepage
     if (path.startsWith('#') && location.pathname === '/') {
-      e?.preventDefault();
       const element = document.querySelector(path);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
