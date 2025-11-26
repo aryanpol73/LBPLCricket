@@ -51,6 +51,18 @@ export const Navigation = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Handle hash navigation on page load
+  useEffect(() => {
+    if (location.hash && location.pathname === '/') {
+      setTimeout(() => {
+        const element = document.querySelector(location.hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  }, [location.hash, location.pathname]);
+
   const baseNavLinks = [
     { path: "#home", label: "Home" },
     { path: "#timeline", label: "Match Timeline" },
@@ -74,8 +86,17 @@ export const Navigation = () => {
     return location.pathname === path;
   };
 
-  const handleNavClick = (path: string) => {
+  const handleNavClick = (path: string, e?: React.MouseEvent) => {
     setIsOpen(false);
+    
+    // Handle hash navigation on homepage
+    if (path.startsWith('#') && location.pathname === '/') {
+      e?.preventDefault();
+      const element = document.querySelector(path);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
   };
 
   // Convert hash links to proper routes when not on homepage
@@ -127,7 +148,7 @@ export const Navigation = () => {
                         <a
                           key={link.path}
                           href={link.path}
-                          onClick={() => handleNavClick(link.path)}
+                          onClick={(e) => handleNavClick(link.path, e)}
                           className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
                             isActive(link.path)
                               ? "bg-secondary text-primary shadow-gold"
@@ -194,7 +215,7 @@ export const Navigation = () => {
                   <a
                     key={link.path}
                     href={link.path}
-                    onClick={() => handleNavClick(link.path)}
+                    onClick={(e) => handleNavClick(link.path, e)}
                     className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                       isActive(link.path)
                         ? "bg-secondary text-primary shadow-gold"
