@@ -252,7 +252,7 @@ export const MatchesSection = () => {
           {day1Matches.length > 0 ? (
             <>
               <div className="space-y-8">
-                {(showAllDay1 ? day1Matches : day1Matches.slice(0, 6)).map((match) => (
+                {(showAllDay1 ? day1Matches : day1Matches.slice(0, 3)).map((match) => (
                   <FixtureCard 
                     key={match.id} 
                     match={match} 
@@ -260,13 +260,13 @@ export const MatchesSection = () => {
                   />
                 ))}
               </div>
-              {day1Matches.length > 6 && (
+              {day1Matches.length > 3 && (
                 <div className="text-center mt-8">
                   <button
                     onClick={() => setShowAllDay1(!showAllDay1)}
                     className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow"
                   >
-                    {showAllDay1 ? 'View Less' : `View More (${day1Matches.length - 6} more matches)`}
+                    {showAllDay1 ? 'View Less' : `View More (${day1Matches.length - 3} more matches)`}
                   </button>
                 </div>
               )}
@@ -282,7 +282,7 @@ export const MatchesSection = () => {
           {day2Matches.length > 0 ? (
             <>
               <div className="space-y-8">
-                {(showAllDay2 ? day2Matches : day2Matches.slice(0, 6)).map((match) => (
+                {(showAllDay2 ? day2Matches : day2Matches.slice(0, 3)).map((match) => (
                   <FixtureCard 
                     key={match.id} 
                     match={match} 
@@ -290,13 +290,13 @@ export const MatchesSection = () => {
                   />
                 ))}
               </div>
-              {day2Matches.length > 6 && (
+              {day2Matches.length > 3 && (
                 <div className="text-center mt-8">
                   <button
                     onClick={() => setShowAllDay2(!showAllDay2)}
                     className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow"
                   >
-                    {showAllDay2 ? 'View Less' : `View More (${day2Matches.length - 6} more matches)`}
+                    {showAllDay2 ? 'View Less' : `View More (${day2Matches.length - 3} more matches)`}
                   </button>
                 </div>
               )}
