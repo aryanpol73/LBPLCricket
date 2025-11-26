@@ -5,6 +5,7 @@ import { MatchTimeline } from "@/components/MatchTimeline";
 import { SponsorsSection } from "@/components/SponsorsSection";
 import { GallerySection } from "@/components/GallerySection";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
+import { MatchesSection } from "@/components/MatchesSection";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -634,6 +635,11 @@ const Index = () => {
             />
           </TabsContent>
         </Tabs>
+      </section>
+
+      {/* Matches Section */}
+      <section id="matches" className="reveal">
+        <MatchesSection />
       </section>
 
       {/* Teams Section */}
