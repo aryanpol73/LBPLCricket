@@ -670,7 +670,7 @@ const Index = () => {
           {(showAllTeams ? teams : teams.slice(0, 3)).map((team) => (
             <Card 
               key={team.id} 
-              className="p-6 bg-gradient-team-card shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer border-2 border-primary/20 bg-blue-500/5"
+              className="reveal-zoom-fade p-6 bg-gradient-team-card shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer border-2 border-primary/20 bg-blue-500/5"
               onClick={() => handleTeamClick(team)}
             >
               <div className="flex items-start gap-4 mb-4">

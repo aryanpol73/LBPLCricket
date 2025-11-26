@@ -115,6 +115,22 @@ html {
   }
 }
 
+/* Zoom Fade animation for cards and images */
+.reveal-zoom-fade {
+  opacity: 0;
+  transform: scale(0.9);
+  animation: reveal-zoom-fade-in linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% cover 35%;
+}
+
+@keyframes reveal-zoom-fade-in {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @keyframes pulse-glow {
   0%, 100% {
     box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);

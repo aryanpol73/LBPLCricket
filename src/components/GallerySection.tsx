@@ -49,7 +49,7 @@ export const GallerySection = () => {
         >
           <CarouselContent>
             {galleryImages.map((image) => (
-              <CarouselItem key={image.id} className="basis-1/2 md:basis-1/3 lg:basis-1/5 xl:basis-1/6">
+              <CarouselItem key={image.id} className="basis-1/2 md:basis-1/3 lg:basis-1/5 xl:basis-1/6 reveal-zoom-fade">
                 <Card 
                   className="overflow-hidden cursor-pointer shadow-sm hover:shadow-glow transition-all duration-300 hover:scale-105 group rounded-lg"
                   onClick={() => setSelectedImage(image.image_url)}
