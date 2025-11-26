@@ -76,6 +76,8 @@ export const MatchesSection = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMatch, setSelectedMatch] = useState<any | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showAllDay1, setShowAllDay1] = useState(false);
+  const [showAllDay2, setShowAllDay2] = useState(false);
 
   useEffect(() => {
     loadMatches();
@@ -178,29 +180,29 @@ export const MatchesSection = () => {
 
     return (
       <div 
-        className="rounded-lg shadow-md overflow-hidden transition-all hover:shadow-lg cursor-pointer"
+        className="rounded-lg shadow-md overflow-hidden transition-all hover:shadow-xl hover:scale-[1.02] cursor-pointer"
         style={{ 
           backgroundColor: roundColor,
         }}
         onClick={onClick}
       >
-        <div className="flex items-center justify-between py-5 px-6">
+        <div className="flex items-center justify-between py-6 px-6">
           {/* Left side - Teams and Status */}
           <div className="flex-1">
-            <div className="space-y-2">
-              <div className="font-bold text-white text-xl">
+            <div className="space-y-3">
+              <div className="font-bold text-white text-xl drop-shadow-lg">
                 {teamAName}
                 {match.team_a_score && isLive && (
                   <span className="ml-3 text-base font-semibold">{match.team_a_score}</span>
                 )}
               </div>
-              <div className="font-bold text-white text-xl">
+              <div className="font-bold text-white text-xl drop-shadow-lg">
                 {teamBName}
                 {match.team_b_score && isLive && (
                   <span className="ml-3 text-base font-semibold">{match.team_b_score}</span>
                 )}
               </div>
-              <div className="text-sm text-white/90 mt-3 font-medium">
+              <div className="text-sm text-white font-medium drop-shadow-md">
                 {statusText}
               </div>
             </div>
@@ -213,10 +215,10 @@ export const MatchesSection = () => {
                 ● LIVE
               </Badge>
             )}
-            <div className="text-lg font-bold text-white">
+            <div className="text-lg font-bold text-white drop-shadow-lg">
               Match {match.match_no || '—'}
             </div>
-            <div className="text-sm text-white/90 font-medium">
+            <div className="text-sm text-white font-medium drop-shadow-md">
               {timeRange}
             </div>
           </div>
@@ -248,15 +250,27 @@ export const MatchesSection = () => {
 
         <TabsContent value="day1">
           {day1Matches.length > 0 ? (
-            <div className="space-y-8">
-              {day1Matches.map((match) => (
-                <FixtureCard 
-                  key={match.id} 
-                  match={match} 
-                  onClick={() => handleMatchClick(match)}
-                />
-              ))}
-            </div>
+            <>
+              <div className="space-y-8">
+                {(showAllDay1 ? day1Matches : day1Matches.slice(0, 6)).map((match) => (
+                  <FixtureCard 
+                    key={match.id} 
+                    match={match} 
+                    onClick={() => handleMatchClick(match)}
+                  />
+                ))}
+              </div>
+              {day1Matches.length > 6 && (
+                <div className="text-center mt-8">
+                  <button
+                    onClick={() => setShowAllDay1(!showAllDay1)}
+                    className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow"
+                  >
+                    {showAllDay1 ? 'View Less' : `View More (${day1Matches.length - 6} more matches)`}
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="p-8 text-center text-muted-foreground bg-card border border-border rounded-lg">
               No Day 1 fixtures available
@@ -266,15 +280,27 @@ export const MatchesSection = () => {
 
         <TabsContent value="day2">
           {day2Matches.length > 0 ? (
-            <div className="space-y-8">
-              {day2Matches.map((match) => (
-                <FixtureCard 
-                  key={match.id} 
-                  match={match} 
-                  onClick={() => handleMatchClick(match)}
-                />
-              ))}
-            </div>
+            <>
+              <div className="space-y-8">
+                {(showAllDay2 ? day2Matches : day2Matches.slice(0, 6)).map((match) => (
+                  <FixtureCard 
+                    key={match.id} 
+                    match={match} 
+                    onClick={() => handleMatchClick(match)}
+                  />
+                ))}
+              </div>
+              {day2Matches.length > 6 && (
+                <div className="text-center mt-8">
+                  <button
+                    onClick={() => setShowAllDay2(!showAllDay2)}
+                    className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow"
+                  >
+                    {showAllDay2 ? 'View Less' : `View More (${day2Matches.length - 6} more matches)`}
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="p-8 text-center text-muted-foreground bg-card border border-border rounded-lg">
               No Day 2 fixtures available

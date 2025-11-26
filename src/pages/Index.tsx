@@ -28,6 +28,7 @@ const Index = () => {
   const [teams, setTeams] = useState<any[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [showAllTeams, setShowAllTeams] = useState(false);
   
   const { count: teamsCount, startCounting: startTeamsCount } = useCountUp(0, 500);
   const { count: matchesCount, startCounting: startMatchesCount } = useCountUp(0, 500);
@@ -654,7 +655,7 @@ const Index = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {teams.map((team) => (
+          {(showAllTeams ? teams : teams.slice(0, 6)).map((team) => (
             <Card 
               key={team.id} 
               className="p-6 bg-gradient-team-card shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer border-2 border-primary/20 bg-blue-500/5"
@@ -698,6 +699,17 @@ const Index = () => {
             </Card>
           ))}
         </div>
+
+        {teams.length > 6 && (
+          <div className="text-center mt-8">
+            <button
+              onClick={() => setShowAllTeams(!showAllTeams)}
+              className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow"
+            >
+              {showAllTeams ? 'View Less' : `View More (${teams.length - 6} more teams)`}
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Sponsors Section */}
