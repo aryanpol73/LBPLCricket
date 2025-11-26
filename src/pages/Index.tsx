@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, Users, Calendar, Crown, Award, Star, TrendingUp, Target } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 import { TeamDetailDialog } from "@/components/TeamDetailDialog";
+import { Link } from "react-router-dom";
 const Index = () => {
   const [liveMatch, setLiveMatch] = useState<any>(null);
   const [upcomingMatch, setUpcomingMatch] = useState<any>(null);
@@ -392,9 +393,14 @@ const Index = () => {
                   </div>;
             })}
             </div>
-            {groups.length > 2 && <div className="text-center mt-8">
-                <button onClick={() => setShowAllGroups(!showAllGroups)} className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow">
-                  {showAllGroups ? 'View Less' : `View More (${groups.length - 2} more groups)`}
+            {groups.length > 2 && !showAllGroups && <div className="text-center mt-8">
+                <Button asChild size="lg" className="font-semibold">
+                  <Link to="/points-table">View Full Points Table</Link>
+                </Button>
+              </div>}
+            {showAllGroups && <div className="text-center mt-8">
+                <button onClick={() => setShowAllGroups(false)} className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow">
+                  View Less
                 </button>
               </div>}
           </TabsContent>
@@ -491,8 +497,17 @@ const Index = () => {
                   <Award className="mx-auto text-[hsl(45,70%,60%)] mb-4" size={48} />
                   <p className="text-muted-foreground text-lg">No completed matches yet</p>
                 </div>
-              </Card>}
+                </Card>}
           </div>
+          
+          {/* View More Button for Results */}
+          {results.length > 0 && (
+            <div className="text-center mt-8">
+              <Button asChild size="lg" className="font-semibold bg-secondary hover:bg-secondary/90">
+                <Link to="/results">View All Results</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -545,6 +560,15 @@ const Index = () => {
             <StatCard title="Top Fielders" players={getTopFielders()} stat={(p: any) => `${p.catches + p.stumpings} dismissals`} icon={Award} />
           </TabsContent>
         </Tabs>
+        
+        {/* View More Button for Stats */}
+        {players.length > 0 && (
+          <div className="text-center mt-8">
+            <Button asChild size="lg" className="font-semibold">
+              <Link to="/stats">View Full Statistics</Link>
+            </Button>
+          </div>
+        )}
       </section>
 
       {/* Matches Section */}
@@ -589,9 +613,14 @@ const Index = () => {
             </Card>)}
         </div>
 
-        {teams.length > 3 && <div className="text-center mt-8">
-            <button onClick={() => setShowAllTeams(!showAllTeams)} className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow">
-              {showAllTeams ? 'View Less' : `View More (${teams.length - 3} more teams)`}
+        {teams.length > 3 && !showAllTeams && <div className="text-center mt-8">
+            <Button asChild size="lg" className="font-semibold">
+              <Link to="/teams">View All Teams</Link>
+            </Button>
+          </div>}
+        {showAllTeams && <div className="text-center mt-8">
+            <button onClick={() => setShowAllTeams(false)} className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow">
+              View Less
             </button>
           </div>}
       </section>
