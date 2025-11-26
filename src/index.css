@@ -17,19 +17,101 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Scroll Watcher Animations */
+/* Modern Scroll-Based Animations */
 .reveal {
   opacity: 0;
-  transform: translateY(40px);
-  animation: reveal-animation linear forwards;
+  transform: translateY(50px) scale(0.95);
+  animation: reveal-fade-up linear forwards;
   animation-timeline: view();
-  animation-range: entry 0% cover 40%;
+  animation-range: entry 0% cover 35%;
 }
 
-@keyframes reveal-animation {
+@keyframes reveal-fade-up {
   to {
     opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Fade from Left */
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-60px);
+  animation: reveal-from-left linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% cover 35%;
+}
+
+@keyframes reveal-from-left {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Fade from Right */
+.reveal-right {
+  opacity: 0;
+  transform: translateX(60px);
+  animation: reveal-from-right linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% cover 35%;
+}
+
+@keyframes reveal-from-right {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Scale up animation */
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.85);
+  animation: reveal-scale-up linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% cover 35%;
+}
+
+@keyframes reveal-scale-up {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Blur reveal animation */
+.reveal-blur {
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateY(30px);
+  animation: reveal-blur-in linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% cover 35%;
+}
+
+@keyframes reveal-blur-in {
+  to {
+    opacity: 1;
+    filter: blur(0);
     transform: translateY(0);
+  }
+}
+
+/* Rotate reveal animation */
+.reveal-rotate {
+  opacity: 0;
+  transform: perspective(1000px) rotateX(-15deg) translateY(20px);
+  animation: reveal-rotate-in linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% cover 35%;
+}
+
+@keyframes reveal-rotate-in {
+  to {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0) translateY(0);
   }
 }
 
