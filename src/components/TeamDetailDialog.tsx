@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star, Users } from "lucide-react";
 import { PlayerProfileDialog } from "./PlayerProfileDialog";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Player {
   id: string;
@@ -34,13 +35,25 @@ interface TeamDetailDialogProps {
 
 export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogProps) => {
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<any | null>(null);
   const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
 
   if (!team) return null;
 
-  const handlePlayerClick = (playerId: string) => {
-    setSelectedPlayerId(playerId);
-    setPlayerDialogOpen(true);
+  const handlePlayerClick = async (playerId: string) => {
+    const { data } = await supabase
+      .from('players')
+      .select(`
+        *,
+        teams(name, logo_url)
+      `)
+      .eq('id', playerId)
+      .single();
+    
+    if (data) {
+      setSelectedPlayer(data);
+      setPlayerDialogOpen(true);
+    }
   };
 
   // Separate players by role
@@ -171,7 +184,7 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
       </DialogContent>
 
       <PlayerProfileDialog 
-        playerId={selectedPlayerId}
+        player={selectedPlayer}
         open={playerDialogOpen}
         onOpenChange={setPlayerDialogOpen}
       />

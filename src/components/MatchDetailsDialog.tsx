@@ -59,11 +59,23 @@ export const MatchDetailsDialog = ({
   const [teamBSquad, setTeamBSquad] = useState<Player[]>([]);
   const [scoreIframeUrl, setScoreIframeUrl] = useState("");
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<any | null>(null);
   const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
 
-  const handlePlayerClick = (playerId: string) => {
-    setSelectedPlayerId(playerId);
-    setPlayerDialogOpen(true);
+  const handlePlayerClick = async (playerId: string) => {
+    const { data } = await supabase
+      .from('players')
+      .select(`
+        *,
+        teams(name, logo_url)
+      `)
+      .eq('id', playerId)
+      .single();
+    
+    if (data) {
+      setSelectedPlayer(data);
+      setPlayerDialogOpen(true);
+    }
   };
 
   useEffect(() => {
@@ -249,7 +261,7 @@ export const MatchDetailsDialog = ({
       </DialogContent>
 
       <PlayerProfileDialog 
-        playerId={selectedPlayerId}
+        player={selectedPlayer}
         open={playerDialogOpen}
         onOpenChange={setPlayerDialogOpen}
       />

@@ -32,50 +32,14 @@ interface PlayerProfile {
 }
 
 interface PlayerProfileDialogProps {
-  playerId: string | null;
+  player: PlayerProfile | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const PlayerProfileDialog = ({ playerId, open, onOpenChange }: PlayerProfileDialogProps) => {
-  const [player, setPlayer] = useState<PlayerProfile | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (playerId && open) {
-      loadPlayerProfile();
-    }
-  }, [playerId, open]);
-
-  const loadPlayerProfile = async () => {
-    if (!playerId) return;
-    
-    setLoading(true);
-    const { data } = await supabase
-      .from('players')
-      .select(`
-        *,
-        teams(name, logo_url)
-      `)
-      .eq('id', playerId)
-      .single();
-
-    if (data) {
-      setPlayer(data as PlayerProfile);
-    }
-    setLoading(false);
-  };
-
-  if (loading || !player) {
-    return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl">
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
+export const PlayerProfileDialog = ({ player, open, onOpenChange }: PlayerProfileDialogProps) => {
+  if (!player) {
+    return null;
   }
 
   const StatItem = ({ label, value }: { label: string; value: string | number }) => (
