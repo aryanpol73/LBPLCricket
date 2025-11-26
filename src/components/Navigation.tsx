@@ -58,6 +58,7 @@ export const Navigation = () => {
     { path: "#points", label: "Points Table" },
     { path: "#results", label: "Results" },
     { path: "#player-stats", label: "Player Stats" },
+    { path: "#matches", label: "Matches" },
     { path: "#teams", label: "Teams" },
     { path: "#sponsors", label: "Sponsors" },
     { path: "#gallery", label: "Gallery" },
