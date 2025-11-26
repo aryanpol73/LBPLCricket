@@ -91,11 +91,11 @@ export const SponsorsSection = () => {
           }}
         >
           <CarouselContent className="-ml-4">
-            {sponsors.map((sponsor, index) => {
+            {[...sponsors, ...sponsors].map((sponsor, index) => {
               const style = tierStyles[sponsor.tier];
               return (
                 <CarouselItem 
-                  key={index} 
+                  key={`sponsor-${index}`}
                   className="pl-4 reveal-zoom-fade basis-1/2 md:basis-1/4 min-w-[170px] sm:min-w-[200px]"
                 >
                 <Card
