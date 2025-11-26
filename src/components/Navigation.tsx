@@ -53,7 +53,6 @@ export const Navigation = () => {
 
   const baseNavLinks = [
     { path: "#home", label: "Home" },
-    { path: "#league-stats", label: "League Stats" },
     { path: "#timeline", label: "Match Timeline" },
     { path: "#points", label: "Points Table" },
     { path: "#results", label: "Results" },
