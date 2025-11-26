@@ -75,9 +75,15 @@ export const Navigation = () => {
   };
 
   const handleNavClick = (path: string) => {
-    if (path.startsWith('#')) {
-      setIsOpen(false);
+    setIsOpen(false);
+  };
+
+  // Convert hash links to proper routes when not on homepage
+  const getProperPath = (path: string) => {
+    if (path.startsWith('#') && location.pathname !== '/') {
+      return `/${path}`;
     }
+    return path;
   };
 
   return (
@@ -114,19 +120,36 @@ export const Navigation = () => {
                 <div className="mt-4 flex flex-col gap-2">
                   {navLinks.map((link) => {
                     const isAnchor = link.path.startsWith('#');
+                    const properPath = getProperPath(link.path);
+                    
                     return isAnchor ? (
-                      <a
-                        key={link.path}
-                        href={link.path}
-                        onClick={() => handleNavClick(link.path)}
-                        className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
-                          isActive(link.path)
-                            ? "bg-secondary text-primary shadow-gold"
-                            : "text-white hover:bg-white/10"
-                        }`}
-                      >
-                        {link.label}
-                      </a>
+                      location.pathname === '/' ? (
+                        <a
+                          key={link.path}
+                          href={link.path}
+                          onClick={() => handleNavClick(link.path)}
+                          className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
+                            isActive(link.path)
+                              ? "bg-secondary text-primary shadow-gold"
+                              : "text-white hover:bg-white/10"
+                          }`}
+                        >
+                          {link.label}
+                        </a>
+                      ) : (
+                        <Link
+                          key={link.path}
+                          to={properPath}
+                          onClick={() => handleNavClick(link.path)}
+                          className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
+                            isActive(link.path)
+                              ? "bg-secondary text-primary shadow-gold"
+                              : "text-white hover:bg-white/10"
+                          }`}
+                        >
+                          {link.label}
+                        </Link>
+                      )
                     ) : (
                       <Link
                         key={link.path}
@@ -164,19 +187,36 @@ export const Navigation = () => {
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => {
               const isAnchor = link.path.startsWith('#');
+              const properPath = getProperPath(link.path);
+              
               return isAnchor ? (
-                <a
-                  key={link.path}
-                  href={link.path}
-                  onClick={() => handleNavClick(link.path)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                    isActive(link.path)
-                      ? "bg-secondary text-primary shadow-gold"
-                      : "text-white hover:bg-white/10"
-                  }`}
-                >
-                  {link.label}
-                </a>
+                location.pathname === '/' ? (
+                  <a
+                    key={link.path}
+                    href={link.path}
+                    onClick={() => handleNavClick(link.path)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                      isActive(link.path)
+                        ? "bg-secondary text-primary shadow-gold"
+                        : "text-white hover:bg-white/10"
+                    }`}
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={link.path}
+                    to={properPath}
+                    onClick={() => handleNavClick(link.path)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                      isActive(link.path)
+                        ? "bg-secondary text-primary shadow-gold"
+                        : "text-white hover:bg-white/10"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                )
               ) : (
                 <Link
                   key={link.path}
