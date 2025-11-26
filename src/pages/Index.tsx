@@ -254,7 +254,7 @@ const Index = () => {
       {/* Hero Section */}
       <section id="home" className="relative z-10 bg-gradient-hero py-16 px-4 overflow-hidden">
         <div className="container mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 animate-fade-in-down">LBPL SEASON 3 </h1>
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 animate-fade-in-down">    LBPL SEASON 3 </h1>
           <p className="text-xl md:text-2xl text-secondary mb-6 animate-fade-in-up" style={{
           animationDelay: '0.2s',
           animationFillMode: 'both'
