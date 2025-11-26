@@ -269,7 +269,7 @@ const Index = () => {
             <Button asChild variant="destructive" size="lg" className="relative z-10 font-bold px-8 py-4 shadow-glow transition-all duration-300 hover:scale-110 hover:shadow-xl">
               <a href={liveMatch?.youtube_stream_url || import.meta.env.VITE_YOUTUBE_LIVE_URL || "https://www.youtube.com/"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                 <span className="animate-pulse">🔴</span>
-                <span>Click here to watch live</span>
+                <span>Click Here To Watch Live</span>
               </a>
             </Button>
           </div>
