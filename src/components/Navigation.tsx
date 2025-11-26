@@ -52,21 +52,33 @@ export const Navigation = () => {
   }, []);
 
   const baseNavLinks = [
-    { path: "/", label: "Home" },
-    { path: "/matches", label: "Matches" },
-    { path: "/results", label: "Results" },
-    { path: "/points-table", label: "Points Table" },
-    { path: "/teams", label: "Teams" },
-    { path: "/stats", label: "Stats" },
-    { path: "/gallery", label: "Gallery" },
-    // { path: "/rules", label: "Rules" },
+    { path: "#home", label: "Home" },
+    { path: "#league-stats", label: "League Stats" },
+    { path: "#timeline", label: "Match Timeline" },
+    { path: "#points", label: "Points Table" },
+    { path: "#results", label: "Results" },
+    { path: "#player-stats", label: "Player Stats" },
+    { path: "#teams", label: "Teams" },
+    { path: "#sponsors", label: "Sponsors" },
+    { path: "#gallery", label: "Gallery" },
   ];
 
   const navLinks = isAdmin 
     ? [...baseNavLinks, { path: "/admin", label: "Admin" }] 
     : baseNavLinks;
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    if (path.startsWith('#')) {
+      return location.hash === path || (path === '#home' && !location.hash);
+    }
+    return location.pathname === path;
+  };
+
+  const handleNavClick = (path: string) => {
+    if (path.startsWith('#')) {
+      setIsOpen(false);
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-gradient-hero shadow-glow backdrop-blur-sm bg-gradient-to-r from-primary via-primary to-primary-glow animate-gradient-x" style={{ backgroundSize: '200% 100%' }}>
@@ -100,20 +112,36 @@ export const Navigation = () => {
                   </Button>
                 </div>
                 <div className="mt-4 flex flex-col gap-2">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.path}
-                      to={link.path}
-                      onClick={() => setIsOpen(false)}
-                      className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
-                        isActive(link.path)
-                          ? "bg-secondary text-primary shadow-gold"
-                          : "text-white hover:bg-white/10"
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
+                  {navLinks.map((link) => {
+                    const isAnchor = link.path.startsWith('#');
+                    return isAnchor ? (
+                      <a
+                        key={link.path}
+                        href={link.path}
+                        onClick={() => handleNavClick(link.path)}
+                        className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
+                          isActive(link.path)
+                            ? "bg-secondary text-primary shadow-gold"
+                            : "text-white hover:bg-white/10"
+                        }`}
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        key={link.path}
+                        to={link.path}
+                        onClick={() => setIsOpen(false)}
+                        className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
+                          isActive(link.path)
+                            ? "bg-secondary text-primary shadow-gold"
+                            : "text-white hover:bg-white/10"
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    );
+                  })}
                 </div>
               </SheetContent>
             </Sheet>
@@ -134,19 +162,35 @@ export const Navigation = () => {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                  isActive(link.path)
-                    ? "bg-secondary text-primary shadow-gold"
-                    : "text-white hover:bg-white/10"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isAnchor = link.path.startsWith('#');
+              return isAnchor ? (
+                <a
+                  key={link.path}
+                  href={link.path}
+                  onClick={() => handleNavClick(link.path)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                    isActive(link.path)
+                      ? "bg-secondary text-primary shadow-gold"
+                      : "text-white hover:bg-white/10"
+                  }`}
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                    isActive(link.path)
+                      ? "bg-secondary text-primary shadow-gold"
+                      : "text-white hover:bg-white/10"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
         </div>
 
