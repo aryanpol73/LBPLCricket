@@ -169,4 +169,10 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Smooth scrolling with offset for fixed navbar */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+  }
 }
