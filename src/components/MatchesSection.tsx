@@ -180,7 +180,7 @@ export const MatchesSection = () => {
 
     return (
       <div 
-        className="rounded-lg shadow-md overflow-hidden transition-all hover:shadow-xl hover:scale-[1.02] cursor-pointer"
+        className="reveal-zoom-fade rounded-lg shadow-md overflow-hidden transition-all hover:shadow-xl hover:scale-[1.02] cursor-pointer"
         style={{ 
           backgroundColor: roundColor,
         }}

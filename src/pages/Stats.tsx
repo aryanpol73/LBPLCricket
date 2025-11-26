@@ -231,8 +231,8 @@ const Stats = () => {
           <TabsContent value="batting" className="space-y-6">
             <div className="relative">
               {/* Horizontal Scrollable Container */}
-              <div className="flex gap-6 overflow-x-auto overflow-y-visible pb-4 snap-x snap-mandatory scroll-smooth touch-pan-x scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50 hover:scrollbar-thumb-[#F9C846] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-[#0F1B35]/50 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#F9C846]/50 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#F9C846]">
-                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
+              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth [touch-action:pan-x_pan-y] scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50 hover:scrollbar-thumb-[#F9C846] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-[#0F1B35]/50 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#F9C846]/50 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#F9C846]">
+                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center reveal-zoom-fade">
                   <StatCard
                     title="Top Run Scorers"
                     players={getTopBatsmen()}
@@ -240,7 +240,7 @@ const Stats = () => {
                     icon={Trophy}
                   />
                 </div>
-                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
+                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center reveal-zoom-fade">
                   <StatCard
                     title="Highest Strike Rate"
                     players={getHighestStrikeRate()}
@@ -248,7 +248,7 @@ const Stats = () => {
                     icon={TrendingUp}
                   />
                 </div>
-                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
+                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center reveal-zoom-fade">
                   <StatCard
                     title="Best Batting Average"
                     players={getHighestAverage()}
@@ -263,8 +263,8 @@ const Stats = () => {
           <TabsContent value="bowling" className="space-y-6">
             <div className="relative">
               {/* Horizontal Scrollable Container */}
-              <div className="flex gap-6 overflow-x-auto overflow-y-visible pb-4 snap-x snap-mandatory scroll-smooth touch-pan-x scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50 hover:scrollbar-thumb-[#F9C846] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-[#0F1B35]/50 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#F9C846]/50 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#F9C846]">
-                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
+              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth [touch-action:pan-x_pan-y] scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50 hover:scrollbar-thumb-[#F9C846] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-[#0F1B35]/50 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#F9C846]/50 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#F9C846]">
+                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center reveal-zoom-fade">
                   <StatCard
                     title="Top Wicket Takers"
                     players={getTopBowlers()}
@@ -272,7 +272,7 @@ const Stats = () => {
                     icon={Target}
                   />
                 </div>
-                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
+                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center reveal-zoom-fade">
                   <StatCard
                     title="Best Economy Rate"
                     players={getBestEconomy()}
@@ -285,12 +285,14 @@ const Stats = () => {
           </TabsContent>
 
           <TabsContent value="fielding" className="space-y-6">
-            <StatCard
-              title="Top Fielders"
-              players={getTopFielders()}
-              stat={(p: PlayerStats) => `${p.catches + p.stumpings} dismissals`}
-              icon={Award}
-            />
+            <div className="reveal-zoom-fade">
+              <StatCard
+                title="Top Fielders"
+                players={getTopFielders()}
+                stat={(p: PlayerStats) => `${p.catches + p.stumpings} dismissals`}
+                icon={Award}
+              />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
