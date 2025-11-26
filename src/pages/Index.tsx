@@ -529,7 +529,7 @@ const Index = () => {
 
           <TabsContent value="batting" className="space-y-6">
             <div className="relative">
-              <div className="flex gap-6 overflow-x-auto overflow-y-visible pb-4 snap-x snap-mandatory scroll-smooth touch-pan-x scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50 hover:scrollbar-thumb-[#F9C846]">
+              <div className="flex gap-6 overflow-x-auto overflow-y-visible pb-4 snap-x snap-mandatory scroll-smooth scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50 hover:scrollbar-thumb-[#F9C846]" style={{ touchAction: 'pan-y pan-x' }}>
                 <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
                   <StatCard title="Top Run Scorers" players={getTopBatsmen()} stat={(p: any) => `${p.runs_scored} runs`} icon={Trophy} />
                 </div>
@@ -545,7 +545,7 @@ const Index = () => {
 
           <TabsContent value="bowling" className="space-y-6">
             <div className="relative">
-              <div className="flex gap-6 overflow-x-auto overflow-y-visible pb-4 snap-x snap-mandatory scroll-smooth touch-pan-x scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50 hover:scrollbar-thumb-[#F9C846]">
+              <div className="flex gap-6 overflow-x-auto overflow-y-visible pb-4 snap-x snap-mandatory scroll-smooth scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50 hover:scrollbar-thumb-[#F9C846]" style={{ touchAction: 'pan-y pan-x' }}>
                 <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
                   <StatCard title="Top Wicket Takers" players={getTopBowlers()} stat={(p: any) => `${p.wickets_taken} wickets`} icon={Target} />
                 </div>
