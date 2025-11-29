@@ -431,44 +431,44 @@ const Index = () => {
           <Crown className="text-[hsl(45,90%,55%)]" size={40} strokeWidth={2.5} />
         </div>
 
-        <div className="relative bg-gradient-to-br from-[hsl(45,100%,65%)] via-[hsl(42,95%,60%)] to-[hsl(40,90%,58%)] rounded-3xl p-8 shadow-premium">
-          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[hsl(45,100%,70%)]/25 via-transparent to-[hsl(40,90%,65%)]/20 pointer-events-none" />
+        <div className="relative bg-gradient-to-br from-[hsl(220,25%,12%)] via-[hsl(220,30%,15%)] to-[hsl(220,25%,10%)] rounded-3xl p-8 shadow-premium border-2 border-[hsl(45,90%,50%)]/30">
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[hsl(45,90%,50%)]/10 via-transparent to-[hsl(45,90%,50%)]/5 pointer-events-none" />
           
           <div className="relative overflow-x-auto">
             {results.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow className="border-[hsl(45,70%,75%)] hover:bg-transparent">
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Round No.</TableHead>
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Match No.</TableHead>
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Teams</TableHead>
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Score</TableHead>
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Winner</TableHead>
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Player of the Match</TableHead>
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Phase</TableHead>
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Round No.</TableHead>
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Match No.</TableHead>
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Teams</TableHead>
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Score</TableHead>
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Winner</TableHead>
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Player of the Match</TableHead>
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Phase</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {results.map((match) => (
-                    <TableRow key={match.id} className="border-[hsl(45,70%,75%)] hover:bg-card/50 transition-colors">
-                      <TableCell className="text-center font-bold text-[hsl(45,90%,50%)] text-2xl">
+                    <TableRow key={match.id} className="border-[hsl(220,20%,25%)] hover:bg-[hsl(220,25%,18%)] transition-colors">
+                      <TableCell className="text-center font-bold text-[hsl(45,90%,55%)] text-2xl">
                         {match.round_no || '-'}
                       </TableCell>
-                      <TableCell className="text-center font-semibold text-foreground text-lg">
+                      <TableCell className="text-center font-semibold text-white text-lg">
                         {match.match_no || '-'}
                       </TableCell>
-                      <TableCell className="text-center font-semibold text-foreground">
+                      <TableCell className="text-center font-semibold text-white">
                         {match.team_a?.name} vs {match.team_b?.name}
                       </TableCell>
                       <TableCell className="text-center">
-                        <div className="font-mono text-xl font-bold text-foreground bg-muted/50 rounded-lg px-3 py-1 inline-block">
+                        <div className="font-mono text-xl font-bold text-white bg-[hsl(220,25%,18%)] rounded-lg px-3 py-1 inline-block">
                           {match.team_a_score} - {match.team_b_score}
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
                         {match.winner ? (
                           <div className="flex items-center justify-center gap-1">
-                            <Trophy className="text-[hsl(45,90%,50%)]" size={18} />
+                            <Trophy className="text-[hsl(45,90%,55%)]" size={18} />
                             <Badge className="bg-gradient-gold text-white border-0 shadow-gold-soft font-semibold px-3 py-1">
                               {match.winner.name}
                             </Badge>
@@ -480,8 +480,8 @@ const Index = () => {
                       <TableCell className="text-center">
                         {match.player_of_match ? (
                           <div className="flex items-center justify-center gap-1">
-                            <Star className="text-[hsl(45,90%,50%)]" size={16} fill="hsl(45,90%,50%)" />
-                            <Badge variant="outline" className="border-2 border-[hsl(45,80%,60%)] text-[hsl(45,90%,35%)] font-semibold bg-[hsl(45,90%,95%)]">
+                            <Star className="text-[hsl(45,90%,55%)]" size={16} fill="hsl(45,90%,55%)" />
+                            <Badge variant="outline" className="border-2 border-[hsl(45,80%,60%)] text-[hsl(45,90%,55%)] font-semibold bg-[hsl(220,25%,15%)]">
                               {match.player_of_match.name}
                             </Badge>
                           </div>
