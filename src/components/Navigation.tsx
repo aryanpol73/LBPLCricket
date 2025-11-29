@@ -57,16 +57,16 @@ export const Navigation = () => {
       setTimeout(() => {
         const element = document.querySelector(location.hash);
         if (element) {
-          const navbarHeight = 80; // h-20 = 5rem = 80px
-          const elementPosition = element.getBoundingClientRect().top + window.scrollY;
-          const offsetPosition = elementPosition - navbarHeight;
+          const navbarHeight = 80;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.scrollY - navbarHeight;
           
           window.scrollTo({
             top: offsetPosition,
             behavior: 'smooth'
           });
         }
-      }, 100);
+      }, 300);
     }
   }, [location.hash, location.pathname]);
 
@@ -94,42 +94,30 @@ export const Navigation = () => {
   };
 
   const handleNavClick = (path: string, e?: React.MouseEvent<HTMLAnchorElement>) => {
-    console.log('handleNavClick called with path:', path);
-    console.log('Current location.pathname:', location.pathname);
-    
     // Prevent default anchor behavior for hash links on homepage
     if (path.startsWith('#') && location.pathname === '/' && e) {
       e.preventDefault();
-      console.log('Prevented default for hash link');
     }
     
     setIsOpen(false);
     
     // Handle hash navigation on homepage
     if (path.startsWith('#') && location.pathname === '/') {
-      console.log('Handling hash navigation for:', path);
       // Small delay to ensure sheet closes first
       setTimeout(() => {
         const element = document.querySelector(path);
-        console.log('Found element:', element);
         if (element) {
-          const navbarHeight = 80; // h-20 = 5rem = 80px
-          const elementPosition = element.getBoundingClientRect().top + window.scrollY;
-          const offsetPosition = elementPosition - navbarHeight;
-          
-          console.log('Scrolling to position:', offsetPosition);
+          // Use scrollIntoView with offset
+          const navbarHeight = 80;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.scrollY - navbarHeight;
           
           window.scrollTo({
             top: offsetPosition,
             behavior: 'smooth'
           });
-          
-          // Update URL hash without triggering scroll
-          window.history.replaceState(null, '', path);
-        } else {
-          console.error('Element not found for selector:', path);
         }
-      }, 100);
+      }, 150);
     }
   };
 
