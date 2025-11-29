@@ -94,22 +94,30 @@ export const Navigation = () => {
   };
 
   const handleNavClick = (path: string, e?: React.MouseEvent<HTMLAnchorElement>) => {
+    console.log('handleNavClick called with path:', path);
+    console.log('Current location.pathname:', location.pathname);
+    
     // Prevent default anchor behavior for hash links on homepage
     if (path.startsWith('#') && location.pathname === '/' && e) {
       e.preventDefault();
+      console.log('Prevented default for hash link');
     }
     
     setIsOpen(false);
     
     // Handle hash navigation on homepage
     if (path.startsWith('#') && location.pathname === '/') {
+      console.log('Handling hash navigation for:', path);
       // Small delay to ensure sheet closes first
       setTimeout(() => {
         const element = document.querySelector(path);
+        console.log('Found element:', element);
         if (element) {
           const navbarHeight = 80; // h-20 = 5rem = 80px
           const elementPosition = element.getBoundingClientRect().top + window.scrollY;
           const offsetPosition = elementPosition - navbarHeight;
+          
+          console.log('Scrolling to position:', offsetPosition);
           
           window.scrollTo({
             top: offsetPosition,
@@ -118,6 +126,8 @@ export const Navigation = () => {
           
           // Update URL hash without triggering scroll
           window.history.replaceState(null, '', path);
+        } else {
+          console.error('Element not found for selector:', path);
         }
       }, 100);
     }
