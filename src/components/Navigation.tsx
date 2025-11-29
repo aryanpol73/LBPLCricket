@@ -51,31 +51,13 @@ export const Navigation = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Handle hash navigation on page load
-  useEffect(() => {
-    if (location.hash && location.pathname === '/') {
-      setTimeout(() => {
-        const element = document.querySelector(location.hash);
-        if (element) {
-          const navbarHeight = 80;
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.scrollY - navbarHeight;
-          
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-          });
-        }
-      }, 300);
-    }
-  }, [location.hash, location.pathname]);
 
   const baseNavLinks = [
     { path: "#home", label: "Home" },
-    { path: "#timeline", label: "Match Timeline" },
-    { path: "#points", label: "Points Table" },
+    { path: "#matchTimeline", label: "Match Timeline" },
+    { path: "#pointsTable", label: "Points Table" },
     { path: "#results", label: "Results" },
-    { path: "#player-stats", label: "Player Stats" },
+    { path: "#playerStats", label: "Player Stats" },
     { path: "#matches", label: "Matches" },
     { path: "#teams", label: "Teams" },
     { path: "#sponsors", label: "Sponsors" },
@@ -93,32 +75,9 @@ export const Navigation = () => {
     return location.pathname === path;
   };
 
-  const handleNavClick = (path: string, e?: React.MouseEvent<HTMLAnchorElement>) => {
-    // Always prevent default for hash links
-    if (path.startsWith('#') && e) {
-      e.preventDefault();
-    }
-    
-    // Close the sheet/menu
+  const handleNavClick = () => {
+    // Just close the sheet/menu - native anchor scrolling will handle the rest
     setIsOpen(false);
-    
-    // Handle hash navigation on homepage
-    if (path.startsWith('#') && location.pathname === '/') {
-      // Wait for sheet closing animation to complete
-      setTimeout(() => {
-        const element = document.querySelector(path);
-        if (element) {
-          const navbarHeight = 80;
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.scrollY - navbarHeight;
-          
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-          });
-        }
-      }, 300); // Increased delay for sheet animation
-    }
   };
 
   // Convert hash links to proper routes when not on homepage
@@ -166,33 +125,18 @@ export const Navigation = () => {
                     const properPath = getProperPath(link.path);
                     
                     return isAnchor ? (
-                      location.pathname === '/' ? (
-                        <a
-                          key={link.path}
-                          href={link.path}
-                          onClick={(e) => handleNavClick(link.path, e)}
-                          className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
-                            isActive(link.path)
-                              ? "bg-secondary text-primary shadow-gold"
-                              : "text-white hover:bg-white/10"
-                          }`}
-                        >
-                          {link.label}
-                        </a>
-                      ) : (
-                        <Link
-                          key={link.path}
-                          to={properPath}
-                          onClick={() => handleNavClick(link.path)}
-                          className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
-                            isActive(link.path)
-                              ? "bg-secondary text-primary shadow-gold"
-                              : "text-white hover:bg-white/10"
-                          }`}
-                        >
-                          {link.label}
-                        </Link>
-                      )
+                      <a
+                        key={link.path}
+                        href={link.path}
+                        onClick={handleNavClick}
+                        className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
+                          isActive(link.path)
+                            ? "bg-secondary text-primary shadow-gold"
+                            : "text-white hover:bg-white/10"
+                        }`}
+                      >
+                        {link.label}
+                      </a>
                     ) : (
                       <Link
                         key={link.path}
@@ -233,33 +177,17 @@ export const Navigation = () => {
               const properPath = getProperPath(link.path);
               
               return isAnchor ? (
-                location.pathname === '/' ? (
-                  <a
-                    key={link.path}
-                    href={link.path}
-                    onClick={(e) => handleNavClick(link.path, e)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                      isActive(link.path)
-                        ? "bg-secondary text-primary shadow-gold"
-                        : "text-white hover:bg-white/10"
-                    }`}
-                  >
-                    {link.label}
-                  </a>
-                ) : (
-                  <Link
-                    key={link.path}
-                    to={properPath}
-                    onClick={() => handleNavClick(link.path)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                      isActive(link.path)
-                        ? "bg-secondary text-primary shadow-gold"
-                        : "text-white hover:bg-white/10"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                )
+                <a
+                  key={link.path}
+                  href={link.path}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                    isActive(link.path)
+                      ? "bg-secondary text-primary shadow-gold"
+                      : "text-white hover:bg-white/10"
+                  }`}
+                >
+                  {link.label}
+                </a>
               ) : (
                 <Link
                   key={link.path}
