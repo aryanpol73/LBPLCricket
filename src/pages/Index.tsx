@@ -97,9 +97,9 @@ const Index = () => {
         team_b:teams!matches_team_b_id_fkey(*),
         winner:teams!matches_winner_id_fkey(*),
         player_of_match:players(*)
-      `).eq('status', 'completed').order('match_date', {
-      ascending: false
-    });
+      `).eq('status', 'completed').order('match_no', {
+      ascending: true
+    }).limit(3);
     setResults(data || []);
   };
   const loadStandings = async () => {
@@ -434,81 +434,85 @@ const Index = () => {
         <div className="relative bg-gradient-gold-premium rounded-3xl p-8 shadow-premium">
           <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/40 via-transparent to-white/20 pointer-events-none" />
           
-          <div className="relative space-y-6">
-            {results.length > 0 ? results.map(match => <Card key={match.id} className="bg-card/95 backdrop-blur-sm border-2 border-[hsl(45,70%,75%)] shadow-gold-soft hover:shadow-gold hover:scale-[1.02] transition-all duration-300">
-                  <div className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-center">
-                      <div className="md:col-span-1 flex md:flex-col gap-2 items-center">
-                        <div className="text-center">
-                          <div className="text-xs text-muted-foreground font-medium mb-1">Round</div>
-                          <div className="text-2xl font-bold text-[hsl(45,90%,50%)]">
-                            {match.round_no || '-'}
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xs text-muted-foreground font-medium mb-1">Match</div>
-                          <div className="text-lg font-semibold text-foreground">
-                            #{match.match_no || '-'}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="md:col-span-2">
-                        <div className="font-semibold text-lg text-foreground">
-                          {match.team_a?.name}
-                          <span className="text-muted-foreground mx-2">vs</span>
-                          {match.team_b?.name}
-                        </div>
-                      </div>
-
-                      <div className="md:col-span-1 text-center">
-                        <div className="text-xs text-muted-foreground font-medium mb-1">Score</div>
-                        <div className="font-mono text-2xl font-bold text-foreground bg-muted/50 rounded-lg px-3 py-1 inline-block">
+          <div className="relative overflow-x-auto">
+            {results.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-[hsl(45,70%,75%)] hover:bg-transparent">
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Round No.</TableHead>
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Match No.</TableHead>
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Teams</TableHead>
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Score</TableHead>
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Winner</TableHead>
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Player of the Match</TableHead>
+                    <TableHead className="text-center font-bold text-[hsl(45,90%,50%)]">Phase</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {results.map((match) => (
+                    <TableRow key={match.id} className="border-[hsl(45,70%,75%)] hover:bg-card/50 transition-colors">
+                      <TableCell className="text-center font-bold text-[hsl(45,90%,50%)] text-2xl">
+                        {match.round_no || '-'}
+                      </TableCell>
+                      <TableCell className="text-center font-semibold text-foreground text-lg">
+                        {match.match_no || '-'}
+                      </TableCell>
+                      <TableCell className="text-center font-semibold text-foreground">
+                        {match.team_a?.name} vs {match.team_b?.name}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="font-mono text-xl font-bold text-foreground bg-muted/50 rounded-lg px-3 py-1 inline-block">
                           {match.team_a_score} - {match.team_b_score}
                         </div>
-                      </div>
-
-                      <div className="md:col-span-1 text-center">
-                        <div className="text-xs text-muted-foreground font-medium mb-1">Winner</div>
-                        {match.winner ? <div className="flex items-center justify-center gap-1">
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {match.winner ? (
+                          <div className="flex items-center justify-center gap-1">
                             <Trophy className="text-[hsl(45,90%,50%)]" size={18} />
                             <Badge className="bg-gradient-gold text-white border-0 shadow-gold-soft font-semibold px-3 py-1">
                               {match.winner.name}
                             </Badge>
-                          </div> : <span className="text-muted-foreground">-</span>}
-                      </div>
-
-                      <div className="md:col-span-1 text-center">
-                        <div className="text-xs text-muted-foreground font-medium mb-1">Player of Match</div>
-                        {match.player_of_match ? <div className="flex items-center justify-center gap-1">
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {match.player_of_match ? (
+                          <div className="flex items-center justify-center gap-1">
                             <Star className="text-[hsl(45,90%,50%)]" size={16} fill="hsl(45,90%,50%)" />
                             <Badge variant="outline" className="border-2 border-[hsl(45,80%,60%)] text-[hsl(45,90%,35%)] font-semibold bg-[hsl(45,90%,95%)]">
                               {match.player_of_match.name}
                             </Badge>
-                          </div> : <span className="text-muted-foreground">-</span>}
-                      </div>
-
-                      <div className="md:col-span-1 text-center">
-                        <div className="text-xs text-muted-foreground font-medium mb-1">Phase</div>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-center">
                         <Badge className="bg-primary text-primary-foreground font-semibold">
                           {match.match_phase?.toUpperCase()}
                         </Badge>
-                      </div>
-                    </div>
-                  </div>
-                </Card>) : <Card className="bg-card/95 backdrop-blur-sm border-2 border-[hsl(45,70%,75%)] shadow-gold-soft">
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <Card className="bg-card/95 backdrop-blur-sm border-2 border-[hsl(45,70%,75%)] shadow-gold-soft">
                 <div className="p-12 text-center">
                   <Award className="mx-auto text-[hsl(45,70%,60%)] mb-4" size={48} />
                   <p className="text-muted-foreground text-lg">No completed matches yet</p>
                 </div>
-                </Card>}
+              </Card>
+            )}
           </div>
           
           {/* View More Button for Results */}
           {results.length > 0 && (
             <div className="text-center mt-8">
               <Button asChild size="lg" className="font-semibold bg-secondary hover:bg-secondary/90">
-                <Link to="/results">View All Results</Link>
+                <Link to="/results">View More</Link>
               </Button>
             </div>
           )}
