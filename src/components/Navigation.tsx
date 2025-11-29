@@ -57,7 +57,14 @@ export const Navigation = () => {
       setTimeout(() => {
         const element = document.querySelector(location.hash);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const navbarHeight = 80; // h-20 = 5rem = 80px
+          const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+          const offsetPosition = elementPosition - navbarHeight;
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
         }
       }, 100);
     }
@@ -96,10 +103,23 @@ export const Navigation = () => {
     
     // Handle hash navigation on homepage
     if (path.startsWith('#') && location.pathname === '/') {
-      const element = document.querySelector(path);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      // Small delay to ensure sheet closes first
+      setTimeout(() => {
+        const element = document.querySelector(path);
+        if (element) {
+          const navbarHeight = 80; // h-20 = 5rem = 80px
+          const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+          const offsetPosition = elementPosition - navbarHeight;
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+          
+          // Update URL hash without triggering scroll
+          window.history.replaceState(null, '', path);
+        }
+      }, 100);
     }
   };
 
