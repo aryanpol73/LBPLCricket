@@ -73,9 +73,9 @@ const Results = () => {
         </div>
 
         {/* Premium Golden Background Container */}
-        <div className="relative bg-gradient-to-br from-[hsl(45,55%,85%)] via-[hsl(45,60%,88%)] to-[hsl(45,58%,86%)] rounded-3xl p-8 shadow-premium">
+        <div className="relative bg-gradient-gold-premium rounded-3xl p-8 shadow-premium">
           {/* Subtle inner glow */}
-          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[hsl(45,70%,75%)]/20 via-transparent to-[hsl(45,75%,70%)]/15 pointer-events-none" />
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/40 via-transparent to-white/20 pointer-events-none" />
           
           <div className="relative space-y-12">
             {results.length > 0 ? (
