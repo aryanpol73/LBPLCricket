@@ -323,12 +323,12 @@ const Index = () => {
       </section>
 
       {/* Match Timeline Section */}
-      <section id="timeline" className="reveal-left">
+      <section id="matchTimeline" className="reveal-left">
         <MatchTimeline />
       </section>
 
       {/* Points Table Section */}
-      <section id="points" className="reveal-right container mx-auto px-4 py-12">
+      <section id="pointsTable" className="reveal-right container mx-auto px-4 py-12">
         <div className="flex items-center gap-3 mb-8">
           <Trophy className="text-secondary" size={32} />
           <h2 className="text-4xl font-bold text-primary">Points Table - Season 3</h2>
@@ -516,7 +516,7 @@ const Index = () => {
       </section>
 
       {/* Player Stats Section */}
-      <section id="player-stats" className="reveal-rotate container mx-auto px-4 py-12">
+      <section id="playerStats" className="reveal-rotate container mx-auto px-4 py-12">
         <div className="flex items-center gap-3 mb-8">
           <div className="p-2 rounded-lg bg-[#F9C846]/10 border border-[#F9C846]/30">
             <Trophy className="text-[#F9C846]" size={32} />
