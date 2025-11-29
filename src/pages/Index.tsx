@@ -431,8 +431,8 @@ const Index = () => {
           <Crown className="text-[hsl(45,90%,55%)]" size={40} strokeWidth={2.5} />
         </div>
 
-        <div className="relative bg-gradient-gold-premium rounded-3xl p-8 shadow-premium">
-          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/40 via-transparent to-white/20 pointer-events-none" />
+        <div className="relative bg-gradient-to-br from-[hsl(45,100%,65%)] via-[hsl(42,95%,60%)] to-[hsl(40,90%,58%)] rounded-3xl p-8 shadow-premium">
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[hsl(45,100%,70%)]/25 via-transparent to-[hsl(40,90%,65%)]/20 pointer-events-none" />
           
           <div className="relative overflow-x-auto">
             {results.length > 0 ? (
