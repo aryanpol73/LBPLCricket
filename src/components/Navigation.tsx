@@ -94,20 +94,20 @@ export const Navigation = () => {
   };
 
   const handleNavClick = (path: string, e?: React.MouseEvent<HTMLAnchorElement>) => {
-    // Prevent default anchor behavior for hash links on homepage
-    if (path.startsWith('#') && location.pathname === '/' && e) {
+    // Always prevent default for hash links
+    if (path.startsWith('#') && e) {
       e.preventDefault();
     }
     
+    // Close the sheet/menu
     setIsOpen(false);
     
     // Handle hash navigation on homepage
     if (path.startsWith('#') && location.pathname === '/') {
-      // Small delay to ensure sheet closes first
+      // Wait for sheet closing animation to complete
       setTimeout(() => {
         const element = document.querySelector(path);
         if (element) {
-          // Use scrollIntoView with offset
           const navbarHeight = 80;
           const elementPosition = element.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.scrollY - navbarHeight;
@@ -117,7 +117,7 @@ export const Navigation = () => {
             behavior: 'smooth'
           });
         }
-      }, 150);
+      }, 300); // Increased delay for sheet animation
     }
   };
 
