@@ -164,85 +164,136 @@ const Index = () => {
     setSelectedTeam(team);
     setDialogOpen(true);
   };
+  const getRankBadgeStyles = (rank: number) => {
+    if (rank === 1) {
+      return {
+        bg: 'from-[#F9C846] to-[#d4a837]',
+        border: 'border-[#F9C846]',
+        shadow: 'shadow-[0_0_20px_rgba(249,200,70,0.6)]',
+        text: 'text-[#0A1325]',
+        icon: <Crown className="w-4 h-4" />
+      };
+    } else if (rank === 2) {
+      return {
+        bg: 'from-gray-300 to-gray-500',
+        border: 'border-gray-400',
+        shadow: 'shadow-[0_0_15px_rgba(200,200,200,0.4)]',
+        text: 'text-white',
+        icon: <Award className="w-4 h-4" />
+      };
+    } else if (rank === 3) {
+      return {
+        bg: 'from-amber-700 to-amber-900',
+        border: 'border-amber-600',
+        shadow: 'shadow-[0_0_15px_rgba(217,119,6,0.4)]',
+        text: 'text-white',
+        icon: <Star className="w-4 h-4" />
+      };
+    }
+    return {
+      bg: 'from-[#2E73FF]/30 to-[#2E73FF]/10',
+      border: 'border-[#2E73FF]/40',
+      shadow: '',
+      text: 'text-[#F9C846]',
+      icon: null
+    };
+  };
+
   const StatCard = ({
     title,
     players,
     stat,
     icon: Icon
   }: any) => {
-    const topThree = players.slice(0, 3);
-    return <Card className="p-8 bg-gradient-to-br from-[#2E73FF]/20 via-[#2E73FF]/10 to-transparent border-[#F9C846]/30 shadow-2xl hover:shadow-[0_0_40px_rgba(249,200,70,0.3)] transition-all duration-500 animate-fade-in-up backdrop-blur-sm">
-        <div className="flex items-center gap-3 mb-8">
+    const topTen = players.slice(0, 10);
+    
+    return <Card className="p-6 md:p-8 bg-gradient-to-br from-[#0F1B35] via-[#0A1325] to-[#0F1B35] border-[#F9C846]/30 shadow-2xl hover:shadow-[0_0_40px_rgba(249,200,70,0.3)] transition-all duration-500 animate-fade-in-up backdrop-blur-sm h-full">
+        <div className="flex items-center gap-3 mb-6">
           <div className="p-2 rounded-lg bg-[#F9C846]/10 border border-[#F9C846]/30">
-            <Icon className="text-[#F9C846]" size={28} />
+            <Icon className="text-[#F9C846]" size={24} />
           </div>
-          <h3 className="text-2xl font-bold text-white">{title}</h3>
+          <h3 className="text-xl md:text-2xl font-bold text-white">{title}</h3>
         </div>
         
-        <div className="flex justify-center items-end gap-6 min-h-[320px]">
-          {topThree.length === 0 ? <p className="text-center text-gray-400 py-12">No statistics available yet</p> : <>
-              {/* Second Place */}
-              {topThree[1] && <div className="flex flex-col items-center animate-fade-in-up" style={{
-            animationDelay: '0.1s',
-            animationFillMode: 'both'
-          }}>
-                  <div className="relative group">
-                    <div className="relative w-32 h-40 bg-gradient-to-b from-[#0A1325] to-[#0F1B35] rounded-t-full flex flex-col items-center justify-center border-2 border-[#F9C846] shadow-[0_0_20px_rgba(249,200,70,0.4)] transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(249,200,70,0.6)] group-hover:scale-105">
-                      <div className="w-16 h-16 rounded-full bg-[#2E73FF]/30 border-2 border-[#F9C846]/50 flex items-center justify-center mb-2">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[#F9C846]/40 to-transparent"></div>
-                      </div>
-                      <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-gray-300 to-gray-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg border-2 border-white">
-                        2
-                      </div>
-                      <div className="mt-2 text-center">
-                        <p className="text-xl font-bold text-[#F9C846]">{stat(topThree[1])}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>}
+        {topTen.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-20 h-20 rounded-full bg-[#2E73FF]/10 border-2 border-[#F9C846]/20 flex items-center justify-center mb-4">
+              <Icon className="text-[#F9C846]/40" size={32} />
+            </div>
+            <p className="text-center text-gray-400 text-lg">No statistics available yet</p>
+          </div>
+        ) : (
+          <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50">
+            {topTen.map((player, index) => {
+              const rank = index + 1;
+              const rankStyles = getRankBadgeStyles(rank);
               
-              {/* First Place */}
-              {topThree[0] && <div className="flex flex-col items-center animate-fade-in-up mb-8" style={{
-            animationDelay: '0s',
-            animationFillMode: 'both'
-          }}>
-                  <div className="relative group">
-                    <div className="relative w-40 h-48 bg-gradient-to-b from-[#0A1325] to-[#0F1B35] rounded-t-full flex flex-col items-center justify-center border-[3px] border-[#F9C846] shadow-[0_0_30px_rgba(249,200,70,0.5)] transition-all duration-300 group-hover:shadow-[0_0_40px_rgba(249,200,70,0.7)] group-hover:scale-105 animate-pulse-glow">
-                      <div className="w-20 h-20 rounded-full bg-[#2E73FF]/40 border-2 border-[#F9C846]/60 flex items-center justify-center mb-3">
-                        <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#F9C846]/50 to-transparent"></div>
+              return (
+                <div 
+                  key={player.id}
+                  className={`
+                    group relative flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-lg
+                    bg-gradient-to-r from-[#2E73FF]/10 via-[#2E73FF]/5 to-transparent
+                    border border-[#F9C846]/20
+                    hover:border-[#F9C846]/50 hover:bg-[#2E73FF]/20
+                    transition-all duration-300 hover:scale-[1.02]
+                    ${rank <= 3 ? 'hover:shadow-[0_0_20px_rgba(249,200,70,0.3)]' : ''}
+                    animate-fade-in-up
+                  `}
+                  style={{ 
+                    animationDelay: `${index * 0.05}s`,
+                    animationFillMode: 'both'
+                  }}
+                >
+                  {/* Rank Badge */}
+                  <div className={`
+                    relative flex-shrink-0 w-10 h-10 md:w-12 md:h-12
+                    rounded-full bg-gradient-to-br ${rankStyles.bg}
+                    border-2 ${rankStyles.border} ${rankStyles.shadow}
+                    flex items-center justify-center
+                    font-bold text-base md:text-lg ${rankStyles.text}
+                    transition-transform duration-300 group-hover:scale-110
+                  `}>
+                    {rank <= 3 && rankStyles.icon && (
+                      <div className="absolute -top-1 -right-1">
+                        {rankStyles.icon}
                       </div>
-                      <div className="absolute -top-4 -right-4 w-12 h-12 bg-gradient-to-br from-[#F9C846] to-[#d4a837] rounded-full flex items-center justify-center text-[#0A1325] font-bold text-xl shadow-xl border-2 border-white">
-                        1
-                      </div>
-                      <Trophy className="absolute -top-8 text-[#F9C846] animate-bounce-subtle" size={24} />
-                      <div className="mt-2 text-center">
-                        <p className="text-2xl font-bold text-[#F9C846]">{stat(topThree[0])}</p>
-                      </div>
-                    </div>
+                    )}
+                    {rank}
                   </div>
-                </div>}
-              
-              {/* Third Place */}
-              {topThree[2] && <div className="flex flex-col items-center animate-fade-in-up" style={{
-            animationDelay: '0.2s',
-            animationFillMode: 'both'
-          }}>
-                  <div className="relative group">
-                    <div className="relative w-32 h-40 bg-gradient-to-b from-[#0A1325] to-[#0F1B35] rounded-t-full flex flex-col items-center justify-center border-2 border-[#F9C846] shadow-[0_0_20px_rgba(249,200,70,0.4)] transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(249,200,70,0.6)] group-hover:scale-105">
-                      <div className="w-16 h-16 rounded-full bg-[#2E73FF]/30 border-2 border-[#F9C846]/50 flex items-center justify-center mb-2">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[#F9C846]/40 to-transparent"></div>
-                      </div>
-                      <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-amber-700 to-amber-900 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg border-2 border-white">
-                        3
-                      </div>
-                      <div className="mt-2 text-center">
-                        <p className="text-xl font-bold text-[#F9C846]">{stat(topThree[2])}</p>
-                      </div>
-                    </div>
+
+                  {/* Player Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-white text-sm md:text-base truncate mb-1 group-hover:text-[#F9C846] transition-colors">
+                      {player.name}
+                    </p>
+                    {player.teams && (
+                      <p className="text-xs md:text-sm text-gray-400 truncate">
+                        {player.teams.name}
+                      </p>
+                    )}
                   </div>
-                </div>}
-            </>}
-        </div>
+
+                  {/* Stat Value */}
+                  <div className={`
+                    flex-shrink-0 px-3 md:px-4 py-1.5 md:py-2 rounded-full
+                    ${rank === 1 ? 'bg-gradient-to-r from-[#F9C846]/30 to-[#F9C846]/10 border border-[#F9C846]/50' : 'bg-[#2E73FF]/20 border border-[#2E73FF]/30'}
+                    font-bold text-sm md:text-base
+                    ${rank === 1 ? 'text-[#F9C846]' : 'text-white'}
+                    transition-all duration-300 group-hover:scale-105
+                  `}>
+                    {stat(player)}
+                  </div>
+
+                  {/* Hover Glow Effect */}
+                  {rank <= 3 && (
+                    <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-r from-[#F9C846]/5 to-transparent"></div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </Card>;
   };
   return <div className="min-h-screen bg-background relative">
@@ -536,36 +587,24 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="batting" className="space-y-6">
-            <div className="relative">
-              <div className="flex gap-6 overflow-x-auto overflow-y-visible pb-4 snap-x snap-mandatory scroll-smooth scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50 hover:scrollbar-thumb-[#F9C846]" style={{ touchAction: 'pan-y pan-x' }}>
-                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
-                  <StatCard title="Top Run Scorers" players={getTopBatsmen()} stat={(p: any) => `${p.runs_scored} runs`} icon={Trophy} />
-                </div>
-                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
-                  <StatCard title="Highest Strike Rate" players={getHighestStrikeRate()} stat={(p: any) => `${p.strike_rate.toFixed(2)}`} icon={TrendingUp} />
-                </div>
-                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
-                  <StatCard title="Best Batting Average" players={getHighestAverage()} stat={(p: any) => `${p.batting_average.toFixed(2)}`} icon={Award} />
-                </div>
-              </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <StatCard title="Top Run Scorers" players={getTopBatsmen()} stat={(p: any) => `${p.runs_scored} runs`} icon={Trophy} />
+              <StatCard title="Highest Strike Rate" players={getHighestStrikeRate()} stat={(p: any) => `${p.strike_rate.toFixed(2)}`} icon={TrendingUp} />
+              <StatCard title="Best Batting Average" players={getHighestAverage()} stat={(p: any) => `${p.batting_average.toFixed(2)}`} icon={Award} />
             </div>
           </TabsContent>
 
           <TabsContent value="bowling" className="space-y-6">
-            <div className="relative">
-              <div className="flex gap-6 overflow-x-auto overflow-y-visible pb-4 snap-x snap-mandatory scroll-smooth scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50 hover:scrollbar-thumb-[#F9C846]" style={{ touchAction: 'pan-y pan-x' }}>
-                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
-                  <StatCard title="Top Wicket Takers" players={getTopBowlers()} stat={(p: any) => `${p.wickets_taken} wickets`} icon={Target} />
-                </div>
-                <div className="flex-none w-[90vw] md:w-[45vw] lg:w-[30vw] snap-center">
-                  <StatCard title="Best Economy Rate" players={getBestEconomy()} stat={(p: any) => `${p.economy_rate.toFixed(2)}`} icon={TrendingUp} />
-                </div>
-              </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <StatCard title="Top Wicket Takers" players={getTopBowlers()} stat={(p: any) => `${p.wickets_taken} wickets`} icon={Target} />
+              <StatCard title="Best Economy Rate" players={getBestEconomy()} stat={(p: any) => `${p.economy_rate.toFixed(2)}`} icon={TrendingUp} />
             </div>
           </TabsContent>
 
           <TabsContent value="fielding" className="space-y-6">
-            <StatCard title="Top Fielders" players={getTopFielders()} stat={(p: any) => `${p.catches + p.stumpings} dismissals`} icon={Award} />
+            <div className="grid grid-cols-1 lg:grid-cols-1 max-w-2xl mx-auto">
+              <StatCard title="Top Fielders" players={getTopFielders()} stat={(p: any) => `${p.catches + p.stumpings} dismissals`} icon={Award} />
+            </div>
           </TabsContent>
         </Tabs>
         
