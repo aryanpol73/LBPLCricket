@@ -27,6 +27,27 @@ export const MatchPredictionPoll = ({
   useEffect(() => {
     loadResults();
     checkIfVoted();
+    
+    // Set up real-time subscription for prediction updates
+    const channel = supabase
+      .channel('match-predictions')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'match_predictions',
+          filter: `match_id=eq.${matchId}`
+        },
+        () => {
+          loadResults();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [matchId]);
 
   const getUserIdentifier = () => {
@@ -93,35 +114,45 @@ export const MatchPredictionPoll = ({
   return (
     <Card className="p-6 bg-gradient-card shadow-card">
       <div className="flex items-center gap-2 mb-4">
-        <TrendingUp className="text-secondary" size={20} />
-        <h3 className="font-bold text-foreground">Who will win?</h3>
+        <TrendingUp className="text-[hsl(45,90%,55%)]" size={24} />
+        <h3 className="font-bold text-foreground text-lg">Who will win?</h3>
       </div>
 
       <div className="space-y-3">
-        <Button
+        <button
           onClick={() => vote(teamAId)}
           disabled={voted || loading}
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+          className="w-full relative overflow-hidden rounded-lg border border-border/50 bg-gradient-hero/20 hover:bg-gradient-hero/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed p-4"
         >
-          {teamAName}
-          {voted && <span className="ml-2">({teamAPercent}%)</span>}
-        </Button>
+          <div 
+            className="absolute inset-0 bg-gradient-hero transition-all duration-500"
+            style={{ width: `${teamAPercent}%` }}
+          />
+          <div className="relative flex items-center justify-between text-white font-semibold">
+            <span>{teamAName}</span>
+            <span>({teamAPercent}%)</span>
+          </div>
+        </button>
 
-        <Button
+        <button
           onClick={() => vote(teamBId)}
           disabled={voted || loading}
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+          className="w-full relative overflow-hidden rounded-lg border border-border/50 bg-gradient-hero/20 hover:bg-gradient-hero/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed p-4"
         >
-          {teamBName}
-          {voted && <span className="ml-2">({teamBPercent}%)</span>}
-        </Button>
+          <div 
+            className="absolute inset-0 bg-gradient-hero transition-all duration-500"
+            style={{ width: `${teamBPercent}%` }}
+          />
+          <div className="relative flex items-center justify-between text-white font-semibold">
+            <span>{teamBName}</span>
+            <span>({teamBPercent}%)</span>
+          </div>
+        </button>
       </div>
 
-      {voted && (
-        <p className="text-sm text-muted-foreground mt-4 text-center">
-          Total votes: {total}
-        </p>
-      )}
+      <p className="text-sm text-muted-foreground mt-4 text-center">
+        Total votes: {total}
+      </p>
     </Card>
   );
 };

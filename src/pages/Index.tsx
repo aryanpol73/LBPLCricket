@@ -378,6 +378,26 @@ const Index = () => {
         <MatchTimeline />
       </section>
 
+      {/* Countdown and Prediction Section */}
+      {upcomingMatch && (
+        <section className="reveal-zoom-fade container mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <CountdownTimer 
+              targetDate={new Date(upcomingMatch.match_date)}
+              matchNo={upcomingMatch.match_no}
+              matchLabel="Match starts in"
+            />
+            <MatchPredictionPoll
+              matchId={upcomingMatch.id}
+              teamAId={upcomingMatch.team_a?.id}
+              teamBId={upcomingMatch.team_b?.id}
+              teamAName={upcomingMatch.team_a?.name || "Team A"}
+              teamBName={upcomingMatch.team_b?.name || "Team B"}
+            />
+          </div>
+        </section>
+      )}
+
       {/* Points Table Section */}
       <section id="pointsTable" className="reveal-right container mx-auto px-4 py-12">
         <div className="flex items-center gap-3 mb-8">

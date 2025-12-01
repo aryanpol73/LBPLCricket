@@ -94,11 +94,11 @@ export const CountdownTimer = ({ targetDate, matchNo, matchLabel }: CountdownTim
   return (
     <Card className="p-6 bg-gradient-card shadow-card">
       <div className="flex items-center gap-2 mb-4">
-        <Clock className="text-secondary" size={20} />
-        <h3 className="font-bold text-foreground">{matchLabel}</h3>
+        <Clock className="text-[hsl(45,90%,55%)]" size={24} />
+        <h3 className="font-bold text-foreground text-lg">{matchLabel}</h3>
       </div>
 
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-4 gap-3">
         {[
           { label: "Days", value: timeLeft.days },
           { label: "Hours", value: timeLeft.hours },
@@ -106,8 +106,8 @@ export const CountdownTimer = ({ targetDate, matchNo, matchLabel }: CountdownTim
           { label: "Secs", value: timeLeft.seconds },
         ].map((item) => (
           <div key={item.label} className="text-center">
-            <div className="bg-gradient-hero text-white rounded-lg p-3 mb-1 shadow-glow">
-              <p className="text-2xl font-bold">{String(item.value).padStart(2, "0")}</p>
+            <div className="bg-gradient-hero text-white rounded-xl p-4 mb-2 shadow-glow">
+              <p className="text-3xl font-bold">{String(item.value).padStart(2, "0")}</p>
             </div>
             <p className="text-xs text-muted-foreground font-medium">{item.label}</p>
           </div>
