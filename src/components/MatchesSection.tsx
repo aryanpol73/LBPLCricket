@@ -83,6 +83,26 @@ export const MatchesSection = () => {
 
   useEffect(() => {
     loadMatches();
+    
+    // Set up realtime subscription for match updates
+    const channel = supabase
+      .channel('match-fixtures-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'matches'
+        },
+        () => {
+          loadMatches();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const loadMatches = async () => {
