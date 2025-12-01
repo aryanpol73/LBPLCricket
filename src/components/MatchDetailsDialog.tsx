@@ -61,6 +61,7 @@ export const MatchDetailsDialog = ({
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<any | null>(null);
   const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const handlePlayerClick = async (playerId: string) => {
     const { data } = await supabase
@@ -83,6 +84,24 @@ export const MatchDetailsDialog = ({
       loadSquads(match.team_a?.id, match.team_b?.id);
     }
   }, [match, open]);
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .single();
+        
+        setIsAdmin(!!data);
+      }
+    };
+    
+    checkAdminStatus();
+  }, []);
 
   const loadSquads = async (teamAId?: string, teamBId?: string) => {
     if (!teamAId || !teamBId) {
@@ -205,9 +224,9 @@ export const MatchDetailsDialog = ({
         </DialogHeader>
 
         <Tabs defaultValue="squad" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'}`}>
             <TabsTrigger value="squad">Squad</TabsTrigger>
-            <TabsTrigger value="score">Score</TabsTrigger>
+            {isAdmin && <TabsTrigger value="score">Score</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="squad" className="space-y-6 mt-6">
@@ -225,38 +244,40 @@ export const MatchDetailsDialog = ({
             </div>
           </TabsContent>
 
-          <TabsContent value="score" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Live Score</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Paste iframe URL here..."
-                    value={scoreIframeUrl}
-                    onChange={(e) => setScoreIframeUrl(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button onClick={() => setScoreIframeUrl("")}>Clear</Button>
-                </div>
-                {scoreIframeUrl ? (
-                  <div className="w-full aspect-video rounded-lg overflow-hidden border">
-                    <iframe
-                      src={scoreIframeUrl}
-                      className="w-full h-full"
-                      title="Live Score"
-                      allowFullScreen
+          {isAdmin && (
+            <TabsContent value="score" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Live Score</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Paste iframe URL here..."
+                      value={scoreIframeUrl}
+                      onChange={(e) => setScoreIframeUrl(e.target.value)}
+                      className="flex-1"
                     />
+                    <Button onClick={() => setScoreIframeUrl("")}>Clear</Button>
                   </div>
-                ) : (
-                  <div className="w-full aspect-video rounded-lg border border-dashed flex items-center justify-center text-muted-foreground">
-                    Paste an iframe URL to view live scores
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                  {scoreIframeUrl ? (
+                    <div className="w-full aspect-video rounded-lg overflow-hidden border">
+                      <iframe
+                        src={scoreIframeUrl}
+                        className="w-full h-full"
+                        title="Live Score"
+                        allowFullScreen
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full aspect-video rounded-lg border border-dashed flex items-center justify-center text-muted-foreground">
+                      Paste an iframe URL to view live scores
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
         </Tabs>
       </DialogContent>
 
