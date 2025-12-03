@@ -3,6 +3,7 @@ import { Menu, X, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import lbplLogo from "@/assets/lbpl-logo-new.jpg";
 
 const navLinks = [
   { href: "#home", label: "Home" },
@@ -36,23 +37,8 @@ export const Navigation = () => {
     <nav className="sticky top-0 z-50 bg-gradient-to-r from-primary via-primary to-primary/90 shadow-lg backdrop-blur-sm border-b border-secondary/20">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo - Left */}
-          <a 
-            href="#home" 
-            onClick={(e) => { e.preventDefault(); handleNavClick("#home"); }}
-            className="flex items-center gap-2 group"
-          >
-            <span className="text-xl md:text-2xl font-bold text-white group-hover:text-secondary transition-colors">
-              LBPL
-            </span>
-            <span className="text-sm md:text-base text-secondary font-medium">
-              SEASON 3
-            </span>
-          </a>
-
-          {/* Right Side - Hamburger Menu + Dark Mode Toggle */}
-          <div className="flex items-center gap-2">
-            {/* Hamburger Menu */}
+          {/* Left Side - Hamburger Menu */}
+          <div className="flex items-center">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button
@@ -65,8 +51,8 @@ export const Navigation = () => {
                 </Button>
               </SheetTrigger>
               <SheetContent 
-                side="right" 
-                className="w-72 bg-gradient-to-b from-primary to-primary/95 border-l border-secondary/30"
+                side="left" 
+                className="w-72 bg-gradient-to-b from-primary to-primary/95 border-r border-secondary/30"
               >
                 <div className="flex flex-col gap-2 mt-8">
                   {navLinks.map((link) => (
@@ -85,8 +71,31 @@ export const Navigation = () => {
                 </div>
               </SheetContent>
             </Sheet>
+          </div>
 
-            {/* Dark Mode Toggle - Round Button */}
+          {/* Center - Logo + Text */}
+          <a 
+            href="#home" 
+            onClick={(e) => { e.preventDefault(); handleNavClick("#home"); }}
+            className="flex items-center gap-3 group absolute left-1/2 -translate-x-1/2"
+          >
+            <img 
+              src={lbplLogo} 
+              alt="LBPL Logo" 
+              className="w-10 h-10 rounded-full object-cover border-2 border-secondary/50"
+            />
+            <div className="flex flex-col">
+              <span className="text-xl md:text-2xl font-bold text-white group-hover:text-secondary transition-colors leading-tight">
+                LBPL
+              </span>
+              <span className="text-xs md:text-sm text-secondary font-medium leading-tight">
+                Season 3 • 2026
+              </span>
+            </div>
+          </a>
+
+          {/* Right Side - Dark Mode Toggle */}
+          <div className="flex items-center">
             {mounted && (
               <Button
                 variant="ghost"
