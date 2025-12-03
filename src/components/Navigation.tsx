@@ -40,7 +40,7 @@ export const Navigation = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-gradient-to-r from-primary via-primary to-primary/90 shadow-lg backdrop-blur-sm border-b border-secondary/20">
+    <nav className="sticky top-0 z-50 bg-[image:var(--gradient-hero)] shadow-lg backdrop-blur-sm border-b border-secondary/20">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Left Side - Hamburger Menu + Logo + Text */}
@@ -58,7 +58,7 @@ export const Navigation = () => {
               </SheetTrigger>
               <SheetContent 
                 side="left" 
-                className="w-72 bg-gradient-to-b from-primary to-primary/95 border-r border-secondary/30"
+                className="w-72 bg-[image:var(--gradient-hero)] border-r border-secondary/30"
               >
                 <div className="flex flex-col gap-2 mt-8">
                   {navLinks.map((link) => (
