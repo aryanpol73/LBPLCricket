@@ -1,4 +1,4 @@
-import { Navigation } from "@/components/Navigation";
+
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { MatchPredictionPoll } from "@/components/MatchPredictionPoll";
 import { MatchTimeline } from "@/components/MatchTimeline";
@@ -298,7 +298,7 @@ const Index = () => {
   };
   return <div className="min-h-screen bg-background relative">
       <AnimatedBackground />
-      <Navigation />
+      
       
       {/* Live Ticker Banner */}
       <LiveTicker />

@@ -1,4 +1,4 @@
-import { Navigation } from "@/components/Navigation";
+
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Users, Target, Award } from "lucide-react";
@@ -6,7 +6,7 @@ import { Trophy, Users, Target, Award } from "lucide-react";
 const Rules = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      
 
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-primary mb-8">Rules & Format</h1>

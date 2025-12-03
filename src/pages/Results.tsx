@@ -1,4 +1,4 @@
-import { Navigation } from "@/components/Navigation";
+
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
@@ -50,7 +50,6 @@ const Results = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
         <div className="container mx-auto px-4 py-8 text-center">
           <p>Loading results...</p>
         </div>
@@ -60,7 +59,7 @@ const Results = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      
 
       <div className="container mx-auto px-4 py-8">
         {/* Premium Header */}
