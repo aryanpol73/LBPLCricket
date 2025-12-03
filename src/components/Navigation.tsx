@@ -1,211 +1,109 @@
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Moon, Sun } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Menu, X, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import lbplLogo from "@/assets/lbpl-logo-new.jpg";
-import { supabase } from "@/integrations/supabase/client";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+
+const navLinks = [
+  { href: "#home", label: "Home" },
+  { href: "#pointsTable", label: "Points Table" },
+  { href: "#results", label: "Match Results" },
+  { href: "#playerStats", label: "Player Statistics" },
+  { href: "#matches", label: "Matches" },
+  { href: "#teams", label: "Teams" },
+  { href: "#sponsors", label: "Sponsors" },
+  { href: "#gallery", label: "Gallery" },
+];
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const location = useLocation();
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const checkAdminStatus = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        const { data: roleData } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id)
-          .eq('role', 'admin')
-          .single();
-        
-        setIsAdmin(!!roleData);
-      }
-    };
-
-    checkAdminStatus();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          const { data: roleData } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', session.user.id)
-            .eq('role', 'admin')
-            .single();
-          
-          setIsAdmin(!!roleData);
-        } else {
-          setIsAdmin(false);
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
+    setMounted(true);
   }, []);
 
-
-  const baseNavLinks = [
-    { path: "#home", label: "Home" },
-    { path: "#matchTimeline", label: "Match Timeline" },
-    { path: "#pointsTable", label: "Points Table" },
-    { path: "#results", label: "Results" },
-    { path: "#playerStats", label: "Player Stats" },
-    { path: "#matches", label: "Matches" },
-    { path: "#teams", label: "Teams" },
-    { path: "#sponsors", label: "Sponsors" },
-    { path: "#gallery", label: "Gallery" },
-  ];
-
-  const navLinks = isAdmin 
-    ? [...baseNavLinks, { path: "/admin", label: "Admin" }] 
-    : baseNavLinks;
-
-  const isActive = (path: string) => {
-    if (path.startsWith('#')) {
-      return location.hash === path || (path === '#home' && !location.hash);
-    }
-    return location.pathname === path;
-  };
-
-  const handleNavClick = () => {
-    // Just close the sheet/menu - native anchor scrolling will handle the rest
+  const handleNavClick = (href: string) => {
     setIsOpen(false);
-  };
-
-  // Convert hash links to proper routes when not on homepage
-  const getProperPath = (path: string) => {
-    if (path.startsWith('#') && location.pathname !== '/') {
-      return `/${path}`;
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
     }
-    return path;
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-gradient-hero shadow-glow backdrop-blur-sm bg-gradient-to-r from-primary via-primary to-primary-glow animate-gradient-x" style={{ backgroundSize: '200% 100%' }}>
+    <nav className="sticky top-0 z-50 bg-gradient-to-r from-primary via-primary to-primary/90 shadow-lg backdrop-blur-sm border-b border-secondary/20">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
-          <div className="flex items-center gap-3">
-            {/* Universal Menu - Left */}
+        <div className="flex items-center justify-between h-16">
+          {/* Logo - Left */}
+          <a 
+            href="#home" 
+            onClick={(e) => { e.preventDefault(); handleNavClick("#home"); }}
+            className="flex items-center gap-2 group"
+          >
+            <span className="text-xl md:text-2xl font-bold text-white group-hover:text-secondary transition-colors">
+              LBPL
+            </span>
+            <span className="text-sm md:text-base text-secondary font-medium">
+              SEASON 3
+            </span>
+          </a>
+
+          {/* Right Side - Hamburger Menu + Dark Mode Toggle */}
+          <div className="flex items-center gap-2">
+            {/* Hamburger Menu */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <button
-                  className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
-                  aria-label="Menu"
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-white/10 rounded-full"
+                  aria-label="Open menu"
                 >
                   {isOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
+                </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-72 bg-gradient-hero border-primary/20">
-                <div className="flex flex-row items-center justify-between pb-4">
-                  <h2 className="text-lg font-semibold text-white">Navigate</h2>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                    className="text-white hover:bg-white/10 rounded-lg transition-all duration-300"
-                  >
-                    {theme === "dark" ? (
-                      <Sun className="h-5 w-5" />
-                    ) : (
-                      <Moon className="h-5 w-5" />
-                    )}
-                  </Button>
-                </div>
-                <div className="mt-4 flex flex-col gap-2">
-                  {navLinks.map((link) => {
-                    const isAnchor = link.path.startsWith('#');
-                    const properPath = getProperPath(link.path);
-                    
-                    return isAnchor ? (
-                      <a
-                        key={link.path}
-                        href={link.path}
-                        onClick={handleNavClick}
-                        className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
-                          isActive(link.path)
-                            ? "bg-secondary text-primary shadow-gold"
-                            : "text-white hover:bg-white/10"
-                        }`}
-                      >
-                        {link.label}
-                      </a>
-                    ) : (
-                      <Link
-                        key={link.path}
-                        to={link.path}
-                        onClick={() => setIsOpen(false)}
-                        className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
-                          isActive(link.path)
-                            ? "bg-secondary text-primary shadow-gold"
-                            : "text-white hover:bg-white/10"
-                        }`}
-                      >
-                        {link.label}
-                      </Link>
-                    );
-                  })}
+              <SheetContent 
+                side="right" 
+                className="w-72 bg-gradient-to-b from-primary to-primary/95 border-l border-secondary/30"
+              >
+                <div className="flex flex-col gap-2 mt-8">
+                  {navLinks.map((link) => (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavClick(link.href);
+                      }}
+                      className="px-4 py-3 rounded-lg font-medium text-white hover:bg-secondary/20 hover:text-secondary transition-all duration-300"
+                    >
+                      {link.label}
+                    </a>
+                  ))}
                 </div>
               </SheetContent>
             </Sheet>
 
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-3 group">
-              <img 
-                src={lbplLogo} 
-                alt="LBPL Logo" 
-                className="h-14 w-14 rounded-full shadow-gold group-hover:shadow-glow transition-all duration-300"
-              />
-              <div className="flex flex-col">
-                <span className="text-xl font-bold text-white">LBPL</span>
-                <span className="text-xs text-secondary">Season 3 • 2026</span>
-              </div>
-            </Link>
-          </div>
-
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => {
-              const isAnchor = link.path.startsWith('#');
-              const properPath = getProperPath(link.path);
-              
-              return isAnchor ? (
-                <a
-                  key={link.path}
-                  href={link.path}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                    isActive(link.path)
-                      ? "bg-secondary text-primary shadow-gold"
-                      : "text-white hover:bg-white/10"
-                  }`}
-                >
-                  {link.label}
-                </a>
-              ) : (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                    isActive(link.path)
-                      ? "bg-secondary text-primary shadow-gold"
-                      : "text-white hover:bg-white/10"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
+            {/* Dark Mode Toggle - Round Button */}
+            {mounted && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="text-white hover:bg-white/10 rounded-full w-10 h-10"
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
+              </Button>
+            )}
           </div>
         </div>
-
-        {/* Sheet Content rendered above; no separate mobile nav needed */}
       </div>
     </nav>
   );
