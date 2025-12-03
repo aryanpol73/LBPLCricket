@@ -112,24 +112,24 @@ export const MatchPredictionPoll = ({
   const teamBPercent = total > 0 ? Math.round((results.teamB / total) * 100) : 0;
 
   return (
-    <Card className="p-6 bg-gradient-card shadow-card">
-      <div className="flex items-center gap-2 mb-4">
-        <TrendingUp className="text-[hsl(45,90%,55%)]" size={24} />
-        <h3 className="font-bold text-foreground text-lg">Who will win?</h3>
+    <Card className="p-4 bg-gradient-card shadow-card">
+      <div className="flex items-center gap-2 mb-3">
+        <TrendingUp className="text-[hsl(45,90%,55%)]" size={20} />
+        <h3 className="font-bold text-foreground text-base">Who will win?</h3>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         <button
           onClick={() => vote(teamAId)}
           disabled={voted || loading}
-          className="w-full relative overflow-hidden rounded-lg border border-border/50 bg-gradient-hero/20 hover:bg-gradient-hero/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed p-4"
+          className="w-full relative overflow-hidden rounded-lg border border-border/50 bg-gradient-hero/20 hover:bg-gradient-hero/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed p-3"
         >
           <div 
             className="absolute inset-0 bg-gradient-hero transition-all duration-500"
             style={{ width: `${teamAPercent}%` }}
           />
-          <div className="relative flex items-center justify-between text-white font-semibold">
-            <span>{teamAName}</span>
+          <div className="relative flex items-center justify-between text-white font-semibold text-sm">
+            <span className="truncate mr-2">{teamAName}</span>
             <span>({teamAPercent}%)</span>
           </div>
         </button>
@@ -137,20 +137,20 @@ export const MatchPredictionPoll = ({
         <button
           onClick={() => vote(teamBId)}
           disabled={voted || loading}
-          className="w-full relative overflow-hidden rounded-lg border border-border/50 bg-gradient-hero/20 hover:bg-gradient-hero/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed p-4"
+          className="w-full relative overflow-hidden rounded-lg border border-border/50 bg-gradient-hero/20 hover:bg-gradient-hero/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed p-3"
         >
           <div 
             className="absolute inset-0 bg-gradient-hero transition-all duration-500"
             style={{ width: `${teamBPercent}%` }}
           />
-          <div className="relative flex items-center justify-between text-white font-semibold">
-            <span>{teamBName}</span>
+          <div className="relative flex items-center justify-between text-white font-semibold text-sm">
+            <span className="truncate mr-2">{teamBName}</span>
             <span>({teamBPercent}%)</span>
           </div>
         </button>
       </div>
 
-      <p className="text-sm text-muted-foreground mt-4 text-center">
+      <p className="text-xs text-muted-foreground mt-3 text-center">
         Total votes: {total}
       </p>
     </Card>
