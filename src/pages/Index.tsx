@@ -1,4 +1,4 @@
-
+import { Navigation } from "@/components/Navigation";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { MatchPredictionPoll } from "@/components/MatchPredictionPoll";
 import { MatchTimeline } from "@/components/MatchTimeline";
@@ -18,6 +18,7 @@ import { Trophy, Users, Calendar, Crown, Award, Star, TrendingUp, Target } from 
 import { useCountUp } from "@/hooks/useCountUp";
 import { TeamDetailDialog } from "@/components/TeamDetailDialog";
 import { Link } from "react-router-dom";
+
 const Index = () => {
   const [liveMatch, setLiveMatch] = useState<any>(null);
   const [upcomingMatch, setUpcomingMatch] = useState<any>(null);
@@ -299,6 +300,8 @@ const Index = () => {
   return <div className="min-h-screen bg-background relative">
       <AnimatedBackground />
       
+      {/* Navigation */}
+      <Navigation />
       
       {/* Live Ticker Banner */}
       <LiveTicker />
