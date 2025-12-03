@@ -380,12 +380,12 @@ const Index = () => {
 
       {/* Countdown and Prediction Section */}
       {upcomingMatch && (
-        <section className="reveal-zoom-fade container mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <section className="reveal-zoom-fade container mx-auto px-4 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
             <CountdownTimer 
               targetDate={new Date(upcomingMatch.match_date)}
               matchNo={upcomingMatch.match_no}
-              matchLabel="Match starts in"
+              matchLabel="Next Match"
             />
             <MatchPredictionPoll
               matchId={upcomingMatch.id}
@@ -607,23 +607,23 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="batting" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <StatCard title="Top Run Scorers" players={getTopBatsmen()} stat={(p: any) => `${p.runs_scored} runs`} icon={Trophy} />
-              <StatCard title="Highest Strike Rate" players={getHighestStrikeRate()} stat={(p: any) => `${p.strike_rate.toFixed(2)}`} icon={TrendingUp} />
-              <StatCard title="Best Batting Average" players={getHighestAverage()} stat={(p: any) => `${p.batting_average.toFixed(2)}`} icon={Award} />
+            <div className="flex lg:grid lg:grid-cols-3 gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" style={{ touchAction: 'pan-y pan-x' }}>
+              <div className="min-w-[300px] lg:min-w-0 snap-start"><StatCard title="Top Run Scorers" players={getTopBatsmen()} stat={(p: any) => `${p.runs_scored} runs`} icon={Trophy} /></div>
+              <div className="min-w-[300px] lg:min-w-0 snap-start"><StatCard title="Highest Strike Rate" players={getHighestStrikeRate()} stat={(p: any) => `${p.strike_rate.toFixed(2)}`} icon={TrendingUp} /></div>
+              <div className="min-w-[300px] lg:min-w-0 snap-start"><StatCard title="Best Batting Average" players={getHighestAverage()} stat={(p: any) => `${p.batting_average.toFixed(2)}`} icon={Award} /></div>
             </div>
           </TabsContent>
 
           <TabsContent value="bowling" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <StatCard title="Top Wicket Takers" players={getTopBowlers()} stat={(p: any) => `${p.wickets_taken} wickets`} icon={Target} />
-              <StatCard title="Best Economy Rate" players={getBestEconomy()} stat={(p: any) => `${p.economy_rate.toFixed(2)}`} icon={TrendingUp} />
+            <div className="flex lg:grid lg:grid-cols-2 gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" style={{ touchAction: 'pan-y pan-x' }}>
+              <div className="min-w-[300px] lg:min-w-0 snap-start"><StatCard title="Top Wicket Takers" players={getTopBowlers()} stat={(p: any) => `${p.wickets_taken} wickets`} icon={Target} /></div>
+              <div className="min-w-[300px] lg:min-w-0 snap-start"><StatCard title="Best Economy Rate" players={getBestEconomy()} stat={(p: any) => `${p.economy_rate.toFixed(2)}`} icon={TrendingUp} /></div>
             </div>
           </TabsContent>
 
           <TabsContent value="fielding" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-1 max-w-2xl mx-auto">
-              <StatCard title="Top Fielders" players={getTopFielders()} stat={(p: any) => `${p.catches + p.stumpings} dismissals`} icon={Award} />
+            <div className="flex lg:grid lg:grid-cols-1 max-w-2xl mx-auto gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" style={{ touchAction: 'pan-y pan-x' }}>
+              <div className="min-w-[300px] lg:min-w-0 snap-start"><StatCard title="Top Fielders" players={getTopFielders()} stat={(p: any) => `${p.catches + p.stumpings} dismissals`} icon={Award} /></div>
             </div>
           </TabsContent>
         </Tabs>
