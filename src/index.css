@@ -267,6 +267,11 @@ All colors MUST be HSL.
   /* Smooth scrolling with offset for fixed navbar */
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 90px;
+    scroll-padding-top: 80px;
+  }
+  
+  /* Scroll margin for all sections to prevent navbar overlap */
+  section[id] {
+    scroll-margin-top: 80px;
   }
 }

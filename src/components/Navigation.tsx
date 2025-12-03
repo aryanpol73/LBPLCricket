@@ -27,14 +27,20 @@ export const Navigation = () => {
 
   const handleNavClick = (href: string) => {
     setIsOpen(false);
-    const element = document.querySelector(href);
+    const targetId = href.replace("#", "");
+    const element = document.getElementById(targetId);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      const navHeight = 64;
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({
+        top: elementPosition - navHeight,
+        behavior: "smooth"
+      });
     }
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-gradient-to-r from-primary via-primary to-primary/90 shadow-lg backdrop-blur-sm border-b border-secondary/20">
+    <nav className="sticky top-0 z-50 bg-gradient-to-r from-[#0A1325] via-[#0F1B35] to-[#0A1325] shadow-lg backdrop-blur-sm border-b border-secondary/20">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Left Side - Hamburger Menu + Logo + Text */}
@@ -52,29 +58,24 @@ export const Navigation = () => {
               </SheetTrigger>
               <SheetContent 
                 side="left" 
-                className="w-72 bg-gradient-to-b from-primary to-primary/95 border-r border-secondary/30"
+                className="w-72 bg-gradient-to-b from-[#0A1325] via-[#0F1B35] to-[#0A1325] border-r border-secondary/30"
               >
                 <div className="flex flex-col gap-2 mt-8">
                   {navLinks.map((link) => (
-                    <a
+                    <button
                       key={link.href}
-                      href={link.href}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleNavClick(link.href);
-                      }}
-                      className="px-4 py-3 rounded-lg font-medium text-white hover:bg-secondary/20 hover:text-secondary transition-all duration-300"
+                      onClick={() => handleNavClick(link.href)}
+                      className="px-4 py-3 rounded-lg font-medium text-white hover:bg-secondary/20 hover:text-secondary transition-all duration-300 text-left"
                     >
                       {link.label}
-                    </a>
+                    </button>
                   ))}
                 </div>
               </SheetContent>
             </Sheet>
 
-            <a 
-              href="#home" 
-              onClick={(e) => { e.preventDefault(); handleNavClick("#home"); }}
+            <button 
+              onClick={() => handleNavClick("#home")}
               className="flex items-center gap-2 group"
             >
               <img 
@@ -90,7 +91,7 @@ export const Navigation = () => {
                   Season 3 • 2026
                 </span>
               </div>
-            </a>
+            </button>
           </div>
 
           {/* Right Side - Dark Mode Toggle */}
