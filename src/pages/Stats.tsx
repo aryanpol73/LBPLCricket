@@ -1,4 +1,4 @@
-import { Navigation } from "@/components/Navigation";
+
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -213,7 +213,6 @@ const Stats = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
         <div className="container mx-auto px-4 py-8 text-center">
           <p>Loading statistics...</p>
         </div>
@@ -223,7 +222,7 @@ const Stats = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A1325] via-[#0F1B35] to-[#0A1325]">
-      <Navigation />
+      
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8 animate-slide-in-left">

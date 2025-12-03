@@ -1,4 +1,4 @@
-import { Navigation } from "@/components/Navigation";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
@@ -229,7 +229,6 @@ const Matches = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
         <div className="container mx-auto px-4 py-8 text-center">
           <p className="text-lg text-foreground">Loading fixtures...</p>
         </div>
@@ -242,7 +241,7 @@ const Matches = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      
 
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-primary mb-8">Fixtures</h1>

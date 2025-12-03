@@ -1,4 +1,4 @@
-import { Navigation } from "@/components/Navigation";
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -39,7 +39,6 @@ const PointsTable = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
         <div className="container mx-auto px-4 py-8 text-center">
           <p>Loading standings...</p>
         </div>
@@ -49,7 +48,7 @@ const PointsTable = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8 animate-slide-in-left">

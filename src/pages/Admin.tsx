@@ -1,4 +1,4 @@
-import { Navigation } from "@/components/Navigation";
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -338,7 +338,7 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-3">

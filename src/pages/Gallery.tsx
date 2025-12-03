@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Navigation } from "@/components/Navigation";
+
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { X } from "lucide-react";
@@ -19,7 +19,7 @@ const Gallery = () => {
     setAllGalleryImages(data || []);
   };
   return <div className="min-h-screen bg-background">
-      <Navigation />
+      
       
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-10">
