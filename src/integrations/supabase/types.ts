@@ -93,6 +93,7 @@ export type Database = {
           match_phase: string | null
           player_of_match_id: string | null
           round_no: number | null
+          scorer_link: string | null
           status: string | null
           team_a_id: string
           team_a_score: string | null
@@ -111,6 +112,7 @@ export type Database = {
           match_phase?: string | null
           player_of_match_id?: string | null
           round_no?: number | null
+          scorer_link?: string | null
           status?: string | null
           team_a_id: string
           team_a_score?: string | null
@@ -129,6 +131,7 @@ export type Database = {
           match_phase?: string | null
           player_of_match_id?: string | null
           round_no?: number | null
+          scorer_link?: string | null
           status?: string | null
           team_a_id?: string
           team_a_score?: string | null
