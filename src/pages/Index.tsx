@@ -207,6 +207,13 @@ const Index = () => {
     { id: 'd3', name: 'Amit Kumar', teams: { name: 'Storm Warriors' }, runs_scored: 210, wickets_taken: 15, strike_rate: 135.2, batting_average: 42.0, economy_rate: 6.5, catches: 7, stumpings: 1 },
   ];
 
+  // Dummy match results for preview
+  const dummyResults = [
+    { id: 'dr1', round_no: 1, match_no: 1, team_a: { name: 'Thunder Kings' }, team_b: { name: 'Royal Strikers' }, team_a_score: '156/4', team_b_score: '142/8', winner: { name: 'Thunder Kings' }, player_of_match: { name: 'Rahul Sharma' }, match_phase: 'league' },
+    { id: 'dr2', round_no: 1, match_no: 2, team_a: { name: 'Storm Warriors' }, team_b: { name: 'Phoenix Rising' }, team_a_score: '178/6', team_b_score: '180/3', winner: { name: 'Phoenix Rising' }, player_of_match: { name: 'Amit Kumar' }, match_phase: 'league' },
+    { id: 'dr3', round_no: 1, match_no: 3, team_a: { name: 'Golden Eagles' }, team_b: { name: 'Silver Sharks' }, team_a_score: '165/5', team_b_score: '160/7', winner: { name: 'Golden Eagles' }, player_of_match: { name: 'Vikas Patel' }, match_phase: 'league' },
+  ];
+
   const getDummyTopBatsmen = () => dummyPlayers.sort((a, b) => b.runs_scored - a.runs_scored).slice(0, 3);
   const getDummyTopBowlers = () => dummyPlayers.sort((a, b) => b.wickets_taken - a.wickets_taken).slice(0, 3);
   const getDummyStrikeRate = () => dummyPlayers.sort((a, b) => b.strike_rate - a.strike_rate).slice(0, 3);
@@ -503,93 +510,85 @@ const Index = () => {
             Match Results
           </h2>
           <Crown className="text-[hsl(45,90%,55%)]" size={40} strokeWidth={2.5} />
+          {results.length === 0 && (
+            <span className="ml-2 text-xs px-2 py-1 bg-[#F9C846]/20 text-[#F9C846] rounded-full">Preview</span>
+          )}
         </div>
 
         <div className="relative bg-gradient-to-br from-[hsl(220,25%,12%)] via-[hsl(220,30%,15%)] to-[hsl(220,25%,10%)] rounded-3xl p-8 shadow-premium border-2 border-[hsl(45,90%,50%)]/30">
           <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[hsl(45,90%,50%)]/10 via-transparent to-[hsl(45,90%,50%)]/5 pointer-events-none" />
           
           <div className="relative overflow-x-auto">
-            {results.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-[hsl(45,70%,75%)] hover:bg-transparent">
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Round No.</TableHead>
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Match No.</TableHead>
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Teams</TableHead>
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Score</TableHead>
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Winner</TableHead>
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Player of the Match</TableHead>
-                    <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Phase</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {results.map((match) => (
-                    <TableRow key={match.id} className="border-[hsl(220,20%,25%)] hover:bg-[hsl(220,25%,18%)] transition-colors">
-                      <TableCell className="text-center font-bold text-[hsl(45,90%,55%)] text-2xl">
-                        {match.round_no || '-'}
-                      </TableCell>
-                      <TableCell className="text-center font-semibold text-white text-lg">
-                        {match.match_no || '-'}
-                      </TableCell>
-                      <TableCell className="text-center font-semibold text-white">
-                        {match.team_a?.name} vs {match.team_b?.name}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <div className="font-mono text-xl font-bold text-white bg-[hsl(220,25%,18%)] rounded-lg px-3 py-1 inline-block">
-                          {match.team_a_score} - {match.team_b_score}
+            <Table>
+              <TableHeader>
+                <TableRow className="border-[hsl(45,70%,75%)] hover:bg-transparent">
+                  <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Round No.</TableHead>
+                  <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Match No.</TableHead>
+                  <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Teams</TableHead>
+                  <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Score</TableHead>
+                  <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Winner</TableHead>
+                  <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Player of the Match</TableHead>
+                  <TableHead className="text-center font-bold text-[hsl(45,90%,55%)]">Phase</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(results.length > 0 ? results : dummyResults).map((match) => (
+                  <TableRow key={match.id} className="border-[hsl(220,20%,25%)] hover:bg-[hsl(220,25%,18%)] transition-colors">
+                    <TableCell className="text-center font-bold text-[hsl(45,90%,55%)] text-2xl">
+                      {match.round_no || '-'}
+                    </TableCell>
+                    <TableCell className="text-center font-semibold text-white text-lg">
+                      {match.match_no || '-'}
+                    </TableCell>
+                    <TableCell className="text-center font-semibold text-white">
+                      {match.team_a?.name} vs {match.team_b?.name}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="font-mono text-xl font-bold text-white bg-[hsl(220,25%,18%)] rounded-lg px-3 py-1 inline-block">
+                        {match.team_a_score} - {match.team_b_score}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {match.winner ? (
+                        <div className="flex items-center justify-center gap-1">
+                          <Trophy className="text-[hsl(45,90%,55%)]" size={18} />
+                          <Badge className="bg-gradient-gold text-white border-0 shadow-gold-soft font-semibold px-3 py-1">
+                            {match.winner.name}
+                          </Badge>
                         </div>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {match.winner ? (
-                          <div className="flex items-center justify-center gap-1">
-                            <Trophy className="text-[hsl(45,90%,55%)]" size={18} />
-                            <Badge className="bg-gradient-gold text-white border-0 shadow-gold-soft font-semibold px-3 py-1">
-                              {match.winner.name}
-                            </Badge>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {match.player_of_match ? (
-                          <div className="flex items-center justify-center gap-1">
-                            <Star className="text-[hsl(45,90%,55%)]" size={16} fill="hsl(45,90%,55%)" />
-                            <Badge variant="outline" className="border-2 border-[hsl(45,80%,60%)] text-[hsl(45,90%,55%)] font-semibold bg-[hsl(220,25%,15%)]">
-                              {match.player_of_match.name}
-                            </Badge>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge className="bg-primary text-primary-foreground font-semibold">
-                          {match.match_phase?.toUpperCase()}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <Card className="bg-card/95 backdrop-blur-sm border-2 border-[hsl(45,70%,75%)] shadow-gold-soft">
-                <div className="p-12 text-center">
-                  <Award className="mx-auto text-[hsl(45,70%,60%)] mb-4" size={48} />
-                  <p className="text-muted-foreground text-lg">No completed matches yet</p>
-                </div>
-              </Card>
-            )}
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {match.player_of_match ? (
+                        <div className="flex items-center justify-center gap-1">
+                          <Star className="text-[hsl(45,90%,55%)]" size={16} fill="hsl(45,90%,55%)" />
+                          <Badge variant="outline" className="border-2 border-[hsl(45,80%,60%)] text-[hsl(45,90%,55%)] font-semibold bg-[hsl(220,25%,15%)]">
+                            {match.player_of_match.name}
+                          </Badge>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge className="bg-primary text-primary-foreground font-semibold">
+                        {match.match_phase?.toUpperCase()}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
           
           {/* View More Button for Results */}
-          {results.length > 0 && (
-            <div className="text-center mt-8">
-              <Button asChild size="lg" className="font-semibold bg-secondary hover:bg-secondary/90">
-                <Link to="/results">View More</Link>
-              </Button>
-            </div>
-          )}
+          <div className="text-center mt-8">
+            <Button asChild size="lg" className="font-semibold bg-secondary hover:bg-secondary/90">
+              <Link to="/results">View More</Link>
+            </Button>
+          </div>
         </div>
       </section>
 
