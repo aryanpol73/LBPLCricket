@@ -10,31 +10,105 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+  
+  /* Smooth iOS scrolling */
+  .scroll-smooth-ios {
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
-/* Modern Scroll-Based Animations */
-.reveal {
-  opacity: 0;
-  transform: translateY(50px) scale(0.95);
-  animation: reveal-fade-up linear forwards;
-  animation-timeline: view();
-  animation-range: entry 0% cover 35%;
+/* ============================================
+   SCROLL-BASED ANIMATIONS WITH FALLBACKS
+   Uses @supports to provide fallbacks for 
+   Safari, Firefox, and older browsers
+   ============================================ */
+
+/* Default visible state for browsers without animation-timeline support */
+.reveal,
+.reveal-left,
+.reveal-right,
+.reveal-scale,
+.reveal-blur,
+.reveal-rotate,
+.reveal-zoom-fade {
+  opacity: 1;
+  transform: none;
+  filter: none;
 }
 
+/* Only apply scroll animations on browsers that support animation-timeline */
+@supports (animation-timeline: view()) {
+  /* Modern Scroll-Based Animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+    animation: reveal-fade-up linear forwards;
+    animation-timeline: view();
+    animation-range: entry 0% cover 35%;
+  }
+
+  /* Fade from Left */
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-60px);
+    animation: reveal-from-left linear forwards;
+    animation-timeline: view();
+    animation-range: entry 0% cover 35%;
+  }
+
+  /* Fade from Right */
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(60px);
+    animation: reveal-from-right linear forwards;
+    animation-timeline: view();
+    animation-range: entry 0% cover 35%;
+  }
+
+  /* Scale up animation */
+  .reveal-scale {
+    opacity: 0;
+    transform: scale(0.85);
+    animation: reveal-scale-up linear forwards;
+    animation-timeline: view();
+    animation-range: entry 0% cover 35%;
+  }
+
+  /* Blur reveal animation */
+  .reveal-blur {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(30px);
+    animation: reveal-blur-in linear forwards;
+    animation-timeline: view();
+    animation-range: entry 0% cover 35%;
+  }
+
+  /* Rotate reveal animation */
+  .reveal-rotate {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(-15deg) translateY(20px);
+    animation: reveal-rotate-in linear forwards;
+    animation-timeline: view();
+    animation-range: entry 0% cover 35%;
+  }
+
+  /* Zoom Fade animation for cards and images */
+  .reveal-zoom-fade {
+    opacity: 0;
+    transform: scale(0.9);
+    animation: reveal-zoom-fade-in linear forwards;
+    animation-timeline: view();
+    animation-range: entry 0% cover 35%;
+  }
+}
+
+/* Keyframes - always defined for browsers that support them */
 @keyframes reveal-fade-up {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
-}
-
-/* Fade from Left */
-.reveal-left {
-  opacity: 0;
-  transform: translateX(-60px);
-  animation: reveal-from-left linear forwards;
-  animation-timeline: view();
-  animation-range: entry 0% cover 35%;
 }
 
 @keyframes reveal-from-left {
@@ -44,15 +118,6 @@
   }
 }
 
-/* Fade from Right */
-.reveal-right {
-  opacity: 0;
-  transform: translateX(60px);
-  animation: reveal-from-right linear forwards;
-  animation-timeline: view();
-  animation-range: entry 0% cover 35%;
-}
-
 @keyframes reveal-from-right {
   to {
     opacity: 1;
@@ -60,30 +125,11 @@
   }
 }
 
-/* Scale up animation */
-.reveal-scale {
-  opacity: 0;
-  transform: scale(0.85);
-  animation: reveal-scale-up linear forwards;
-  animation-timeline: view();
-  animation-range: entry 0% cover 35%;
-}
-
 @keyframes reveal-scale-up {
   to {
     opacity: 1;
     transform: scale(1);
   }
-}
-
-/* Blur reveal animation */
-.reveal-blur {
-  opacity: 0;
-  filter: blur(10px);
-  transform: translateY(30px);
-  animation: reveal-blur-in linear forwards;
-  animation-timeline: view();
-  animation-range: entry 0% cover 35%;
 }
 
 @keyframes reveal-blur-in {
@@ -94,29 +140,11 @@
   }
 }
 
-/* Rotate reveal animation */
-.reveal-rotate {
-  opacity: 0;
-  transform: perspective(1000px) rotateX(-15deg) translateY(20px);
-  animation: reveal-rotate-in linear forwards;
-  animation-timeline: view();
-  animation-range: entry 0% cover 35%;
-}
-
 @keyframes reveal-rotate-in {
   to {
     opacity: 1;
     transform: perspective(1000px) rotateX(0) translateY(0);
   }
-}
-
-/* Zoom Fade animation for cards and images */
-.reveal-zoom-fade {
-  opacity: 0;
-  transform: scale(0.9);
-  animation: reveal-zoom-fade-in linear forwards;
-  animation-timeline: view();
-  animation-range: entry 0% cover 35%;
 }
 
 @keyframes reveal-zoom-fade-in {
