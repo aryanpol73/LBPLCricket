@@ -200,101 +200,101 @@ const Index = () => {
     };
   };
 
+  // Dummy players for preview when no live data
+  const dummyPlayers = [
+    { id: 'd1', name: 'Rahul Sharma', teams: { name: 'Thunder Kings' }, runs_scored: 245, wickets_taken: 8, strike_rate: 142.5, batting_average: 48.2, economy_rate: 6.8, catches: 5, stumpings: 0 },
+    { id: 'd2', name: 'Vikas Patel', teams: { name: 'Royal Strikers' }, runs_scored: 228, wickets_taken: 12, strike_rate: 138.4, batting_average: 45.6, economy_rate: 7.2, catches: 4, stumpings: 2 },
+    { id: 'd3', name: 'Amit Kumar', teams: { name: 'Storm Warriors' }, runs_scored: 210, wickets_taken: 15, strike_rate: 135.2, batting_average: 42.0, economy_rate: 6.5, catches: 7, stumpings: 1 },
+  ];
+
+  const getDummyTopBatsmen = () => dummyPlayers.sort((a, b) => b.runs_scored - a.runs_scored).slice(0, 3);
+  const getDummyTopBowlers = () => dummyPlayers.sort((a, b) => b.wickets_taken - a.wickets_taken).slice(0, 3);
+  const getDummyStrikeRate = () => dummyPlayers.sort((a, b) => b.strike_rate - a.strike_rate).slice(0, 3);
+  const getDummyAverage = () => dummyPlayers.sort((a, b) => b.batting_average - a.batting_average).slice(0, 3);
+  const getDummyEconomy = () => dummyPlayers.sort((a, b) => a.economy_rate - b.economy_rate).slice(0, 3);
+  const getDummyFielders = () => dummyPlayers.sort((a, b) => (b.catches + b.stumpings) - (a.catches + a.stumpings)).slice(0, 3);
+
   const StatCard = ({
     title,
     players,
     stat,
-    icon: Icon
+    icon: Icon,
+    dummyPlayers: dummyData,
+    dummyStat
   }: any) => {
-    const topTen = players.slice(0, 10);
+    const hasLiveData = players.length > 0;
+    const displayPlayers = hasLiveData ? players.slice(0, 3) : dummyData?.slice(0, 3) || [];
+    const statFn = hasLiveData ? stat : dummyStat || stat;
     
-    return <Card className="p-6 md:p-8 bg-gradient-to-br from-[#0F1B35] via-[#0A1325] to-[#0F1B35] border-[#F9C846]/30 shadow-2xl hover:shadow-[0_0_40px_rgba(249,200,70,0.3)] transition-all duration-500 animate-fade-in-up backdrop-blur-sm h-full">
-        <div className="flex items-center gap-3 mb-6">
+    return <Card className="p-4 md:p-6 bg-gradient-to-br from-[#0F1B35] via-[#0A1325] to-[#0F1B35] border-[#F9C846]/30 shadow-2xl hover:shadow-[0_0_40px_rgba(249,200,70,0.3)] transition-all duration-500 animate-fade-in-up backdrop-blur-sm h-full">
+        <div className="flex items-center gap-3 mb-4">
           <div className="p-2 rounded-lg bg-[#F9C846]/10 border border-[#F9C846]/30">
-            <Icon className="text-[#F9C846]" size={24} />
+            <Icon className="text-[#F9C846]" size={20} />
           </div>
-          <h3 className="text-xl md:text-2xl font-bold text-white">{title}</h3>
+          <h3 className="text-lg md:text-xl font-bold text-white">{title}</h3>
+          {!hasLiveData && (
+            <span className="ml-auto text-xs px-2 py-1 bg-[#F9C846]/20 text-[#F9C846] rounded-full">Preview</span>
+          )}
         </div>
         
-        {topTen.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-20 h-20 rounded-full bg-[#2E73FF]/10 border-2 border-[#F9C846]/20 flex items-center justify-center mb-4">
-              <Icon className="text-[#F9C846]/40" size={32} />
-            </div>
-            <p className="text-center text-gray-400 text-lg">No statistics available yet</p>
-          </div>
-        ) : (
-          <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#F9C846]/50 scrollbar-track-[#0F1B35]/50">
-            {topTen.map((player, index) => {
-              const rank = index + 1;
-              const rankStyles = getRankBadgeStyles(rank);
-              
-              return (
-                <div 
-                  key={player.id}
-                  className={`
-                    group relative flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-lg
-                    bg-gradient-to-r from-[#2E73FF]/10 via-[#2E73FF]/5 to-transparent
-                    border border-[#F9C846]/20
-                    hover:border-[#F9C846]/50 hover:bg-[#2E73FF]/20
-                    transition-all duration-300 hover:scale-[1.02]
-                    ${rank <= 3 ? 'hover:shadow-[0_0_20px_rgba(249,200,70,0.3)]' : ''}
-                    animate-fade-in-up
-                  `}
-                  style={{ 
-                    animationDelay: `${index * 0.05}s`,
-                    animationFillMode: 'both'
-                  }}
-                >
-                  {/* Rank Badge */}
-                  <div className={`
-                    relative flex-shrink-0 w-10 h-10 md:w-12 md:h-12
-                    rounded-full bg-gradient-to-br ${rankStyles.bg}
-                    border-2 ${rankStyles.border} ${rankStyles.shadow}
-                    flex items-center justify-center
-                    font-bold text-base md:text-lg ${rankStyles.text}
-                    transition-transform duration-300 group-hover:scale-110
-                  `}>
-                    {rank <= 3 && rankStyles.icon && (
-                      <div className="absolute -top-1 -right-1">
-                        {rankStyles.icon}
-                      </div>
-                    )}
-                    {rank}
-                  </div>
+        <div className="space-y-2">
+          {displayPlayers.map((player: any, index: number) => {
+            const rank = index + 1;
+            const rankStyles = getRankBadgeStyles(rank);
+            
+            return (
+              <div 
+                key={player.id}
+                className={`
+                  group relative flex items-center gap-2 md:gap-3 p-2 md:p-3 rounded-lg
+                  bg-gradient-to-r from-[#2E73FF]/10 via-[#2E73FF]/5 to-transparent
+                  border border-[#F9C846]/20
+                  hover:border-[#F9C846]/50 hover:bg-[#2E73FF]/20
+                  transition-all duration-300
+                  ${rank <= 3 ? 'hover:shadow-[0_0_15px_rgba(249,200,70,0.2)]' : ''}
+                `}
+              >
+                {/* Rank Badge */}
+                <div className={`
+                  relative flex-shrink-0 w-8 h-8 md:w-10 md:h-10
+                  rounded-full bg-gradient-to-br ${rankStyles.bg}
+                  border-2 ${rankStyles.border} ${rankStyles.shadow}
+                  flex items-center justify-center
+                  font-bold text-sm md:text-base ${rankStyles.text}
+                `}>
+                  {rank <= 3 && rankStyles.icon && (
+                    <div className="absolute -top-1 -right-1 scale-75">
+                      {rankStyles.icon}
+                    </div>
+                  )}
+                  {rank}
+                </div>
 
-                  {/* Player Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-white text-sm md:text-base truncate mb-1 group-hover:text-[#F9C846] transition-colors">
-                      {player.name}
+                {/* Player Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-white text-xs md:text-sm truncate group-hover:text-[#F9C846] transition-colors">
+                    {player.name}
+                  </p>
+                  {player.teams && (
+                    <p className="text-[10px] md:text-xs text-gray-400 truncate">
+                      {player.teams.name}
                     </p>
-                    {player.teams && (
-                      <p className="text-xs md:text-sm text-gray-400 truncate">
-                        {player.teams.name}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Stat Value */}
-                  <div className={`
-                    flex-shrink-0 px-3 md:px-4 py-1.5 md:py-2 rounded-full
-                    ${rank === 1 ? 'bg-gradient-to-r from-[#F9C846]/30 to-[#F9C846]/10 border border-[#F9C846]/50' : 'bg-[#2E73FF]/20 border border-[#2E73FF]/30'}
-                    font-bold text-sm md:text-base
-                    ${rank === 1 ? 'text-[#F9C846]' : 'text-white'}
-                    transition-all duration-300 group-hover:scale-105
-                  `}>
-                    {stat(player)}
-                  </div>
-
-                  {/* Hover Glow Effect */}
-                  {rank <= 3 && (
-                    <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-r from-[#F9C846]/5 to-transparent"></div>
                   )}
                 </div>
-              );
-            })}
-          </div>
-        )}
+
+                {/* Stat Value */}
+                <div className={`
+                  flex-shrink-0 px-2 md:px-3 py-1 rounded-full
+                  ${rank === 1 ? 'bg-gradient-to-r from-[#F9C846]/30 to-[#F9C846]/10 border border-[#F9C846]/50' : 'bg-[#2E73FF]/20 border border-[#2E73FF]/30'}
+                  font-bold text-xs md:text-sm
+                  ${rank === 1 ? 'text-[#F9C846]' : 'text-white'}
+                `}>
+                  {statFn(player)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </Card>;
   };
   return <div className="min-h-screen bg-background relative">
@@ -611,34 +611,32 @@ const Index = () => {
 
           <TabsContent value="batting" className="space-y-6">
             <div className="flex lg:grid lg:grid-cols-3 gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" style={{ touchAction: 'pan-y pan-x' }}>
-              <div className="min-w-[300px] lg:min-w-0 snap-start"><StatCard title="Top Run Scorers" players={getTopBatsmen()} stat={(p: any) => `${p.runs_scored} runs`} icon={Trophy} /></div>
-              <div className="min-w-[300px] lg:min-w-0 snap-start"><StatCard title="Highest Strike Rate" players={getHighestStrikeRate()} stat={(p: any) => `${p.strike_rate.toFixed(2)}`} icon={TrendingUp} /></div>
-              <div className="min-w-[300px] lg:min-w-0 snap-start"><StatCard title="Best Batting Average" players={getHighestAverage()} stat={(p: any) => `${p.batting_average.toFixed(2)}`} icon={Award} /></div>
+              <div className="min-w-[280px] lg:min-w-0 snap-start"><StatCard title="Top Run Scorers" players={getTopBatsmen()} stat={(p: any) => `${p.runs_scored} runs`} icon={Trophy} dummyPlayers={getDummyTopBatsmen()} dummyStat={(p: any) => `${p.runs_scored} runs`} /></div>
+              <div className="min-w-[280px] lg:min-w-0 snap-start"><StatCard title="Highest Strike Rate" players={getHighestStrikeRate()} stat={(p: any) => `${p.strike_rate.toFixed(2)}`} icon={TrendingUp} dummyPlayers={getDummyStrikeRate()} dummyStat={(p: any) => `${p.strike_rate.toFixed(2)}`} /></div>
+              <div className="min-w-[280px] lg:min-w-0 snap-start"><StatCard title="Best Batting Average" players={getHighestAverage()} stat={(p: any) => `${p.batting_average.toFixed(2)}`} icon={Award} dummyPlayers={getDummyAverage()} dummyStat={(p: any) => `${p.batting_average.toFixed(2)}`} /></div>
             </div>
           </TabsContent>
 
           <TabsContent value="bowling" className="space-y-6">
             <div className="flex lg:grid lg:grid-cols-2 gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" style={{ touchAction: 'pan-y pan-x' }}>
-              <div className="min-w-[300px] lg:min-w-0 snap-start"><StatCard title="Top Wicket Takers" players={getTopBowlers()} stat={(p: any) => `${p.wickets_taken} wickets`} icon={Target} /></div>
-              <div className="min-w-[300px] lg:min-w-0 snap-start"><StatCard title="Best Economy Rate" players={getBestEconomy()} stat={(p: any) => `${p.economy_rate.toFixed(2)}`} icon={TrendingUp} /></div>
+              <div className="min-w-[280px] lg:min-w-0 snap-start"><StatCard title="Top Wicket Takers" players={getTopBowlers()} stat={(p: any) => `${p.wickets_taken} wickets`} icon={Target} dummyPlayers={getDummyTopBowlers()} dummyStat={(p: any) => `${p.wickets_taken} wickets`} /></div>
+              <div className="min-w-[280px] lg:min-w-0 snap-start"><StatCard title="Best Economy Rate" players={getBestEconomy()} stat={(p: any) => `${p.economy_rate.toFixed(2)}`} icon={TrendingUp} dummyPlayers={getDummyEconomy()} dummyStat={(p: any) => `${p.economy_rate.toFixed(2)}`} /></div>
             </div>
           </TabsContent>
 
           <TabsContent value="fielding" className="space-y-6">
             <div className="flex lg:grid lg:grid-cols-1 max-w-2xl mx-auto gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" style={{ touchAction: 'pan-y pan-x' }}>
-              <div className="min-w-[300px] lg:min-w-0 snap-start"><StatCard title="Top Fielders" players={getTopFielders()} stat={(p: any) => `${p.catches + p.stumpings} dismissals`} icon={Award} /></div>
+              <div className="min-w-[280px] lg:min-w-0 snap-start"><StatCard title="Top Fielders" players={getTopFielders()} stat={(p: any) => `${p.catches + p.stumpings} dismissals`} icon={Award} dummyPlayers={getDummyFielders()} dummyStat={(p: any) => `${p.catches + p.stumpings} dismissals`} /></div>
             </div>
           </TabsContent>
         </Tabs>
         
-        {/* View More Button for Stats */}
-        {players.length > 0 && (
-          <div className="text-center mt-8">
-            <Button asChild size="lg" className="font-semibold">
-              <Link to="/stats">View Full Statistics</Link>
-            </Button>
-          </div>
-        )}
+        {/* View More Button for Stats - Always visible */}
+        <div className="text-center mt-8">
+          <Button asChild size="lg" className="font-semibold">
+            <Link to="/stats">View Full Statistics</Link>
+          </Button>
+        </div>
       </section>
 
       {/* Matches Section */}
