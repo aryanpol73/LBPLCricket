@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { PlayerProfileDialog } from "./PlayerProfileDialog";
+import { toast } from "sonner";
+import { Save, ExternalLink } from "lucide-react";
 
 interface Player {
   id: string;
@@ -24,6 +26,7 @@ interface Match {
   team_b?: { id: string; name: string; short_name?: string };
   team_a_score?: string;
   team_b_score?: string;
+  scorer_link?: string;
 }
 
 interface MatchDetailsDialogProps {
@@ -57,11 +60,12 @@ export const MatchDetailsDialog = ({
 }: MatchDetailsDialogProps) => {
   const [teamASquad, setTeamASquad] = useState<Player[]>([]);
   const [teamBSquad, setTeamBSquad] = useState<Player[]>([]);
-  const [scoreIframeUrl, setScoreIframeUrl] = useState("");
-  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [scorerLink, setScorerLink] = useState("");
+  const [savedScorerLink, setSavedScorerLink] = useState("");
   const [selectedPlayer, setSelectedPlayer] = useState<any | null>(null);
   const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handlePlayerClick = async (playerId: string) => {
     const { data } = await supabase
@@ -82,6 +86,7 @@ export const MatchDetailsDialog = ({
   useEffect(() => {
     if (match && open) {
       loadSquads(match.team_a?.id, match.team_b?.id);
+      loadScorerLink(match.id);
     }
   }, [match, open]);
 
@@ -94,7 +99,7 @@ export const MatchDetailsDialog = ({
           .select('role')
           .eq('user_id', user.id)
           .eq('role', 'admin')
-          .single();
+          .maybeSingle();
         
         setIsAdmin(!!data);
       }
@@ -102,6 +107,41 @@ export const MatchDetailsDialog = ({
     
     checkAdminStatus();
   }, []);
+
+  const loadScorerLink = async (matchId: string) => {
+    const { data } = await supabase
+      .from('matches')
+      .select('scorer_link')
+      .eq('id', matchId)
+      .maybeSingle();
+    
+    if (data?.scorer_link) {
+      setScorerLink(data.scorer_link);
+      setSavedScorerLink(data.scorer_link);
+    } else {
+      setScorerLink("");
+      setSavedScorerLink("");
+    }
+  };
+
+  const saveScorerLink = async () => {
+    if (!match) return;
+    
+    setIsSaving(true);
+    const { error } = await supabase
+      .from('matches')
+      .update({ scorer_link: scorerLink })
+      .eq('id', match.id);
+    
+    setIsSaving(false);
+    
+    if (error) {
+      toast.error("Failed to save scorer link");
+    } else {
+      setSavedScorerLink(scorerLink);
+      toast.success("Scorer link saved successfully");
+    }
+  };
 
   const loadSquads = async (teamAId?: string, teamBId?: string) => {
     if (!teamAId || !teamBId) {
@@ -120,18 +160,6 @@ export const MatchDetailsDialog = ({
       setTeamASquad(playersData.filter(p => p.team_id === teamAId));
       setTeamBSquad(playersData.filter(p => p.team_id === teamBId));
     }
-  };
-
-  const getRoleColor = (role: string) => {
-    const roleColors: Record<string, string> = {
-      'Captain': 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50',
-      'Vice-Captain': 'bg-orange-500/20 text-orange-300 border-orange-500/50',
-      'Batsman': 'bg-blue-500/20 text-blue-300 border-blue-500/50',
-      'Bowler': 'bg-red-500/20 text-red-300 border-red-500/50',
-      'All-Rounder': 'bg-purple-500/20 text-purple-300 border-purple-500/50',
-      'Wicket-Keeper': 'bg-green-500/20 text-green-300 border-green-500/50',
-    };
-    return roleColors[role] || 'bg-gray-500/20 text-gray-300 border-gray-500/50';
   };
 
   const PlayerList = ({ players, teamName }: { players: Player[]; teamName: string }) => {
@@ -224,9 +252,9 @@ export const MatchDetailsDialog = ({
         </DialogHeader>
 
         <Tabs defaultValue="squad" className="w-full">
-          <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'}`}>
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="squad">Squad</TabsTrigger>
-            {isAdmin && <TabsTrigger value="score">Score</TabsTrigger>}
+            <TabsTrigger value="score">Score</TabsTrigger>
           </TabsList>
 
           <TabsContent value="squad" className="space-y-6 mt-6">
@@ -244,40 +272,57 @@ export const MatchDetailsDialog = ({
             </div>
           </TabsContent>
 
-          {isAdmin && (
-            <TabsContent value="score" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Live Score</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+          <TabsContent value="score" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Live Score</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isAdmin && (
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Paste iframe URL here..."
-                      value={scoreIframeUrl}
-                      onChange={(e) => setScoreIframeUrl(e.target.value)}
+                      placeholder="Paste scorer link URL here..."
+                      value={scorerLink}
+                      onChange={(e) => setScorerLink(e.target.value)}
                       className="flex-1"
                     />
-                    <Button onClick={() => setScoreIframeUrl("")}>Clear</Button>
+                    <Button 
+                      onClick={saveScorerLink} 
+                      disabled={isSaving || scorerLink === savedScorerLink}
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      {isSaving ? "Saving..." : "Save"}
+                    </Button>
                   </div>
-                  {scoreIframeUrl ? (
+                )}
+                {savedScorerLink ? (
+                  <div className="space-y-4">
                     <div className="w-full aspect-video rounded-lg overflow-hidden border">
                       <iframe
-                        src={scoreIframeUrl}
+                        src={savedScorerLink}
                         className="w-full h-full"
                         title="Live Score"
                         allowFullScreen
                       />
                     </div>
-                  ) : (
-                    <div className="w-full aspect-video rounded-lg border border-dashed flex items-center justify-center text-muted-foreground">
-                      Paste an iframe URL to view live scores
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          )}
+                    <a 
+                      href={savedScorerLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Open in new tab
+                    </a>
+                  </div>
+                ) : (
+                  <div className="w-full aspect-video rounded-lg border border-dashed flex items-center justify-center text-muted-foreground">
+                    {isAdmin ? "Paste a scorer link URL and save to display live scores" : "No live score available for this match"}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </DialogContent>
 
