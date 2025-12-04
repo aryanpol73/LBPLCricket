@@ -83,7 +83,7 @@ export const Navigation = () => {
                 alt="LBPL Logo" 
                 className="w-10 h-10 rounded-full object-cover border-2 border-secondary/50"
               />
-              <div className="flex flex-col">
+              <div className="flex flex-col items-center text-center">
                 <span className="text-lg md:text-xl font-bold text-white group-hover:text-secondary transition-colors leading-tight">
                   LBPL
                 </span>
