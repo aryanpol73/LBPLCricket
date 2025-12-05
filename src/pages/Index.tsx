@@ -1,6 +1,4 @@
 import { Navigation } from "@/components/Navigation";
-import { CountdownTimer } from "@/components/CountdownTimer";
-import { MatchPredictionPoll } from "@/components/MatchPredictionPoll";
 import { MatchTimeline } from "@/components/MatchTimeline";
 import { SponsorsSection } from "@/components/SponsorsSection";
 import { GallerySection } from "@/components/GallerySection";
@@ -389,25 +387,6 @@ const Index = () => {
         <MatchTimeline />
       </section>
 
-      {/* Countdown and Prediction Section */}
-      {upcomingMatch && (
-        <section className="reveal-zoom-fade container mx-auto px-4 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-            <CountdownTimer 
-              targetDate={new Date(upcomingMatch.match_date)}
-              matchNo={upcomingMatch.match_no}
-              matchLabel="Next Match"
-            />
-            <MatchPredictionPoll
-              matchId={upcomingMatch.id}
-              teamAId={upcomingMatch.team_a?.id}
-              teamBId={upcomingMatch.team_b?.id}
-              teamAName={upcomingMatch.team_a?.name || "Team A"}
-              teamBName={upcomingMatch.team_b?.name || "Team B"}
-            />
-          </div>
-        </section>
-      )}
 
       {/* Points Table Section */}
       <section id="pointsTable" className="reveal-right container mx-auto px-4 py-12">
