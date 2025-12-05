@@ -126,11 +126,8 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     
-    // Use production URL for OAuth redirect to ensure consistency
-    const productionUrl = "https://lbpl-official.lovable.app";
-    const redirectUrl = window.location.hostname === "localhost" 
-      ? `${window.location.origin}/auth/callback`
-      : `${productionUrl}/auth/callback`;
+    // Use current origin for OAuth redirect - relies on Lovable auto-managed URLs
+    const redirectUrl = `${window.location.origin}/auth/callback`;
     
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
