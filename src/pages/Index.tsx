@@ -313,7 +313,7 @@ const Index = () => {
       <LiveTicker />
 
       {/* Hero Section */}
-      <section id="home" className="relative z-10 bg-gradient-hero py-16 px-4 overflow-hidden">
+      <section id="home" className="relative z-10 bg-gradient-hero py-12 px-4 overflow-hidden">
         <div className="container mx-auto text-center">
           <h1 className="text-3xl sm:text-4xl md:text-7xl font-bold text-white mb-4 animate-fade-in-down">LBPL SEASON 3</h1>
           <p className="text-xl md:text-2xl text-secondary mb-6 animate-fade-in-up" style={{
@@ -338,7 +338,7 @@ const Index = () => {
       </section>
 
       {/* League Stats Section */}
-      <section id="league-stats" className="reveal-scale container mx-auto px-4 py-12">
+      <section id="league-stats" className="reveal-scale container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link to="/teams">
             <Card className="p-6 bg-card shadow-card hover:shadow-glow hover:-translate-y-2 transition-all duration-300 cursor-pointer">
@@ -389,7 +389,7 @@ const Index = () => {
 
 
       {/* Points Table Section */}
-      <section id="pointsTable" className="reveal-right container mx-auto px-4 py-12">
+      <section id="pointsTable" className="reveal-right container mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8">
           <Trophy className="text-secondary" size={32} />
           <h2 className="text-4xl font-bold text-primary">Points Table - Season 3</h2>
@@ -483,7 +483,7 @@ const Index = () => {
       </section>
 
       {/* Results Section */}
-      <section id="results" className="reveal-blur container mx-auto px-4 py-12">
+      <section id="results" className="reveal-blur container mx-auto px-4 py-8">
         <div className="flex items-center justify-center gap-3 mb-8">
           <Trophy className="text-[hsl(45,90%,55%)]" size={40} strokeWidth={2.5} />
           <h2 className="text-5xl font-bold bg-gradient-gold bg-clip-text text-transparent">
@@ -573,7 +573,7 @@ const Index = () => {
       </section>
 
       {/* Player Stats Section */}
-      <section id="playerStats" className="reveal-rotate container mx-auto px-4 py-12">
+      <section id="playerStats" className="reveal-rotate container mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8">
           <div className="p-2 rounded-lg bg-[#F9C846]/10 border border-[#F9C846]/30">
             <Trophy className="text-[#F9C846]" size={32} />
@@ -624,7 +624,7 @@ const Index = () => {
       </section>
 
       {/* Teams Section */}
-      <section id="teams" className="reveal-left container mx-auto px-4 py-12">
+      <section id="teams" className="reveal-left container mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8">
           <Users className="text-secondary" size={32} />
           <h2 className="text-4xl font-bold text-primary">All Teams</h2>
