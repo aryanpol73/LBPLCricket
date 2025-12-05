@@ -129,7 +129,7 @@ const Auth = () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "https://lbpl-official.lovable.app/auth/callback",
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 
