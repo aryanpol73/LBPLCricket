@@ -126,9 +126,16 @@ const Teams = () => {
                       <User className="text-[#F9C846]" size={32} />
                     </div>
                     <h3 className="font-bold text-white mb-1">{player.name}</h3>
-                    <Badge variant="outline" className="text-xs border-[#F9C846]/50 text-[#F9C846] mb-2">
-                      {player.role || 'Player'}
-                    </Badge>
+                    <div className="flex items-center justify-center gap-2 flex-wrap mb-2">
+                      <Badge variant="outline" className="text-xs border-[#F9C846]/50 text-[#F9C846]">
+                        {player.role || 'Player'}
+                      </Badge>
+                      {player.name === "Aryan Pol" && (
+                        <Badge className="text-xs bg-gradient-to-r from-yellow-500 to-amber-600 border-0 text-white">
+                          Owner
+                        </Badge>
+                      )}
+                    </div>
                     {player.teams && (
                       <p className="text-xs text-muted-foreground">
                         {player.teams.name}

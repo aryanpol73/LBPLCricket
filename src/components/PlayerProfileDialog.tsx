@@ -80,14 +80,23 @@ export const PlayerProfileDialog = ({ player, open, onOpenChange }: PlayerProfil
                 </div>
               </div>
               
-              {player.role && (
-                <Badge 
-                  variant="outline" 
-                  className="text-sm px-3 py-1 bg-primary/10 border-primary/30 text-primary font-semibold"
-                >
-                  {player.role}
-                </Badge>
-              )}
+              <div className="flex items-center gap-2 flex-wrap">
+                {player.role && (
+                  <Badge 
+                    variant="outline" 
+                    className="text-sm px-3 py-1 bg-primary/10 border-primary/30 text-primary font-semibold"
+                  >
+                    {player.role}
+                  </Badge>
+                )}
+                {player.name === "Aryan Pol" && (
+                  <Badge 
+                    className="text-sm px-3 py-1 bg-gradient-to-r from-yellow-500 to-amber-600 border-0 text-white font-semibold"
+                  >
+                    Owner
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
         </DialogHeader>

@@ -119,6 +119,11 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
                       <span className="text-sm font-medium text-foreground hover:text-primary transition-colors">
                         {player.name}
                       </span>
+                      {player.name === "Aryan Pol" && (
+                        <Badge className="text-xs bg-gradient-to-r from-yellow-500 to-amber-600 border-0 text-white">
+                          Owner
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -145,6 +150,11 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
                       <span className="text-sm font-medium text-foreground hover:text-primary transition-colors">
                         {player.name}
                       </span>
+                      {player.name === "Aryan Pol" && (
+                        <Badge className="text-xs bg-gradient-to-r from-yellow-500 to-amber-600 border-0 text-white">
+                          Owner
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -166,9 +176,16 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
                     className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted hover:scale-[1.02] transition-all duration-300 animate-fade-in cursor-pointer"
                     style={{ animationDelay: `${0.7 + index * 0.05}s`, animationFillMode: 'both' }}
                   >
-                    <span className="text-sm font-medium text-foreground hover:text-primary transition-colors">
-                      {player.name}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+                        {player.name}
+                      </span>
+                      {player.name === "Aryan Pol" && (
+                        <Badge className="text-xs bg-gradient-to-r from-yellow-500 to-amber-600 border-0 text-white">
+                          Owner
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
