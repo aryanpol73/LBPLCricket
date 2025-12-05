@@ -15,6 +15,7 @@ import Rules from "./pages/Rules";
 import Gallery from "./pages/Gallery";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
+import Community from "./pages/Community";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/teams" element={<Teams />} />
             <Route path="/stats" element={<Stats />} />
             <Route path="/gallery" element={<Gallery />} />
+            <Route path="/community" element={<Community />} />
             {/* <Route path="/rules" element={<Rules />} /> */}
             {/* <Route path="/fan-zone" element={<FanZone />} /> */}
             <Route path="/auth" element={<Auth />} />

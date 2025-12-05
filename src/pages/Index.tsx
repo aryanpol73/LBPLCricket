@@ -7,6 +7,7 @@ import { GallerySection } from "@/components/GallerySection";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { MatchesSection } from "@/components/MatchesSection";
 import { LiveTicker } from "@/components/LiveTicker";
+import { CommunitySection } from "@/components/CommunitySection";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -690,6 +691,11 @@ const Index = () => {
               View Less
             </button>
           </div>}
+      </section>
+
+      {/* Community Section */}
+      <section id="community" className="reveal-scale">
+        <CommunitySection />
       </section>
 
       {/* Sponsors Section */}
