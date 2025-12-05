@@ -39,7 +39,8 @@ import {
   MessageSquare,
   Smile,
   X,
-  Loader2
+  Loader2,
+  LogOut
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -414,11 +415,26 @@ const Community = () => {
       <Navigation />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="p-2 rounded-lg bg-secondary/10 border border-secondary/30">
-            <MessageCircle className="text-secondary" size={32} />
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-secondary/10 border border-secondary/30">
+              <MessageCircle className="text-secondary" size={32} />
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-primary">LBPL Community</h1>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-primary">LBPL Community</h1>
+          {user && (
+            <Button
+              variant="outline"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                toast({ title: "Logged out successfully" });
+              }}
+              className="border-secondary/30 hover:bg-red-500/20 hover:border-red-500/50 hover:text-red-400"
+            >
+              <LogOut className="mr-2" size={16} />
+              Logout
+            </Button>
+          )}
         </div>
 
         {/* Create Post Section */}
