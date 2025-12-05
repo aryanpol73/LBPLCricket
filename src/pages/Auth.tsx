@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Mail, Lock, Loader2 } from "lucide-react";
+import { Users, Mail, Lock, Loader2, AlertTriangle } from "lucide-react";
 import { z } from "zod";
+import { checkPasswordBreach } from "@/lib/passwordCheck";
 
 // Validation schemas
 const emailSchema = z.string().email("Please enter a valid email address");
@@ -60,6 +61,21 @@ const Auth = () => {
     if (!validateInputs()) return;
     
     setLoading(true);
+
+    // Check if password has been exposed in data breaches
+    const breachResult = await checkPasswordBreach(password);
+    if (breachResult.breached) {
+      toast.error(
+        `This password has been found in ${breachResult.count.toLocaleString()} data breaches. Please choose a different password.`,
+        {
+          icon: <AlertTriangle className="h-5 w-5 text-destructive" />,
+          duration: 6000,
+        }
+      );
+      setErrors((prev) => ({ ...prev, password: "This password has been compromised. Please choose a stronger one." }));
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase.auth.signUp({
       email,
