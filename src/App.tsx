@@ -15,6 +15,7 @@ import Rules from "./pages/Rules";
 import Gallery from "./pages/Gallery";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import Community from "./pages/Community";
 import NotFound from "./pages/NotFound";
 
@@ -39,6 +40,7 @@ const App = () => (
             {/* <Route path="/rules" element={<Rules />} /> */}
             {/* <Route path="/fan-zone" element={<FanZone />} /> */}
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
