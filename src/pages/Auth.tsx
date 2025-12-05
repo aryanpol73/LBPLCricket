@@ -127,7 +127,7 @@ const Auth = () => {
     setGoogleLoading(true);
     
     // Use production URL for OAuth redirect to ensure consistency
-    const productionUrl = "https://lbpl-season3-hub.lovable.app";
+    const productionUrl = "https://lbpl-official.lovable.app";
     const redirectUrl = window.location.hostname === "localhost" 
       ? `${window.location.origin}/auth/callback`
       : `${productionUrl}/auth/callback`;
