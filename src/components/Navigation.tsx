@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import lbplLogo from "@/assets/lbpl-logo-new.jpg";
@@ -21,6 +22,8 @@ export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     setMounted(true);
@@ -37,6 +40,14 @@ export const Navigation = () => {
         top: elementPosition - navHeight,
         behavior: "smooth"
       });
+    }
+  };
+
+  const handleLogoClick = () => {
+    if (location.pathname !== "/") {
+      navigate("/");
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -76,7 +87,7 @@ export const Navigation = () => {
             </Sheet>
 
             <button 
-              onClick={() => handleNavClick("#home")}
+              onClick={handleLogoClick}
               className="flex items-center gap-2 group"
             >
               <img 
