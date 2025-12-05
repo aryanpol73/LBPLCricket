@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Navigation } from "@/components/Navigation";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { Card } from "@/components/ui/card";
@@ -37,7 +37,9 @@ import {
   Megaphone,
   HelpCircle,
   MessageSquare,
-  Smile
+  Smile,
+  X,
+  Loader2
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -93,6 +95,10 @@ const Community = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -193,18 +199,77 @@ const Community = () => {
     setIsLoading(false);
   };
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({ title: "Image must be less than 5MB", variant: "destructive" });
+        return;
+      }
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const clearImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const uploadImage = async (): Promise<string | null> => {
+    if (!selectedImage || !user) return null;
+    
+    setIsUploading(true);
+    const fileExt = selectedImage.name.split('.').pop();
+    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from('community-images')
+      .upload(fileName, selectedImage);
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      toast({ title: "Failed to upload image", variant: "destructive" });
+      setIsUploading(false);
+      return null;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('community-images')
+      .getPublicUrl(fileName);
+
+    setIsUploading(false);
+    return urlData.publicUrl;
+  };
+
   const createPost = async () => {
     if (!user) {
       toast({ title: "Please login to post", variant: "destructive" });
       return;
     }
-    if (!newPostContent.trim()) return;
+    if (!newPostContent.trim() && !selectedImage) {
+      toast({ title: "Please add some content or an image", variant: "destructive" });
+      return;
+    }
+
+    let imageUrl = null;
+    if (selectedImage) {
+      imageUrl = await uploadImage();
+    }
 
     const { error } = await supabase.from('community_posts').insert({
       user_id: user.id,
       user_name: user.email?.split('@')[0] || 'Anonymous',
       content: newPostContent,
       post_type: newPostType,
+      image_url: imageUrl,
     });
 
     if (error) {
@@ -213,6 +278,7 @@ const Community = () => {
     }
 
     setNewPostContent("");
+    clearImage();
     toast({ title: "Post created!" });
   };
 
@@ -364,6 +430,24 @@ const Community = () => {
               onChange={(e) => setNewPostContent(e.target.value)}
               className="mb-4 bg-background/50 border-secondary/30 min-h-[100px]"
             />
+            
+            {/* Image Preview */}
+            {imagePreview && (
+              <div className="relative mb-4 inline-block">
+                <img 
+                  src={imagePreview} 
+                  alt="Preview" 
+                  className="max-h-48 rounded-lg border border-secondary/30"
+                />
+                <button
+                  onClick={clearImage}
+                  className="absolute -top-2 -right-2 p-1 bg-red-500 rounded-full hover:bg-red-600 transition-colors"
+                >
+                  <X size={14} className="text-white" />
+                </button>
+              </div>
+            )}
+            
             <div className="flex flex-wrap items-center gap-3">
               <select
                 value={newPostType}
@@ -376,9 +460,35 @@ const Community = () => {
                 <option value="match_discussion">🏏 Match Discussion</option>
                 {isAdmin && <option value="announcement">📢 Announcement</option>}
               </select>
-              <Button onClick={createPost} className="bg-secondary hover:bg-secondary/90">
-                <Send className="mr-2" size={16} />
-                Post
+              
+              {/* Image Upload Button */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageSelect}
+                accept="image/*"
+                className="hidden"
+              />
+              <Button 
+                variant="outline" 
+                onClick={() => fileInputRef.current?.click()}
+                className="border-secondary/30 hover:bg-secondary/20"
+              >
+                <ImageIcon className="mr-2" size={16} />
+                Photo
+              </Button>
+              
+              <Button 
+                onClick={createPost} 
+                className="bg-secondary hover:bg-secondary/90"
+                disabled={isUploading}
+              >
+                {isUploading ? (
+                  <Loader2 className="mr-2 animate-spin" size={16} />
+                ) : (
+                  <Send className="mr-2" size={16} />
+                )}
+                {isUploading ? 'Uploading...' : 'Post'}
               </Button>
             </div>
           </Card>
@@ -466,7 +576,21 @@ const Community = () => {
                 </div>
 
                 {/* Post Content */}
-                <p className="text-white whitespace-pre-wrap mb-4">{post.content}</p>
+                {post.content && (
+                  <p className="text-white whitespace-pre-wrap mb-4">{post.content}</p>
+                )}
+                
+                {/* Post Image */}
+                {post.image_url && (
+                  <div className="mb-4">
+                    <img 
+                      src={post.image_url} 
+                      alt="Post image" 
+                      className="max-w-full max-h-[500px] rounded-lg border border-secondary/20 cursor-pointer hover:opacity-90 transition-opacity"
+                      onClick={() => window.open(post.image_url!, '_blank')}
+                    />
+                  </div>
+                )}
 
                 {/* Reactions */}
                 <div className="flex flex-wrap items-center gap-2 mb-3 pb-3 border-b border-secondary/20">
