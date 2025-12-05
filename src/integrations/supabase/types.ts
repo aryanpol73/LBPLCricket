@@ -519,54 +519,23 @@ export type Database = {
       }
     }
     Views: {
-      match_prediction_stats: {
-        Row: {
-          match_id: string | null
-          prediction_count: number | null
-          team_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "match_predictions_match_id_fkey"
-            columns: ["match_id"]
-            isOneToOne: false
-            referencedRelation: "matches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "match_predictions_team_id_fkey"
-            columns: ["team_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      potm_vote_stats: {
-        Row: {
-          match_id: string | null
-          player_id: string | null
-          vote_count: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "potm_votes_match_id_fkey"
-            columns: ["match_id"]
-            isOneToOne: false
-            referencedRelation: "matches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "potm_votes_player_id_fkey"
-            columns: ["player_id"]
-            isOneToOne: false
-            referencedRelation: "players"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
+      get_match_prediction_counts: {
+        Args: { p_match_id: string }
+        Returns: {
+          prediction_count: number
+          team_id: string
+        }[]
+      }
+      get_potm_vote_counts: {
+        Args: { p_match_id: string }
+        Returns: {
+          player_id: string
+          vote_count: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

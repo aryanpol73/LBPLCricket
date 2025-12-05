@@ -54,16 +54,16 @@ export const PlayerOfMatchVoting = ({ matchId }: PlayerOfMatchVotingProps) => {
     return identifier;
   };
 
-  const checkIfVoted = async () => {
-    const userIdentifier = getUserIdentifier();
-    const { data } = await supabase
-      .from('potm_votes')
-      .select('id')
-      .eq('match_id', matchId)
-      .eq('user_identifier', userIdentifier)
-      .single();
+  const checkIfVoted = () => {
+    // Track votes locally for UX (database constraint prevents actual duplicates)
+    const votedMatches = JSON.parse(localStorage.getItem('voted_potm') || '{}');
+    setVoted(!!votedMatches[matchId]);
+  };
 
-    setVoted(!!data);
+  const markAsVoted = () => {
+    const votedMatches = JSON.parse(localStorage.getItem('voted_potm') || '{}');
+    votedMatches[matchId] = true;
+    localStorage.setItem('voted_potm', JSON.stringify(votedMatches));
   };
 
   const vote = async (playerId: string) => {
@@ -84,9 +84,17 @@ export const PlayerOfMatchVoting = ({ matchId }: PlayerOfMatchVotingProps) => {
       });
 
     if (error) {
-      toast.error("Failed to submit vote");
+      if (error.code === '23505') {
+        // Duplicate entry - user already voted
+        toast.error("You have already voted for this match!");
+        markAsVoted();
+        setVoted(true);
+      } else {
+        toast.error("Failed to submit vote");
+      }
     } else {
       toast.success("Vote submitted successfully!");
+      markAsVoted();
       setVoted(true);
     }
     setLoading(false);

@@ -59,28 +59,27 @@ export const MatchPredictionPoll = ({
     return identifier;
   };
 
-  const checkIfVoted = async () => {
-    const identifier = getUserIdentifier();
-    const { data } = await supabase
-      .from('match_predictions')
-      .select('id')
-      .eq('match_id', matchId)
-      .eq('user_identifier', identifier)
-      .single();
-    
-    if (data) setVoted(true);
+  const checkIfVoted = () => {
+    // Track votes locally for UX (database constraint prevents actual duplicates)
+    const votedMatches = JSON.parse(localStorage.getItem('voted_predictions') || '{}');
+    if (votedMatches[matchId]) setVoted(true);
+  };
+
+  const markAsVoted = () => {
+    const votedMatches = JSON.parse(localStorage.getItem('voted_predictions') || '{}');
+    votedMatches[matchId] = true;
+    localStorage.setItem('voted_predictions', JSON.stringify(votedMatches));
   };
 
   const loadResults = async () => {
-    const { data } = await supabase
-      .from('match_predictions')
-      .select('team_id')
-      .eq('match_id', matchId);
+    // Use secure RPC function that returns only aggregated counts
+    const { data, error } = await supabase
+      .rpc('get_match_prediction_counts', { p_match_id: matchId });
 
-    if (data) {
-      const teamAVotes = data.filter(v => v.team_id === teamAId).length;
-      const teamBVotes = data.filter(v => v.team_id === teamBId).length;
-      setResults({ teamA: teamAVotes, teamB: teamBVotes });
+    if (data && !error) {
+      const teamAVotes = data.find((p: any) => p.team_id === teamAId)?.prediction_count || 0;
+      const teamBVotes = data.find((p: any) => p.team_id === teamBId)?.prediction_count || 0;
+      setResults({ teamA: Number(teamAVotes), teamB: Number(teamBVotes) });
     }
   };
 
@@ -98,9 +97,17 @@ export const MatchPredictionPoll = ({
       .insert({ match_id: matchId, team_id: teamId, user_identifier: identifier });
 
     if (error) {
-      toast.error("Failed to submit vote");
+      if (error.code === '23505') {
+        // Duplicate entry - user already voted
+        toast.error("You've already voted!");
+        markAsVoted();
+        setVoted(true);
+      } else {
+        toast.error("Failed to submit vote");
+      }
     } else {
       toast.success("Vote submitted!");
+      markAsVoted();
       setVoted(true);
       loadResults();
     }
