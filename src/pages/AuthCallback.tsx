@@ -11,10 +11,10 @@ const AuthCallback = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === 'SIGNED_IN' && session) {
-          // Successfully signed in, redirect to community
-          navigate("/community", { replace: true });
+          // Redirect to main domain after successful OAuth on old domain
+          window.location.href = "https://lbpl-official.lovable.app/community";
         } else if (event === 'SIGNED_OUT') {
-          navigate("/auth", { replace: true });
+          window.location.href = "https://lbpl-official.lovable.app/auth";
         }
       }
     );
@@ -31,7 +31,7 @@ const AuthCallback = () => {
       }
       
       if (session) {
-        navigate("/community", { replace: true });
+        window.location.href = "https://lbpl-official.lovable.app/community";
       }
     };
     
@@ -41,7 +41,7 @@ const AuthCallback = () => {
     // Fallback: if nothing happens after 5 seconds, redirect to auth
     const fallback = setTimeout(() => {
       setStatus("Taking too long, redirecting...");
-      navigate("/auth", { replace: true });
+      window.location.href = "https://lbpl-official.lovable.app/auth";
     }, 5000);
 
     return () => {
