@@ -19,6 +19,7 @@ import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import ResetPassword from "./pages/ResetPassword";
 import Community from "./pages/Community";
+import Sponsors from "./pages/Sponsors";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
                 <Route path="/stats" element={<Stats />} />
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/community" element={<Community />} />
+                <Route path="/sponsors" element={<Sponsors />} />
                 {/* <Route path="/rules" element={<Rules />} /> */}
                 {/* <Route path="/fan-zone" element={<FanZone />} /> */}
                 <Route path="/auth" element={<Auth />} />

@@ -1,12 +1,8 @@
 import { Card } from "./ui/card";
-import { useRef } from "react";
-import Autoplay from "embla-carousel-autoplay";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 interface Sponsor {
   name: string;
@@ -50,10 +46,6 @@ const tierStyles = {
 };
 
 export const SponsorsSection = () => {
-  const plugin = useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: false })
-  );
-
   const sponsors: Sponsor[] = [
     { name: "Govind Mahajan", city: "Chikhli", tier: "Titanium", amount: "₹61,000" },
     { name: "Dr. Devesh Minase & Ajinkya Saoji", firmName: "Boli Bhishi Group", city: "Mumbai + Dongaon", tier: "Platinum", amount: "₹51,000" },
@@ -76,146 +68,152 @@ export const SponsorsSection = () => {
     { name: "Pankaj Vyawahare", firmName: "Pankaj Vyawahare and Associates", city: "CSN", tier: "Advertiser", amount: "₹11,000" },
   ];
 
+  // Duplicate sponsors for seamless infinite scroll
+  const duplicatedSponsors = [...sponsors, ...sponsors];
+
   return (
-    <div className="bg-muted/30 py-12">
+    <div id="sponsors" className="bg-muted/30 py-12 overflow-hidden">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 bg-gradient-gold bg-clip-text text-transparent">
           Season 3 Sponsors
         </h2>
-        <Carousel
-          plugins={[plugin.current]}
-          className="w-full mb-6"
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-        >
-          <CarouselContent className="-ml-4">
-            {[...sponsors, ...sponsors].map((sponsor, index) => {
+        
+        {/* Infinite Scroll Container */}
+        <div className="relative w-full overflow-hidden mb-8">
+          <div 
+            className="flex gap-4 animate-infinite-scroll"
+            style={{
+              width: `${duplicatedSponsors.length * 220}px`,
+            }}
+          >
+            {duplicatedSponsors.map((sponsor, index) => {
               const style = tierStyles[sponsor.tier];
               return (
-                <CarouselItem 
-                  key={`sponsor-${index}`}
-                  className="pl-4 reveal-zoom-fade basis-1/2 md:basis-1/4 min-w-[170px] sm:min-w-[200px]"
-                >
                 <Card
-                    className="overflow-hidden transition-all duration-300 hover:scale-105 h-full rounded-3xl"
+                  key={`sponsor-${index}`}
+                  className="flex-shrink-0 w-[200px] overflow-hidden transition-all duration-300 hover:scale-105 rounded-3xl hover:pause-animation"
+                  style={{
+                    background: style.gradient,
+                    border: `6px solid ${style.borderColor}`,
+                    boxShadow: `
+                      0 12px 24px rgba(0, 0, 0, 0.5),
+                      0 6px 12px rgba(0, 0, 0, 0.3),
+                      inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                      inset 0 -2px 4px rgba(0, 0, 0, 0.4)
+                    `,
+                  }}
+                >
+                  {/* Embossed Title Badge */}
+                  <div 
+                    className="px-4 py-3 flex justify-center"
                     style={{
-                      background: style.gradient,
-                      border: `6px solid ${style.borderColor}`,
+                      background: `linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5))`,
                       boxShadow: `
-                        0 12px 24px rgba(0, 0, 0, 0.5),
-                        0 6px 12px rgba(0, 0, 0, 0.3),
-                        inset 0 2px 4px rgba(255, 255, 255, 0.4),
-                        inset 0 -2px 4px rgba(0, 0, 0, 0.4)
+                        inset 0 2px 4px rgba(0, 0, 0, 0.6),
+                        inset 0 -1px 2px rgba(255, 255, 255, 0.2)
                       `,
+                      borderBottom: '2px solid rgba(0, 0, 0, 0.4)',
                     }}
                   >
-                    {/* Embossed Title Badge */}
-                    <div 
-                      className="px-6 py-4 flex justify-center"
+                    <Badge
+                      className="font-bold text-xs px-3 py-1 rounded-full"
                       style={{
-                        background: `linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5))`,
+                        backgroundColor: style.badgeColor,
+                        color: '#FFFFFF',
+                        textShadow: '0 2px 4px rgba(0, 0, 0, 0.8), 0 1px 2px rgba(0, 0, 0, 0.6)',
                         boxShadow: `
-                          inset 0 2px 4px rgba(0, 0, 0, 0.6),
-                          inset 0 -1px 2px rgba(255, 255, 255, 0.2)
+                          0 3px 6px rgba(0, 0, 0, 0.5),
+                          inset 0 1px 2px rgba(255, 255, 255, 0.3),
+                          inset 0 -2px 4px rgba(0, 0, 0, 0.4)
                         `,
-                        borderBottom: '2px solid rgba(0, 0, 0, 0.4)',
+                        border: '1px solid rgba(0, 0, 0, 0.4)',
                       }}
                     >
-                      <Badge
-                        className="font-bold text-sm px-4 py-1.5 rounded-full"
+                      {sponsor.tier}
+                    </Badge>
+                  </div>
+                  
+                  {/* Card Content */}
+                  <div 
+                    className="p-4 space-y-1"
+                    style={{
+                      boxShadow: `
+                        inset 0 4px 8px rgba(0, 0, 0, 0.3),
+                        inset 0 -2px 4px rgba(255, 255, 255, 0.2)
+                      `,
+                      background: `linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.1) 100%)`,
+                    }}
+                  >
+                    <h3 
+                      className="font-bold text-base text-white leading-tight line-clamp-2"
+                      style={{
+                        textShadow: `
+                          0 3px 6px rgba(0, 0, 0, 0.8),
+                          0 1px 2px rgba(0, 0, 0, 0.6),
+                          0 -1px 1px rgba(255, 255, 255, 0.3)
+                        `,
+                      }}
+                    >
+                      {sponsor.name}
+                    </h3>
+                    {sponsor.firmName && (
+                      <p 
+                        className="text-white/95 text-xs font-medium line-clamp-1"
                         style={{
-                          backgroundColor: style.badgeColor,
-                          color: '#FFFFFF',
-                          textShadow: '0 2px 4px rgba(0, 0, 0, 0.8), 0 1px 2px rgba(0, 0, 0, 0.6)',
-                          boxShadow: `
-                            0 3px 6px rgba(0, 0, 0, 0.5),
-                            inset 0 1px 2px rgba(255, 255, 255, 0.3),
-                            inset 0 -2px 4px rgba(0, 0, 0, 0.4)
+                          textShadow: `
+                            0 2px 4px rgba(0, 0, 0, 0.7),
+                            0 1px 2px rgba(0, 0, 0, 0.5)
                           `,
-                          border: '1px solid rgba(0, 0, 0, 0.4)',
                         }}
                       >
-                        {sponsor.tier} Sponsor
-                      </Badge>
-                    </div>
-                    
-                    {/* Card Content with Metallic Inner Panel */}
-                    <div 
-                      className="p-6 space-y-2"
+                        {sponsor.firmName}
+                      </p>
+                    )}
+                    <p 
+                      className="text-white/90 text-xs"
                       style={{
-                        boxShadow: `
-                          inset 0 4px 8px rgba(0, 0, 0, 0.3),
-                          inset 0 -2px 4px rgba(255, 255, 255, 0.2)
-                        `,
-                        background: `linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.1) 100%)`,
+                        textShadow: '0 2px 3px rgba(0, 0, 0, 0.6)',
                       }}
                     >
-                      <h3 
-                        className="font-bold text-xl text-white leading-tight break-words"
+                      📍 {sponsor.city}
+                    </p>
+                    <div 
+                      className="pt-2 mt-1"
+                      style={{
+                        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+                      }}
+                    >
+                      <p 
+                        className="text-white font-bold text-lg"
                         style={{
                           textShadow: `
                             0 3px 6px rgba(0, 0, 0, 0.8),
                             0 1px 2px rgba(0, 0, 0, 0.6),
                             0 -1px 1px rgba(255, 255, 255, 0.3)
                           `,
-                          wordWrap: 'break-word',
-                          overflowWrap: 'break-word',
                         }}
                       >
-                        {sponsor.name}
-                      </h3>
-                      {sponsor.firmName && (
-                        <p 
-                          className="text-white/95 text-sm font-medium break-words"
-                          style={{
-                            textShadow: `
-                              0 2px 4px rgba(0, 0, 0, 0.7),
-                              0 1px 2px rgba(0, 0, 0, 0.5)
-                            `,
-                            wordWrap: 'break-word',
-                            overflowWrap: 'break-word',
-                          }}
-                        >
-                          {sponsor.firmName}
-                        </p>
-                      )}
-                      <p 
-                        className="text-white/90 text-sm"
-                        style={{
-                          textShadow: '0 2px 3px rgba(0, 0, 0, 0.6)',
-                        }}
-                      >
-                        📍 {sponsor.city}
+                        {sponsor.amount}
                       </p>
-                      <div 
-                        className="pt-3 mt-2"
-                        style={{
-                          borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-                        }}
-                      >
-                        <p 
-                          className="text-white font-bold text-2xl"
-                          style={{
-                            textShadow: `
-                              0 3px 6px rgba(0, 0, 0, 0.8),
-                              0 1px 2px rgba(0, 0, 0, 0.6),
-                              0 -1px 1px rgba(255, 255, 255, 0.3)
-                            `,
-                          }}
-                        >
-                          {sponsor.amount}
-                        </p>
-                      </div>
                     </div>
-                  </Card>
-                </CarouselItem>
+                  </div>
+                </Card>
               );
             })}
-          </CarouselContent>
-        </Carousel>
-        <p className="text-center text-sm text-muted-foreground mt-6">
+          </div>
+        </div>
+
+        {/* View More Button */}
+        <div className="flex justify-center mb-6">
+          <Button asChild variant="outline" className="border-secondary/50 hover:border-secondary hover:bg-secondary/10">
+            <Link to="/sponsors" className="flex items-center gap-2">
+              View All Sponsors
+              <ArrowRight size={16} />
+            </Link>
+          </Button>
+        </div>
+
+        <p className="text-center text-sm text-muted-foreground">
           Powered by LBPL Pune Cricket Team
         </p>
       </div>
