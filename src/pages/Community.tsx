@@ -410,7 +410,7 @@ const Community = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-background relative pt-16">
       <AnimatedBackground />
       <Navigation />
 

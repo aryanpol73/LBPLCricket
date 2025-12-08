@@ -303,7 +303,7 @@ const Index = () => {
         </div>
       </Card>;
   };
-  return <div className="min-h-screen bg-background relative">
+  return <div className="min-h-screen bg-background relative pt-16">
       <AnimatedBackground />
       
       {/* Navigation */}
