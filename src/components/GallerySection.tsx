@@ -34,7 +34,7 @@ export const GallerySection = () => {
 
   return (
     <>
-      <section className="bg-muted/30 py-12">
+      <section className="bg-muted/30 py-12 overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-foreground mb-2">Gallery</h2>
@@ -52,7 +52,7 @@ export const GallerySection = () => {
         >
           <CarouselContent>
             {galleryImages.map((image, index) => (
-              <CarouselItem key={`gallery-${image.id}-${index}`} className="basis-1/2 md:basis-1/3 lg:basis-1/5 xl:basis-1/6 reveal-zoom-fade">
+              <CarouselItem key={`gallery-${image.id}-${index}`} className="basis-1/2 md:basis-1/3 lg:basis-1/5 xl:basis-1/6">
                 <Card 
                   className="overflow-hidden cursor-pointer shadow-sm hover:shadow-glow transition-all duration-300 hover:scale-105 group rounded-lg"
                   onClick={() => setSelectedImage(image.image_url)}

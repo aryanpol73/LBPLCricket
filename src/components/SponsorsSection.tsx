@@ -73,16 +73,16 @@ export const SponsorsSection = () => {
   const duplicatedSponsors = [...sponsors, ...sponsors];
 
   return (
-    <div id="sponsors" className="bg-muted/30 py-12 overflow-hidden">
+    <div className="bg-muted/30 py-12 overflow-hidden">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 bg-gradient-gold bg-clip-text text-transparent">
           Season 3 Sponsors
         </h2>
         
         {/* Infinite Scroll Container */}
-        <div className="relative w-full overflow-hidden mb-8">
+        <div className="relative w-full overflow-hidden mb-8 mx-auto">
           <div 
-            className="flex gap-4 animate-infinite-scroll"
+            className="flex gap-4 animate-infinite-scroll pl-4"
             style={{
               width: `${duplicatedSponsors.length * 220}px`,
             }}
