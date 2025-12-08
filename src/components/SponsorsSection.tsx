@@ -50,7 +50,7 @@ export const SponsorsSection = () => {
     { name: "Govind Mahajan", city: "Chikhli", tier: "Titanium", amount: "₹61,000" },
     { name: "Dr. Devesh Minase & Ajinkya Saoji", firmName: "Boli Bhishi Group", city: "Mumbai + Dongaon", tier: "Platinum", amount: "₹51,000" },
     { name: "Abhijit (Jitu) Saoji & Vishwajit Saoji", firmName: "Saoji Group of Companies", city: "Nagpur", tier: "Gold", amount: "₹41,000" },
-    { name: "Sagar Umalkar", firmName: "Satyajit Group", city: "Pune", tier: "Gold", amount: "₹41,000" },
+    { name: "Sagar Umalkar", firmName: "Satyajeet Group", city: "Pune", tier: "Gold", amount: "₹41,000" },
     { name: "Suresh Vyawahare", city: "Akot", tier: "Silver Plus", amount: "₹35,000" },
     { name: "Prashant Shriram Saoji Family", firmName: "Arthayojan Finserve Pvt. Ltd.", city: "Mehkar", tier: "Silver Plus", amount: "₹35,000" },
     { name: "Siddhant Vishwesh Saraf", firmName: "Grow Gold", city: "Dongaon", tier: "Silver Plus", amount: "₹35,000" },
