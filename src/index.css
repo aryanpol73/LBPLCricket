@@ -314,6 +314,13 @@ All colors MUST be HSL.
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 80px;
+    overflow-x: hidden;
+  }
+  
+  /* Prevent horizontal overflow globally */
+  html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
   }
   
   /* Scroll margin for all sections to prevent navbar overlap */
