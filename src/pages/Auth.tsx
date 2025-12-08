@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Mail, Lock, Loader2, AlertTriangle } from "lucide-react";
+import { Users, Mail, Lock, Loader2, AlertTriangle, CheckCircle2, Home } from "lucide-react";
 import { z } from "zod";
 import { checkPasswordBreach } from "@/lib/passwordCheck";
+import { Link } from "react-router-dom";
 
 // Validation schemas
 const emailSchema = z.string().email("Please enter a valid email address");
@@ -25,12 +26,21 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
 
   useEffect(() => {
-    // Check for error in URL params
+    // Check for various URL params
     const error = searchParams.get("error");
+    const verified = searchParams.get("verified");
+    
     if (error === "callback_failed") {
       toast.error("Sign in failed. Please try again.");
+    }
+    
+    if (verified === "true") {
+      toast.success("Email verified successfully! You can now sign in.", {
+        duration: 5000,
+      });
     }
 
     // Check if user is already logged in
@@ -94,7 +104,7 @@ const Auth = () => {
         toast.error(error.message);
       }
     } else {
-      toast.success("Account created! Please check your email to confirm.");
+      setSignupSuccess(true);
     }
     setLoading(false);
   };
@@ -113,6 +123,10 @@ const Auth = () => {
     if (error) {
       if (error.message.includes("Invalid login credentials")) {
         toast.error("Invalid email or password. Please try again.");
+      } else if (error.message.includes("Email not confirmed")) {
+        toast.error("Please verify your email before signing in. Check your inbox for the verification link.", {
+          duration: 6000,
+        });
       } else {
         toast.error(error.message);
       }
@@ -166,9 +180,88 @@ const Auth = () => {
     setResetLoading(false);
   };
 
+  const handleResendVerification = async () => {
+    setLoading(true);
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      }
+    });
+    
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Verification email sent! Please check your inbox.");
+    }
+    setLoading(false);
+  };
+
+  // Show success message after signup
+  if (signupSuccess) {
+    return (
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-4">
+        <Card className="w-full max-w-md p-8 bg-card shadow-glow border-primary/20 text-center">
+          <div className="mx-auto w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-6">
+            <CheckCircle2 className="text-green-500" size={32} />
+          </div>
+          
+          <h1 className="text-2xl font-bold text-foreground mb-2">Check Your Email!</h1>
+          
+          <p className="text-muted-foreground mb-6">
+            We've sent a verification link to <span className="text-primary font-medium">{email}</span>. 
+            Please click the link in the email to verify your account.
+          </p>
+          
+          <div className="space-y-3">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleResendVerification}
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Mail className="mr-2 h-4 w-4" />
+              )}
+              Resend Verification Email
+            </Button>
+            
+            <Button
+              variant="ghost"
+              className="w-full"
+              onClick={() => {
+                setSignupSuccess(false);
+                setEmail("");
+                setPassword("");
+              }}
+            >
+              Back to Sign In
+            </Button>
+          </div>
+          
+          <p className="text-xs text-muted-foreground mt-6">
+            Didn't receive the email? Check your spam folder or try resending.
+          </p>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-4">
       <Card className="w-full max-w-md p-8 bg-card shadow-glow border-primary/20">
+        {/* Back to Home Link */}
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6"
+        >
+          <Home size={16} />
+          Back to Home
+        </Link>
+        
         <div className="flex items-center justify-center gap-3 mb-6">
           <Users className="text-primary" size={32} />
           <h1 className="text-3xl font-bold text-foreground">LBPL Community</h1>
@@ -335,6 +428,11 @@ const Auth = () => {
                   <p className="text-sm text-destructive mt-1">{errors.password}</p>
                 )}
               </div>
+              
+              <p className="text-xs text-muted-foreground">
+                A verification email will be sent to confirm your account.
+              </p>
+              
               <Button
                 type="submit"
                 className="w-full bg-gradient-hero text-white"
