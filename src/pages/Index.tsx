@@ -673,17 +673,17 @@ const Index = () => {
       </section>
 
       {/* Community Section */}
-      <section id="community" className="reveal-scale">
+      <section id="community">
         <CommunitySection />
       </section>
 
       {/* Sponsors Section */}
-      <section id="sponsors" className="reveal-right">
+      <section id="sponsors">
         <SponsorsSection />
       </section>
 
       {/* Gallery Section */}
-      <section id="gallery" className="reveal-blur">
+      <section id="gallery">
         <GallerySection />
       </section>
 
