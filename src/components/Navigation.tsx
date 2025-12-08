@@ -88,16 +88,24 @@ export const Navigation = () => {
                 side="left" 
                 className="w-72 bg-[image:var(--gradient-hero)] border-r border-secondary/30"
               >
-                <div className="flex flex-col gap-2 mt-8">
-                  {navLinks.map((link) => (
-                    <button
-                      key={link.href}
-                      onClick={() => handleNavClick(link.href)}
-                      className="px-4 py-3 rounded-lg font-medium text-white hover:bg-secondary/20 hover:text-secondary transition-all duration-300 text-left"
-                    >
-                      {link.label}
-                    </button>
-                  ))}
+                <div className="flex flex-col h-full">
+                  <div className="flex flex-col gap-2 mt-8 flex-1">
+                    {navLinks.map((link) => (
+                      <button
+                        key={link.href}
+                        onClick={() => handleNavClick(link.href)}
+                        className="px-4 py-3 rounded-lg font-medium text-white hover:bg-secondary/20 hover:text-secondary transition-all duration-300 text-left"
+                      >
+                        {link.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="pb-6 pt-4 border-t border-secondary/20">
+                    <p className="text-center text-sm text-white/70">
+                      Designed & Developed by{" "}
+                      <span className="text-secondary font-medium">Aryan Pol</span>
+                    </p>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
