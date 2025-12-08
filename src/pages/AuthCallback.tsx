@@ -47,9 +47,9 @@ const AuthCallback = () => {
       // If this is an email verification callback
       if (type === "signup" || type === "email") {
         setStatus("Email verified successfully!");
-        // Redirect to auth page with success message
+        // Redirect to email-verified page
         setTimeout(() => {
-          window.location.href = "https://lbpl-official.lovable.app/auth?verified=true";
+          navigate("/email-verified", { replace: true });
         }, 1000);
         return;
       }
