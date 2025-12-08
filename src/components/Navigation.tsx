@@ -52,7 +52,15 @@ export const Navigation = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-[image:var(--gradient-hero)] shadow-lg backdrop-blur-sm border-b border-secondary/20">
+    <nav 
+      className="fixed top-0 left-0 right-0 z-50 bg-[image:var(--gradient-hero)] shadow-lg backdrop-blur-sm border-b border-secondary/20"
+      style={{ 
+        WebkitTransform: 'translateZ(0)',
+        transform: 'translateZ(0)',
+        WebkitBackfaceVisibility: 'hidden',
+        backfaceVisibility: 'hidden'
+      }}
+    >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Left Side - Hamburger Menu + Logo + Text */}
