@@ -15,6 +15,24 @@
   .scroll-smooth-ios {
     -webkit-overflow-scrolling: touch;
   }
+
+  /* Infinite scroll animation for sponsors carousel */
+  .animate-infinite-scroll {
+    animation: infinite-scroll 30s linear infinite;
+  }
+  
+  .animate-infinite-scroll:hover {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes infinite-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* ============================================
