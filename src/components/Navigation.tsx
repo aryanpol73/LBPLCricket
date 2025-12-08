@@ -32,6 +32,14 @@ export const Navigation = () => {
   const handleNavClick = (href: string) => {
     setIsOpen(false);
     const targetId = href.replace("#", "");
+    
+    // If not on homepage, navigate to homepage with hash
+    if (location.pathname !== "/") {
+      navigate("/" + href);
+      return;
+    }
+    
+    // If on homepage, scroll to section
     const element = document.getElementById(targetId);
     if (element) {
       const navHeight = 64;

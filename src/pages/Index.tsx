@@ -7,6 +7,7 @@ import { MatchesSection } from "@/components/MatchesSection";
 import { LiveTicker } from "@/components/LiveTicker";
 import { CommunitySection } from "@/components/CommunitySection";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import { TeamDetailDialog } from "@/components/TeamDetailDialog";
 import { Link } from "react-router-dom";
 
 const Index = () => {
+  const location = useLocation();
   const [liveMatch, setLiveMatch] = useState<any>(null);
   const [upcomingMatch, setUpcomingMatch] = useState<any>(null);
   const [stats, setStats] = useState<any[]>([]);
@@ -50,6 +52,25 @@ const Index = () => {
     loadPlayerStats();
     loadTeams();
   }, []);
+
+  // Handle hash navigation from other pages
+  useEffect(() => {
+    if (location.hash) {
+      const targetId = location.hash.replace("#", "");
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        const element = document.getElementById(targetId);
+        if (element) {
+          const navHeight = 64;
+          const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo({
+            top: elementPosition - navHeight,
+            behavior: "smooth"
+          });
+        }
+      }, 100);
+    }
+  }, [location.hash]);
   useEffect(() => {
     if (stats.length > 0) {
       const teamsStat = stats.find(s => s.stat_key === 'teams_count');
