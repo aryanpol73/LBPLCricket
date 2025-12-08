@@ -308,6 +308,8 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden;
+    max-width: 100vw;
+    position: relative;
   }
 
   /* Smooth scrolling with offset for fixed navbar */
@@ -315,12 +317,14 @@ All colors MUST be HSL.
     scroll-behavior: smooth;
     scroll-padding-top: 80px;
     overflow-x: hidden;
+    max-width: 100vw;
   }
   
-  /* Prevent horizontal overflow globally */
-  html, body {
+  /* Prevent horizontal overflow globally - lock the screen */
+  #root {
     max-width: 100vw;
     overflow-x: hidden;
+    position: relative;
   }
   
   /* Scroll margin for all sections to prevent navbar overlap */
