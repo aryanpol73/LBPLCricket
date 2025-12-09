@@ -33,7 +33,7 @@ import {
   Trash2, 
   Edit,
   Send,
-  Image as ImageIcon,
+  Upload,
   Megaphone,
   HelpCircle,
   MessageSquare,
@@ -75,6 +75,7 @@ const postTypeIcons: Record<string, any> = {
   announcement: Megaphone,
   question: HelpCircle,
   match_discussion: MessageCircle,
+  poll: HelpCircle,
 };
 
 const reactionIcons: Record<string, { icon: any; label: string; color: string }> = {
@@ -473,6 +474,7 @@ const Community = () => {
                 <option value="discussion">💬 Discussion</option>
                 <option value="meme">😂 Meme</option>
                 <option value="question">❓ Question</option>
+                <option value="poll">📊 Poll</option>
                 <option value="match_discussion">🏏 Match Discussion</option>
                 {isAdmin && <option value="announcement">📢 Announcement</option>}
               </select>
@@ -490,8 +492,8 @@ const Community = () => {
                 onClick={() => fileInputRef.current?.click()}
                 className="border-secondary/30 hover:bg-secondary/20"
               >
-                <ImageIcon className="mr-2" size={16} />
-                Photo
+                <Upload className="mr-2" size={16} />
+                Upload
               </Button>
               
               <Button 
