@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -47,10 +48,18 @@ const AuthCallback = () => {
       // If this is an email verification callback
       if (type === "signup" || type === "email") {
         setStatus("Email verified successfully!");
-        // Redirect to email-verified page
+        toast.success("Your email has been successfully verified!", {
+          duration: 5000,
+        });
+        // Redirect directly to Community page after verification
         setTimeout(() => {
-          navigate("/email-verified", { replace: true });
-        }, 1000);
+          if (session) {
+            navigate("/community", { replace: true });
+          } else {
+            // If no session, redirect to auth to sign in
+            navigate("/auth", { replace: true });
+          }
+        }, 1500);
         return;
       }
       
