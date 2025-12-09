@@ -125,7 +125,7 @@ const Teams = () => {
                     <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-[#2E73FF]/20 border-2 border-[#F9C846]/50 flex items-center justify-center">
                       <User className="text-[#F9C846]" size={32} />
                     </div>
-                    <h3 className="font-bold text-white mb-1">{player.name}</h3>
+                    <h3 className="font-bold text-foreground mb-1">{player.name}</h3>
                     <div className="flex items-center justify-center gap-2 flex-wrap mb-2">
                       <Badge variant="outline" className="text-xs border-[#F9C846]/50 text-[#F9C846]">
                         {player.role || 'Player'}
