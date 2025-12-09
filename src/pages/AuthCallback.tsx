@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -7,6 +7,7 @@ const AuthCallback = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState("Processing...");
+  const hasRedirected = useRef(false);
 
   useEffect(() => {
     // Check URL for email confirmation type
@@ -16,37 +17,45 @@ const AuthCallback = () => {
     if (errorDescription) {
       setStatus("Verification failed");
       setTimeout(() => {
-        navigate(`/auth?error=callback_failed`, { replace: true });
+        navigate("/auth?error=callback_failed", { replace: true });
       }, 1500);
       return;
     }
 
-    // Set up auth state listener
+    // Set up auth state listener - only for OAuth (Google) sign-in, not email verification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === 'SIGNED_IN' && session) {
+        // Only handle OAuth sign-in here (when no type param = OAuth flow)
+        if (event === 'SIGNED_IN' && session && !type && !hasRedirected.current) {
+          hasRedirected.current = true;
           setStatus("Sign in successful!");
-          // Redirect to main domain after successful OAuth on old domain
-          window.location.href = "https://lbpl-official.lovable.app/community";
-        } else if (event === 'SIGNED_OUT') {
-          window.location.href = "https://lbpl-official.lovable.app/auth";
+          navigate("/community", { replace: true });
+        } else if (event === 'SIGNED_OUT' && !hasRedirected.current) {
+          hasRedirected.current = true;
+          navigate("/auth", { replace: true });
         }
       }
     );
 
-    // Check current session (handles page refresh scenarios and email verification)
+    // Check current session (handles email verification)
     const checkSession = async () => {
+      if (hasRedirected.current) return;
+      
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) {
         console.error("Auth callback error:", error.message);
         setStatus("Authentication failed");
+        hasRedirected.current = true;
         setTimeout(() => navigate("/auth?error=callback_failed", { replace: true }), 1500);
         return;
       }
       
       // If this is an email verification callback
       if (type === "signup" || type === "email") {
+        if (hasRedirected.current) return;
+        hasRedirected.current = true;
+        
         setStatus("Email verified successfully!");
         toast.success("Your email has been successfully verified!", {
           duration: 5000,
@@ -63,9 +72,11 @@ const AuthCallback = () => {
         return;
       }
       
-      if (session) {
+      // For OAuth flow without type param, session check handles refresh scenarios
+      if (session && !hasRedirected.current) {
+        hasRedirected.current = true;
         setStatus("Sign in successful!");
-        window.location.href = "https://lbpl-official.lovable.app/community";
+        navigate("/community", { replace: true });
       }
     };
     
@@ -74,8 +85,11 @@ const AuthCallback = () => {
     
     // Fallback: if nothing happens after 5 seconds, redirect to auth
     const fallback = setTimeout(() => {
-      setStatus("Taking too long, redirecting...");
-      window.location.href = "https://lbpl-official.lovable.app/auth";
+      if (!hasRedirected.current) {
+        hasRedirected.current = true;
+        setStatus("Taking too long, redirecting...");
+        navigate("/auth", { replace: true });
+      }
     }, 5000);
 
     return () => {
