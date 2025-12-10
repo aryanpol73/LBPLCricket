@@ -10,37 +10,39 @@ const AuthCallback = () => {
   const hasRedirected = useRef(false);
 
   useEffect(() => {
-    // Check URL for email confirmation type
-    const type = searchParams.get("type");
-    const errorDescription = searchParams.get("error_description");
-    
-    if (errorDescription) {
-      setStatus("Verification failed");
-      setTimeout(() => {
-        navigate("/auth?error=callback_failed", { replace: true });
-      }, 1500);
-      return;
-    }
+    const handleAuth = async () => {
+      if (hasRedirected.current) return;
 
-    // Set up auth state listener - only for OAuth (Google) sign-in, not email verification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        // Only handle OAuth sign-in here (when no type param = OAuth flow)
-        if (event === 'SIGNED_IN' && session && !type && !hasRedirected.current) {
-          hasRedirected.current = true;
-          setStatus("Sign in successful!");
-          navigate("/community", { replace: true });
-        } else if (event === 'SIGNED_OUT' && !hasRedirected.current) {
-          hasRedirected.current = true;
-          navigate("/auth", { replace: true });
+      // Check URL for type param (email verification) or error
+      const type = searchParams.get("type");
+      const errorDescription = searchParams.get("error_description");
+      
+      if (errorDescription) {
+        setStatus("Verification failed");
+        hasRedirected.current = true;
+        setTimeout(() => {
+          navigate("/auth?error=callback_failed", { replace: true });
+        }, 1500);
+        return;
+      }
+
+      // First, check if there are hash tokens in the URL that need processing
+      const hash = window.location.hash;
+      if (hash && hash.length > 1) {
+        const hashParams = new URLSearchParams(hash.substring(1));
+        const accessToken = hashParams.get("access_token");
+        
+        if (accessToken) {
+          // Supabase will automatically pick up the tokens from the hash
+          // Just wait for the session to be established
+          setStatus("Verifying your email...");
         }
       }
-    );
 
-    // Check current session (handles email verification)
-    const checkSession = async () => {
-      if (hasRedirected.current) return;
-      
+      // Wait a moment for Supabase to process any tokens
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Get the current session
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) {
@@ -51,50 +53,67 @@ const AuthCallback = () => {
         return;
       }
       
-      // If this is an email verification callback
+      // If this is an email verification callback (type=signup or type=email)
       if (type === "signup" || type === "email") {
-        if (hasRedirected.current) return;
         hasRedirected.current = true;
         
-        setStatus("Email verified successfully!");
-        toast.success("Your email has been successfully verified!", {
-          duration: 5000,
-        });
-        // Redirect directly to Community page after verification
-        setTimeout(() => {
-          if (session) {
+        if (session) {
+          setStatus("Email verified successfully!");
+          toast.success("Your email has been successfully verified!", {
+            duration: 5000,
+          });
+          // Redirect to Community page after verification
+          setTimeout(() => {
             navigate("/community", { replace: true });
-          } else {
-            // If no session, redirect to auth to sign in
-            navigate("/auth", { replace: true });
-          }
-        }, 1500);
+          }, 1500);
+        } else {
+          // Email verified but no session - redirect to login
+          setStatus("Email verified! Please sign in.");
+          toast.success("Your email has been verified! Please sign in.", {
+            duration: 5000,
+          });
+          setTimeout(() => {
+            navigate("/auth?verified=true", { replace: true });
+          }, 1500);
+        }
         return;
       }
       
-      // For OAuth flow without type param, session check handles refresh scenarios
-      if (session && !hasRedirected.current) {
+      // For OAuth flow or general session check
+      if (session) {
         hasRedirected.current = true;
         setStatus("Sign in successful!");
         navigate("/community", { replace: true });
+        return;
       }
     };
+
+    // Set up auth state listener for OAuth flows
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (hasRedirected.current) return;
+        
+        if (event === 'SIGNED_IN' && session) {
+          hasRedirected.current = true;
+          setStatus("Sign in successful!");
+          navigate("/community", { replace: true });
+        }
+      }
+    );
+
+    handleAuth();
     
-    // Small delay to allow Supabase to process OAuth response from URL
-    const timer = setTimeout(checkSession, 500);
-    
-    // Fallback: if nothing happens after 5 seconds, redirect to auth
+    // Fallback: if nothing happens after 8 seconds, redirect to auth
     const fallback = setTimeout(() => {
       if (!hasRedirected.current) {
         hasRedirected.current = true;
         setStatus("Taking too long, redirecting...");
         navigate("/auth", { replace: true });
       }
-    }, 5000);
+    }, 8000);
 
     return () => {
       subscription.unsubscribe();
-      clearTimeout(timer);
       clearTimeout(fallback);
     };
   }, [navigate, searchParams]);

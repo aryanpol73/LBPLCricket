@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ThemeProvider } from "next-themes";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { HashAuthHandler } from "@/components/HashAuthHandler";
 import Footer from "@/components/Footer";
 import Index from "./pages/Index";
 import Matches from "./pages/Matches";
@@ -34,6 +35,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <HashAuthHandler />
           <div className="min-h-screen flex flex-col">
             <div className="flex-1">
               <Routes>
