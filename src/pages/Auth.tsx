@@ -140,8 +140,8 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     
-    // Use old domain that's in the URI Allow List (workaround for auto-managed URL issue)
-    const redirectUrl = "https://lbpl-season3-hub.lovable.app/auth/callback";
+    // Use dynamic redirect URL based on current origin
+    const redirectUrl = `${window.location.origin}/auth/callback`;
     
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
