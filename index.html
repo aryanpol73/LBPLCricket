@@ -8,13 +8,17 @@
     <meta name="author" content="LBPL" />
     <meta name="keywords" content="LBPL, cricket tournament, Pune cricket, Season 3, sports league, live scores">
 
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0033a0">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    
     <!-- iOS Web App Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="LBPL S3" />
-    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="format-detection" content="telephone=no" />
-    <meta name="theme-color" content="#0A1325" />
 
     
     
@@ -38,5 +42,12 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => console.log('LBPL SW registered:', reg.scope))
+          .catch(err => console.error('LBPL SW registration failed:', err));
+      }
+    </script>
   </body>
 </html>
