@@ -1,6 +1,6 @@
 {
   "name": "LBPL Official",
-  "short_name": "LBPL",
+  "short_name": "LBPL Cricket",
   "start_url": "/?utm_source=homescreen",
   "display": "standalone",
   "scope": "/",
@@ -9,12 +9,12 @@
   "description": "LBPL Official — fixtures, scores and news",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
+      "src": "/icons/icon-192-v2.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-512.png",
+      "src": "/icons/icon-512-v2.png",
       "sizes": "512x512",
       "type": "image/png"
     }
