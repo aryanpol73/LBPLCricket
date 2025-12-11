@@ -1,43 +1,65 @@
-import { Navigate } from "react-router-dom";
-import { useAuth, useUser } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { User } from "@supabase/supabase-js";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isSignedIn, isLoaded } = useAuth();
-  const { user } = useUser();
+  const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAdminRole = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        setUser(session.user);
+        
+        // Check if user has admin role
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .eq('role', 'admin')
+          .single();
+        
+        setIsAdmin(!!roleData);
       }
-
-      // Check if user has admin role in Supabase
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
-
-      setIsAdmin(!!roleData);
+      
       setLoading(false);
     };
 
-    if (isLoaded) {
-      checkAdminRole();
-    }
-  }, [isLoaded, user]);
+    checkAuth();
 
-  if (!isLoaded || loading) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setUser(session.user);
+          
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .eq('role', 'admin')
+            .single();
+          
+          setIsAdmin(!!roleData);
+        } else {
+          setUser(null);
+          setIsAdmin(false);
+        }
+        setLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-foreground">Loading...</p>
@@ -45,7 +67,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  if (!isSignedIn || !isAdmin) {
+  if (!user || !isAdmin) {
     return <Navigate to="/auth" replace />;
   }
 
