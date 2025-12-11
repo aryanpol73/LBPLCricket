@@ -1,138 +1,68 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Mail, Lock, Loader2, AlertTriangle, CheckCircle2, Home } from "lucide-react";
+import { Users, Mail, Loader2, CheckCircle2, Home } from "lucide-react";
 import { z } from "zod";
-import { checkPasswordBreach } from "@/lib/passwordCheck";
 import { Link } from "react-router-dom";
 
-// Validation schemas
 const emailSchema = z.string().email("Please enter a valid email address");
-const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
 
 const Auth = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [resetLoading, setResetLoading] = useState(false);
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [signupSuccess, setSignupSuccess] = useState(false);
+  const [emailError, setEmailError] = useState<string | undefined>();
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
 
   useEffect(() => {
-    // Check for various URL params
-    const error = searchParams.get("error");
-    const verified = searchParams.get("verified");
-    
-    if (error === "callback_failed") {
-      toast.error("Sign in failed. Please try again.");
-    }
-    
-    if (verified === "true") {
-      toast.success("Email verified successfully! You can now sign in.", {
-        duration: 5000,
-      });
-    }
-
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         navigate("/community");
       }
     });
-  }, [navigate, searchParams]);
 
-  const validateInputs = () => {
-    const newErrors: { email?: string; password?: string } = {};
+    // Listen for auth state changes (magic link login)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          navigate("/community");
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const handleMagicLinkLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     
     const emailResult = emailSchema.safeParse(email);
     if (!emailResult.success) {
-      newErrors.email = emailResult.error.errors[0].message;
-    }
-    
-    const passwordResult = passwordSchema.safeParse(password);
-    if (!passwordResult.success) {
-      newErrors.password = passwordResult.error.errors[0].message;
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateInputs()) return;
-    
-    setLoading(true);
-
-    // Check if password has been exposed in data breaches
-    const breachResult = await checkPasswordBreach(password);
-    if (breachResult.breached) {
-      toast.error(
-        `This password has been found in ${breachResult.count.toLocaleString()} data breaches. Please choose a different password.`,
-        {
-          icon: <AlertTriangle className="h-5 w-5 text-destructive" />,
-          duration: 6000,
-        }
-      );
-      setErrors((prev) => ({ ...prev, password: "This password has been compromised. Please choose a stronger one." }));
-      setLoading(false);
+      setEmailError(emailResult.error.errors[0].message);
       return;
     }
+    
+    setLoading(true);
+    setEmailError(undefined);
 
-    const { error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signInWithOtp({
       email,
-      password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/community`,
       },
     });
 
     if (error) {
-      if (error.message.includes("already registered")) {
-        toast.error("This email is already registered. Please sign in instead.");
-      } else {
-        toast.error(error.message);
-      }
+      toast.error(error.message);
     } else {
-      setSignupSuccess(true);
-    }
-    setLoading(false);
-  };
-
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateInputs()) return;
-    
-    setLoading(true);
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      if (error.message.includes("Invalid login credentials")) {
-        toast.error("Invalid email or password. Please try again.");
-      } else if (error.message.includes("Email not confirmed")) {
-        toast.error("Please verify your email before signing in. Check your inbox for the verification link.", {
-          duration: 6000,
-        });
-      } else {
-        toast.error(error.message);
-      }
-    } else {
-      toast.success("Signed in successfully!");
-      navigate("/community");
+      setMagicLinkSent(true);
     }
     setLoading(false);
   };
@@ -140,13 +70,10 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     
-    // Use dynamic redirect URL based on current origin
-    const redirectUrl = `${window.location.origin}/auth/callback`;
-    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: redirectUrl,
+        redirectTo: `${window.location.origin}/community`,
       },
     });
 
@@ -156,50 +83,8 @@ const Auth = () => {
     }
   };
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const emailResult = emailSchema.safeParse(email);
-    if (!emailResult.success) {
-      setErrors({ email: emailResult.error.errors[0].message });
-      return;
-    }
-    
-    setResetLoading(true);
-    
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Password reset link sent! Check your email.");
-      setShowForgotPassword(false);
-    }
-    setResetLoading(false);
-  };
-
-  const handleResendVerification = async () => {
-    setLoading(true);
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      }
-    });
-    
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Verification email sent! Please check your inbox.");
-    }
-    setLoading(false);
-  };
-
-  // Show success message after signup
-  if (signupSuccess) {
+  // Magic link sent confirmation
+  if (magicLinkSent) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-4">
         <Card className="w-full max-w-md p-8 bg-card shadow-glow border-primary/20 text-center">
@@ -210,15 +95,18 @@ const Auth = () => {
           <h1 className="text-2xl font-bold text-foreground mb-2">Check Your Email!</h1>
           
           <p className="text-muted-foreground mb-6">
-            We've sent a verification link to <span className="text-primary font-medium">{email}</span>. 
-            Please click the link in the email to verify your account.
+            We've sent a magic link to <span className="text-primary font-medium">{email}</span>. 
+            Click the link in the email to sign in instantly.
           </p>
           
           <div className="space-y-3">
             <Button
               variant="outline"
               className="w-full"
-              onClick={handleResendVerification}
+              onClick={() => {
+                setMagicLinkSent(false);
+                handleMagicLinkLogin({ preventDefault: () => {} } as React.FormEvent);
+              }}
               disabled={loading}
             >
               {loading ? (
@@ -226,19 +114,18 @@ const Auth = () => {
               ) : (
                 <Mail className="mr-2 h-4 w-4" />
               )}
-              Resend Verification Email
+              Resend Magic Link
             </Button>
             
             <Button
               variant="ghost"
               className="w-full"
               onClick={() => {
-                setSignupSuccess(false);
+                setMagicLinkSent(false);
                 setEmail("");
-                setPassword("");
               }}
             >
-              Back to Sign In
+              Use Different Email
             </Button>
           </div>
           
@@ -253,7 +140,6 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-4">
       <Card className="w-full max-w-md p-8 bg-card shadow-glow border-primary/20">
-        {/* Back to Home Link */}
         <Link 
           to="/" 
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6"
@@ -313,198 +199,50 @@ const Auth = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="signin" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="signin">
-            <form onSubmit={handleSignIn} className="space-y-4">
-              <div>
-                <Label htmlFor="signin-email" className="flex items-center gap-2">
-                  <Mail className="h-4 w-4" /> Email
-                </Label>
-                <Input
-                  id="signin-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setErrors((prev) => ({ ...prev, email: undefined }));
-                  }}
-                  required
-                  placeholder="your@email.com"
-                  className={errors.email ? "border-destructive" : ""}
-                />
-                {errors.email && (
-                  <p className="text-sm text-destructive mt-1">{errors.email}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="signin-password" className="flex items-center gap-2">
-                  <Lock className="h-4 w-4" /> Password
-                </Label>
-                <Input
-                  id="signin-password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setErrors((prev) => ({ ...prev, password: undefined }));
-                  }}
-                  required
-                  placeholder="••••••••"
-                  className={errors.password ? "border-destructive" : ""}
-                />
-                {errors.password && (
-                  <p className="text-sm text-destructive mt-1">{errors.password}</p>
-                )}
-              </div>
-              <Button
-                type="submit"
-                className="w-full bg-gradient-hero text-white"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  "Sign In"
-                )}
-              </Button>
-              <button
-                type="button"
-                onClick={() => setShowForgotPassword(true)}
-                className="w-full text-sm text-primary hover:underline mt-2"
-              >
-                Forgot your password?
-              </button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="signup">
-            <form onSubmit={handleSignUp} className="space-y-4">
-              <div>
-                <Label htmlFor="signup-email" className="flex items-center gap-2">
-                  <Mail className="h-4 w-4" /> Email
-                </Label>
-                <Input
-                  id="signup-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setErrors((prev) => ({ ...prev, email: undefined }));
-                  }}
-                  required
-                  placeholder="your@email.com"
-                  className={errors.email ? "border-destructive" : ""}
-                />
-                {errors.email && (
-                  <p className="text-sm text-destructive mt-1">{errors.email}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="signup-password" className="flex items-center gap-2">
-                  <Lock className="h-4 w-4" /> Password
-                </Label>
-                <Input
-                  id="signup-password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setErrors((prev) => ({ ...prev, password: undefined }));
-                  }}
-                  required
-                  placeholder="••••••••"
-                  minLength={6}
-                  className={errors.password ? "border-destructive" : ""}
-                />
-                {errors.password && (
-                  <p className="text-sm text-destructive mt-1">{errors.password}</p>
-                )}
-              </div>
-              
-              <p className="text-xs text-muted-foreground">
-                A verification email will be sent to confirm your account.
-              </p>
-              
-              <Button
-                type="submit"
-                className="w-full bg-gradient-hero text-white"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  "Sign Up"
-                )}
-              </Button>
-            </form>
-          </TabsContent>
-        </Tabs>
-
-        {/* Forgot Password Modal */}
-        {showForgotPassword && (
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-            <Card className="w-full max-w-md p-6 bg-card shadow-glow border-primary/20">
-              <h2 className="text-xl font-bold text-foreground mb-2">Reset Password</h2>
-              <p className="text-sm text-muted-foreground mb-4">
-                Enter your email and we'll send you a reset link.
-              </p>
-              <form onSubmit={handleForgotPassword} className="space-y-4">
-                <div>
-                  <Label htmlFor="reset-email" className="flex items-center gap-2">
-                    <Mail className="h-4 w-4" /> Email
-                  </Label>
-                  <Input
-                    id="reset-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      setErrors((prev) => ({ ...prev, email: undefined }));
-                    }}
-                    required
-                    placeholder="your@email.com"
-                    className={errors.email ? "border-destructive" : ""}
-                  />
-                  {errors.email && (
-                    <p className="text-sm text-destructive mt-1">{errors.email}</p>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowForgotPassword(false)}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="flex-1 bg-gradient-hero text-white"
-                    disabled={resetLoading}
-                  >
-                    {resetLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      "Send Reset Link"
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </Card>
+        <form onSubmit={handleMagicLinkLogin} className="space-y-4">
+          <div>
+            <Label htmlFor="email" className="flex items-center gap-2">
+              <Mail className="h-4 w-4" /> Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setEmailError(undefined);
+              }}
+              required
+              placeholder="your@email.com"
+              className={emailError ? "border-destructive" : ""}
+            />
+            {emailError && (
+              <p className="text-sm text-destructive mt-1">{emailError}</p>
+            )}
           </div>
-        )}
+          
+          <Button
+            type="submit"
+            className="w-full bg-gradient-hero text-white"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Sending Magic Link...
+              </>
+            ) : (
+              <>
+                <Mail className="mr-2 h-4 w-4" />
+                Send Magic Link
+              </>
+            )}
+          </Button>
+          
+          <p className="text-xs text-center text-muted-foreground">
+            We'll send you a link to sign in instantly. No password needed!
+          </p>
+        </form>
       </Card>
     </div>
   );

@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ThemeProvider } from "next-themes";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { HashAuthHandler } from "@/components/HashAuthHandler";
 import Footer from "@/components/Footer";
 import Index from "./pages/Index";
 import Matches from "./pages/Matches";
@@ -14,13 +13,10 @@ import Results from "./pages/Results";
 import PointsTable from "./pages/PointsTable";
 import Teams from "./pages/Teams";
 import Stats from "./pages/Stats";
-import Rules from "./pages/Rules";
 import Gallery from "./pages/Gallery";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
-import ResetPassword from "./pages/ResetPassword";
-import EmailVerified from "./pages/EmailVerified";
 import Community from "./pages/Community";
 import Sponsors from "./pages/Sponsors";
 import NotFound from "./pages/NotFound";
@@ -35,7 +31,6 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <HashAuthHandler />
           <div className="min-h-screen flex flex-col">
             <div className="flex-1">
               <Routes>
@@ -48,14 +43,9 @@ const App = () => (
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/community" element={<Community />} />
                 <Route path="/sponsors" element={<Sponsors />} />
-                {/* <Route path="/rules" element={<Rules />} /> */}
-                {/* <Route path="/fan-zone" element={<FanZone />} /> */}
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
-                <Route path="/email-verified" element={<EmailVerified />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
