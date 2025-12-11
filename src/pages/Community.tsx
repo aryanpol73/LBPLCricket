@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useUser, useAuth, SignOutButton } from "@clerk/clerk-react";
 import { Navigation } from "@/components/Navigation";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { Card } from "@/components/ui/card";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Dialog, 
   DialogContent, 
@@ -87,8 +88,9 @@ const reactionIcons: Record<string, { icon: any; label: string; color: string }>
 };
 
 const Community = () => {
+  const { user, isLoaded } = useUser();
+  const { isSignedIn } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
-  const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [newPostContent, setNewPostContent] = useState("");
   const [newPostType, setNewPostType] = useState("discussion");
@@ -104,9 +106,15 @@ const Community = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    checkUser();
-    loadPosts();
+    if (isLoaded) {
+      loadPosts();
+      if (user) {
+        checkAdminRole(user.id);
+      }
+    }
+  }, [isLoaded, user]);
 
+  useEffect(() => {
     const channel = supabase
       .channel('community-posts')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'community_posts' }, () => {
@@ -121,30 +129,6 @@ const Community = () => {
       supabase.removeChannel(channel);
     };
   }, []);
-
-  const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    setUser(session?.user || null);
-    
-    if (session?.user) {
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', session.user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
-      setIsAdmin(!!roleData);
-    }
-
-    supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
-      if (session?.user) {
-        checkAdminRole(session.user.id);
-      } else {
-        setIsAdmin(false);
-      }
-    });
-  };
 
   const checkAdminRole = async (userId: string) => {
     const { data } = await supabase
@@ -251,6 +235,11 @@ const Community = () => {
     return urlData.publicUrl;
   };
 
+  const getUserDisplayName = () => {
+    if (!user) return 'Anonymous';
+    return user.firstName || user.username || user.emailAddresses?.[0]?.emailAddress?.split('@')[0] || 'Anonymous';
+  };
+
   const createPost = async () => {
     if (!user) {
       toast({ title: "Please login to post", variant: "destructive" });
@@ -268,7 +257,7 @@ const Community = () => {
 
     const { error } = await supabase.from('community_posts').insert({
       user_id: user.id,
-      user_name: user.email?.split('@')[0] || 'Anonymous',
+      user_name: getUserDisplayName(),
       content: newPostContent,
       post_type: newPostType,
       image_url: imageUrl,
@@ -369,7 +358,7 @@ const Community = () => {
     const { error } = await supabase.from('community_comments').insert({
       post_id: selectedPost.id,
       user_id: user.id,
-      user_name: user.email?.split('@')[0] || 'Anonymous',
+      user_name: getUserDisplayName(),
       content: newComment,
     });
 
@@ -423,24 +412,31 @@ const Community = () => {
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-primary">LBPL Community</h1>
           </div>
-          {user && (
-            <Button
-              variant="outline"
-              onClick={async () => {
-                await supabase.auth.signOut();
-                toast({ title: "Logged out successfully" });
-              }}
-              className="border-secondary/30 hover:bg-red-500/20 hover:border-red-500/50 hover:text-red-400"
-            >
-              <LogOut className="mr-2" size={16} />
-              Logout
-            </Button>
+          {isSignedIn && (
+            <SignOutButton>
+              <Button
+                variant="outline"
+                className="border-secondary/30 hover:bg-red-500/20 hover:border-red-500/50 hover:text-red-400"
+              >
+                <LogOut className="mr-2" size={16} />
+                Logout
+              </Button>
+            </SignOutButton>
           )}
         </div>
 
         {/* Create Post Section */}
-        {user ? (
+        {isSignedIn && user ? (
           <Card className="p-4 md:p-6 mb-8 bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-secondary/30">
+            <div className="flex items-center gap-3 mb-4">
+              <Avatar className="h-10 w-10 border-2 border-secondary/30">
+                <AvatarImage src={user.imageUrl} />
+                <AvatarFallback className="bg-primary/20 text-primary">
+                  {getUserDisplayName()[0]?.toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-white font-medium">{getUserDisplayName()}</span>
+            </div>
             <Textarea
               placeholder="Share your thoughts, memes, or start a discussion..."
               value={newPostContent}
@@ -679,7 +675,7 @@ const Community = () => {
                             </div>
                           </div>
                         ))}
-                        {user && (
+                        {isSignedIn && (
                           <div className="flex gap-2 mt-4">
                             <Input
                               placeholder="Write a comment..."
