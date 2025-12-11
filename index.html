@@ -1,52 +1,53 @@
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <title>LBPL – Official League Website</title>
+    <meta name="description" content="Welcome to the Official LBPL website — your destination for live scores, fixtures, team profiles, player stats, standings, and league news. Join the LBPL Community to share your opinions, discuss matches, take part in polls, support your favorite team, and connect with fans across the league.">
+    <meta name="author" content="LBPL" />
+    <meta name="keywords" content="LBPL, cricket tournament, Pune cricket, Season 3, sports league, live scores">
 
-  <title>LBPL – Official League Website</title>
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0033a0">
+    <link rel="apple-touch-icon" href="/icons/apple-icon-180.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- iOS Web App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="LBPL S3" />
+    <meta name="format-detection" content="telephone=no" />
 
-  <meta
-    name="description"
-    content="Welcome to the Official LBPL website — your destination for live scores, fixtures, team profiles, player stats, standings, and league news. Join the LBPL Community to share your opinions, discuss matches, take part in polls, support your favorite team, and connect with fans across the league."
-  />
-  <meta name="author" content="LBPL" />
-  <meta name="keywords" content="LBPL, cricket tournament, Pune cricket, Season 3, sports league, live scores" />
+    
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/Wzn0FQmFgxSM5RweEU218RH90Fn1/social-images/social-1765006556797-WhatsApp Image 2025-12-06 at 1.05.25 PM.jpeg">
 
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="/manifest.json" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@lovable_dev" />
+    <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/Wzn0FQmFgxSM5RweEU218RH90Fn1/social-images/social-1765006556797-WhatsApp Image 2025-12-06 at 1.05.25 PM.jpeg">
+    
+  
+  
+  
+  <link rel="icon" type="image/x-icon" href="https://storage.googleapis.com/gpt-engineer-file-uploads/Wzn0FQmFgxSM5RweEU218RH90Fn1/uploads/1765006424251-lbpl logo edited.jpg">
+  <meta property="og:title" content="LBPL – Official League Website">
+  <meta name="twitter:title" content="LBPL – Official League Website">
+  <meta property="og:description" content="Welcome to the Official LBPL website — your destination for live scores, fixtures, team profiles, player stats, standings, and league news. Join the LBPL Community to share your opinions, discuss matches, take part in polls, support your favorite team, and connect with fans across the league.">
+  <meta name="twitter:description" content="Welcome to the Official LBPL website — your destination for live scores, fixtures, team profiles, player stats, standings, and league news. Join the LBPL Community to share your opinions, discuss matches, take part in polls, support your favorite team, and connect with fans across the league.">
+</head>
 
-  <!-- Theme Color -->
-  <meta name="theme-color" content="#0033a0" />
-
-  <!-- Android Icons -->
-  <link rel="icon" type="image/png" sizes="192x192" href="/icons/android_192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="/icons/android_512.png" />
-
-  <!-- iOS Home Screen Icon -->
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/ios_180.png" />
-
-  <!-- iOS Web App Meta -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="LBPL" />
-  <meta name="format-detection" content="telephone=no" />
-
-  <!-- Open Graph (Facebook / WhatsApp Preview) -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="LBPL – Official League Website" />
-  <meta
-    property="og:description"
-    content="Welcome to the Official LBPL website — your destination for live scores, fixtures, team profiles, player stats, standings, and league news."
-  />
-
-  <meta
-    property="og:image"
-    content="https://storage.googleapis.com/gpt-engineer-file-uploads/Wzn0FQmFgxSM5RweEU218RH90Fn1/social-images/social-1765006556797-WhatsApp%20Image%202025-12-06%20at%201.05.25%20PM.jpeg"
-  />
-
-  <!-- Twitter Card Preview -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="LBPL – Official League Website" />
-  <meta
-    name="twitter:description"
-    content="Welcome to the Official LBPL website — your desti
-
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => console.log('LBPL SW registered:', reg.scope))
+          .catch(err => console.error('LBPL SW registration failed:', err));
+      }
+    </script>
+  </body>
+</html>
