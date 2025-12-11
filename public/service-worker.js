@@ -1,4 +1,4 @@
-const CACHE_NAME = "lbpl-cricket-cache-v2";
+const CACHE_NAME = "lbpl-cricket-cache-v10";
 const ASSETS_TO_CACHE = ["/", "/index.html", "/styles.css", "/app.js", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (event) => {
