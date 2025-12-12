@@ -1,4 +1,5 @@
 import { useRef, useCallback, useEffect } from "react";
+import { Settings } from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -13,6 +14,7 @@ interface MoreSheetProps {
   isActive: (path: string) => boolean;
   onItemClick: (path: string) => void;
   triggerHaptic: () => void;
+  isPwa: boolean;
 }
 
 export default function MoreSheet({
@@ -22,7 +24,12 @@ export default function MoreSheet({
   isActive,
   onItemClick,
   triggerHaptic,
+  isPwa,
 }: MoreSheetProps) {
+  // Add Settings item only in PWA mode
+  const allItems = isPwa
+    ? [...items, { label: "Settings", icon: Settings, path: "/settings" }]
+    : items;
   const sheetRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef(0);
   const currentTranslateY = useRef(0);
@@ -115,7 +122,7 @@ export default function MoreSheet({
 
         {/* Grid of items */}
         <div className="grid grid-cols-3 gap-4 px-4 pt-2 pb-4">
-          {items.map((item) => {
+          {allItems.map((item) => {
             const active = isActive(item.path);
             const Icon = item.icon;
 

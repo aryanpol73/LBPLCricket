@@ -21,6 +21,10 @@ import AuthCallback from "./pages/AuthCallback";
 import Community from "./pages/Community";
 import Sponsors from "./pages/Sponsors";
 import NotFound from "./pages/NotFound";
+import SettingsHome from "./pages/settings/SettingsHome";
+import SettingsAbout from "./pages/settings/SettingsAbout";
+import SettingsRules from "./pages/settings/SettingsRules";
+import SettingsDeveloper from "./pages/settings/SettingsDeveloper";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +51,10 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+                <Route path="/settings" element={<SettingsHome />} />
+                <Route path="/settings/about" element={<SettingsAbout />} />
+                <Route path="/settings/rules" element={<SettingsRules />} />
+                <Route path="/settings/developer" element={<SettingsDeveloper />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>

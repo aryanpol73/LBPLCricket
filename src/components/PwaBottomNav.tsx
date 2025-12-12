@@ -221,6 +221,7 @@ export default function PwaBottomNav() {
         isActive={isActive}
         onItemClick={handleNavClick}
         triggerHaptic={triggerHaptic}
+        isPwa={isPwa}
       />
     </>
   );
