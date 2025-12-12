@@ -1,19 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Home, Calendar, Users, Menu, Trophy, Image, BarChart3, Award } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import MoreSheet from "./MoreSheet";
 
 interface NavItem {
   label: string;
   icon: React.ElementType;
   path: string;
+  hasNotification?: boolean;
 }
-
-const navItems: NavItem[] = [
-  { label: "Home", icon: Home, path: "/" },
-  { label: "Matches", icon: Calendar, path: "/matches" },
-  { label: "Community", icon: Users, path: "/community" },
-];
 
 const moreItems: NavItem[] = [
   { label: "Points Table", icon: Trophy, path: "/points-table" },
@@ -26,26 +21,33 @@ const moreItems: NavItem[] = [
 export default function PwaBottomNav() {
   const [isPwa, setIsPwa] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [hasCommunityAlerts, setHasCommunityAlerts] = useState(true); // Toggle this based on actual alerts
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // Swipe detection refs
+  const navRef = useRef<HTMLElement>(null);
+  const touchStartY = useRef(0);
+  const touchStartTime = useRef(0);
+
+  const navItems: NavItem[] = [
+    { label: "Home", icon: Home, path: "/" },
+    { label: "Matches", icon: Calendar, path: "/matches" },
+    { label: "Community", icon: Users, path: "/community", hasNotification: hasCommunityAlerts },
+  ];
 
   useEffect(() => {
     const checkPwaMode = () => {
-      // Check URL override for testing
       const urlParams = new URLSearchParams(window.location.search);
       const pwaOverride = urlParams.get("pwa") === "1";
-
-      // Check if running as standalone PWA
       const isStandalone =
         window.matchMedia("(display-mode: standalone)").matches ||
         (window.navigator as any).standalone === true;
-
       setIsPwa(pwaOverride || isStandalone);
     };
 
     checkPwaMode();
 
-    // Listen for display mode changes
     const mediaQuery = window.matchMedia("(display-mode: standalone)");
     const handleChange = () => checkPwaMode();
     mediaQuery.addEventListener("change", handleChange);
@@ -54,7 +56,6 @@ export default function PwaBottomNav() {
   }, []);
 
   useEffect(() => {
-    // Add/remove body padding when PWA mode changes
     if (isPwa) {
       document.body.style.paddingBottom = "calc(64px + env(safe-area-inset-bottom, 0px))";
     } else {
@@ -64,6 +65,51 @@ export default function PwaBottomNav() {
     return () => {
       document.body.style.paddingBottom = "";
     };
+  }, [isPwa]);
+
+  // Swipe-up gesture to open More sheet
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    if (!isPwa) return;
+    touchStartY.current = e.touches[0].clientY;
+    touchStartTime.current = Date.now();
+  }, [isPwa]);
+
+  const handleTouchEnd = useCallback((e: TouchEvent) => {
+    if (!isPwa) return;
+    
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaY = touchStartY.current - touchEndY;
+    const deltaTime = Date.now() - touchStartTime.current;
+    
+    // Swipe up: open sheet (minimum 50px swipe, within 300ms)
+    if (deltaY > 50 && deltaTime < 300 && !moreOpen) {
+      triggerHaptic();
+      setMoreOpen(true);
+    }
+  }, [isPwa, moreOpen]);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav || !isPwa) return;
+
+    nav.addEventListener("touchstart", handleTouchStart, { passive: true });
+    nav.addEventListener("touchend", handleTouchEnd, { passive: true });
+
+    return () => {
+      nav.removeEventListener("touchstart", handleTouchStart);
+      nav.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [isPwa, handleTouchStart, handleTouchEnd]);
+
+  const triggerHaptic = useCallback(() => {
+    if (!isPwa) return;
+    try {
+      if (navigator.vibrate) {
+        navigator.vibrate(10);
+      }
+    } catch {
+      // Ignore if vibration not supported
+    }
   }, [isPwa]);
 
   if (!isPwa) return null;
@@ -76,126 +122,106 @@ export default function PwaBottomNav() {
   const isMoreActive = moreItems.some((item) => location.pathname.startsWith(item.path));
 
   const handleNavClick = (path: string) => {
+    triggerHaptic();
     navigate(path);
     setMoreOpen(false);
   };
 
-  return (
-    <nav
-      className="fixed bottom-0 left-0 right-0 z-50"
-      style={{
-        paddingBottom: "env(safe-area-inset-bottom, 0px)",
-      }}
-    >
-      {/* Upper shadow gradient */}
-      <div className="absolute inset-x-0 -top-4 h-4 bg-gradient-to-t from-[#081428]/80 to-transparent pointer-events-none" />
+  const handleMoreClick = () => {
+    triggerHaptic();
+    setMoreOpen(true);
+  };
 
-      {/* Main nav bar */}
-      <div
-        className="flex items-center justify-around px-2 py-2"
+  return (
+    <>
+      <nav
+        ref={navRef}
+        className="fixed bottom-0 left-0 right-0 z-50"
         style={{
-          background: "linear-gradient(to bottom, #0b1c3d, #081428)",
-          boxShadow: "0 -4px 20px rgba(0, 0, 0, 0.4)",
+          paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >
-        {navItems.map((item) => {
-          const active = isActive(item.path);
-          const Icon = item.icon;
+        {/* Upper shadow gradient */}
+        <div className="absolute inset-x-0 -top-4 h-4 bg-gradient-to-t from-[#081428]/80 to-transparent pointer-events-none" />
 
-          return (
-            <button
-              key={item.path}
-              onClick={() => handleNavClick(item.path)}
-              className={`flex flex-col items-center justify-center flex-1 py-2 transition-all duration-200 ${
-                active ? "scale-110" : "scale-100"
-              }`}
-            >
-              <Icon
-                size={22}
-                className={`transition-colors duration-200 ${
-                  active ? "text-[#f0b429]" : "text-gray-400"
-                }`}
-                strokeWidth={active ? 2.5 : 2}
-              />
-              <span
-                className={`text-[10px] mt-1 font-medium transition-colors duration-200 ${
-                  active ? "text-[#f0b429]" : "text-gray-400"
+        {/* Main nav bar */}
+        <div
+          className="flex items-center justify-around px-2 py-2"
+          style={{
+            background: "linear-gradient(to bottom, #0b1c3d, #081428)",
+            boxShadow: "0 -4px 20px rgba(0, 0, 0, 0.4)",
+          }}
+        >
+          {navItems.map((item) => {
+            const active = isActive(item.path);
+            const Icon = item.icon;
+
+            return (
+              <button
+                key={item.path}
+                onClick={() => handleNavClick(item.path)}
+                className={`relative flex flex-col items-center justify-center flex-1 py-2 transition-all duration-200 ${
+                  active ? "scale-110" : "scale-100"
                 }`}
               >
-                {item.label}
-              </span>
-            </button>
-          );
-        })}
-
-        {/* More button with sheet */}
-        <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
-          <SheetTrigger asChild>
-            <button
-              className={`flex flex-col items-center justify-center flex-1 py-2 transition-all duration-200 ${
-                isMoreActive ? "scale-110" : "scale-100"
-              }`}
-            >
-              <Menu
-                size={22}
-                className={`transition-colors duration-200 ${
-                  isMoreActive ? "text-[#f0b429]" : "text-gray-400"
-                }`}
-                strokeWidth={isMoreActive ? 2.5 : 2}
-              />
-              <span
-                className={`text-[10px] mt-1 font-medium transition-colors duration-200 ${
-                  isMoreActive ? "text-[#f0b429]" : "text-gray-400"
-                }`}
-              >
-                More
-              </span>
-            </button>
-          </SheetTrigger>
-          <SheetContent
-            side="bottom"
-            className="border-t border-[#f0b429]/20 rounded-t-2xl"
-            style={{
-              background: "linear-gradient(to bottom, #0b1c3d, #081428)",
-              paddingBottom: "calc(80px + env(safe-area-inset-bottom, 0px))",
-            }}
-          >
-            <div className="grid grid-cols-3 gap-4 pt-4">
-              {moreItems.map((item) => {
-                const active = isActive(item.path);
-                const Icon = item.icon;
-
-                return (
-                  <button
-                    key={item.path}
-                    onClick={() => handleNavClick(item.path)}
-                    className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-200 ${
-                      active
-                        ? "bg-[#f0b429]/10 scale-105"
-                        : "bg-white/5 hover:bg-white/10"
+                <div className="relative">
+                  <Icon
+                    size={22}
+                    className={`transition-colors duration-200 ${
+                      active ? "text-[#f0b429]" : "text-gray-400"
                     }`}
-                  >
-                    <Icon
-                      size={24}
-                      className={`transition-colors duration-200 ${
-                        active ? "text-[#f0b429]" : "text-gray-300"
-                      }`}
-                      strokeWidth={active ? 2.5 : 2}
-                    />
-                    <span
-                      className={`text-xs mt-2 font-medium transition-colors duration-200 ${
-                        active ? "text-[#f0b429]" : "text-gray-300"
-                      }`}
-                    >
-                      {item.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </SheetContent>
-        </Sheet>
-      </div>
-    </nav>
+                    strokeWidth={active ? 2.5 : 2}
+                  />
+                  {/* Notification dot */}
+                  {item.hasNotification && (
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  )}
+                </div>
+                <span
+                  className={`text-[10px] mt-1 font-medium transition-colors duration-200 ${
+                    active ? "text-[#f0b429]" : "text-gray-400"
+                  }`}
+                >
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+
+          {/* More button */}
+          <button
+            onClick={handleMoreClick}
+            className={`flex flex-col items-center justify-center flex-1 py-2 transition-all duration-200 ${
+              isMoreActive ? "scale-110" : "scale-100"
+            }`}
+          >
+            <Menu
+              size={22}
+              className={`transition-colors duration-200 ${
+                isMoreActive ? "text-[#f0b429]" : "text-gray-400"
+              }`}
+              strokeWidth={isMoreActive ? 2.5 : 2}
+            />
+            <span
+              className={`text-[10px] mt-1 font-medium transition-colors duration-200 ${
+                isMoreActive ? "text-[#f0b429]" : "text-gray-400"
+              }`}
+            >
+              More
+            </span>
+          </button>
+        </div>
+      </nav>
+
+      {/* More Sheet with spring animation */}
+      <MoreSheet
+        open={moreOpen}
+        onOpenChange={setMoreOpen}
+        items={moreItems}
+        isActive={isActive}
+        onItemClick={handleNavClick}
+        triggerHaptic={triggerHaptic}
+      />
+    </>
   );
 }
