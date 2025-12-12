@@ -1,22 +1,26 @@
 {
   "name": "LBPL Official",
-  "short_name": "LBPL Cricket",
-  "start_url": "/?utm_source=homescreen",
-  "display": "standalone",
-  "scope": "/",
-  "background_color": "#ffffff",
-  "theme_color": "#0033a0",
+  "short_name": "LBPL",
   "description": "LBPL Official — fixtures, scores and news",
-"icons": [
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A1325",
+  "theme_color": "#0033a0",
+  "categories": ["sports", "entertainment"],
+  "icons": [
     {
       "src": "/android-icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/android-icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/apple-touch-icon.png",
@@ -24,5 +28,6 @@
       "type": "image/png",
       "purpose": "any"
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }
