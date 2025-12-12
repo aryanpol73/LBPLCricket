@@ -4,8 +4,9 @@
   "start_url": "/?utm_source=homescreen",
   "display": "standalone",
   "scope": "/",
-  "background_color": "##002c54",
-  "theme_color": "##002c54",
+  "background_color": "#002c54",
+  "theme_color": "#002c54",
+  "manifest version": 2,
   "description": "LBPL Official — fixtures, scores and news",
   "icons": [
     {
@@ -17,6 +18,7 @@
       "src": "/android-icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
+      "purpose": "any maskable",
     },
     {
       "src": "/apple-touch-icon.png",
