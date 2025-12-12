@@ -27,7 +27,6 @@ const Auth = () => {
   const [passwordError, setPasswordError] = useState<string | undefined>();
   const [lastOtpSentAt, setLastOtpSentAt] = useState<number | null>(null);
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
-  const [isNewUser, setIsNewUser] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -41,23 +40,20 @@ const Auth = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === 'SIGNED_IN' && session) {
-          // Don't navigate immediately if we need to set password
-          if (!isNewUser) {
-            navigate("/community");
-          }
+          navigate("/community");
         }
       }
     );
 
     return () => subscription.unsubscribe();
-  }, [navigate, isNewUser]);
+  }, [navigate]);
 
   // Cooldown timer
   useEffect(() => {
     if (lastOtpSentAt) {
       const interval = setInterval(() => {
         const elapsed = Math.floor((Date.now() - lastOtpSentAt) / 1000);
-        const remaining = Math.max(0, 30 - elapsed);
+        const remaining = Math.max(0, 60 - elapsed);
         setCooldownRemaining(remaining);
         if (remaining === 0) {
           clearInterval(interval);
@@ -77,7 +73,7 @@ const Auth = () => {
     }
 
     // Check cooldown
-    if (lastOtpSentAt && Date.now() - lastOtpSentAt < 30000) {
+    if (lastOtpSentAt && Date.now() - lastOtpSentAt < 60000) {
       toast.error(`Please wait ${cooldownRemaining} seconds before requesting another OTP`);
       return;
     }
@@ -85,21 +81,31 @@ const Auth = () => {
     setLoading(true);
     setEmailError(undefined);
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        shouldCreateUser: true,
-      },
-    });
+    try {
+      const response = await supabase.functions.invoke("send-otp", {
+        body: { email: email.toLowerCase() },
+      });
 
-    if (error) {
-      toast.error(error.message);
-    } else {
+      if (response.error) {
+        toast.error(response.error.message || "Failed to send OTP");
+        setLoading(false);
+        return;
+      }
+
+      if (response.data?.error) {
+        toast.error(response.data.error);
+        setLoading(false);
+        return;
+      }
+
       setLastOtpSentAt(Date.now());
-      setCooldownRemaining(30);
+      setCooldownRemaining(60);
       toast.success("OTP Sent! Check your email.");
       setStep("otp");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to send OTP");
     }
+    
     setLoading(false);
   };
 
@@ -111,47 +117,38 @@ const Auth = () => {
 
     setLoading(true);
 
-    const { data, error } = await supabase.auth.verifyOtp({
-      email,
-      token: otp,
-      type: 'email',
-    });
+    try {
+      const response = await supabase.functions.invoke("verify-otp", {
+        body: { email: email.toLowerCase(), otp },
+      });
 
-    if (error) {
-      if (error.message.includes("expired")) {
-        toast.error("OTP expired. Please request a new one.");
-      } else {
-        toast.error("Invalid OTP. Please try again.");
+      if (response.error) {
+        toast.error(response.error.message || "Failed to verify OTP");
+        setOtp("");
+        setLoading(false);
+        return;
       }
-      setOtp("");
-      setLoading(false);
-      return;
-    }
 
-    if (data.user) {
-      // Check if user has a password set by checking user metadata or identities
-      const hasPassword = data.user.identities?.some(
-        (identity) => identity.provider === 'email' && identity.identity_data?.email_verified
-      );
-      
-      // For new users (just created via OTP), they won't have confirmed their password
-      // We check if the user was created recently (within the last minute)
-      const createdAt = new Date(data.user.created_at).getTime();
-      const now = Date.now();
-      const isRecentlyCreated = now - createdAt < 60000; // Created within last minute
-      
-      // Also check if user has ever logged in with password
-      const lastSignIn = data.user.last_sign_in_at;
-      const isFirstLogin = !lastSignIn || new Date(lastSignIn).getTime() === createdAt;
-      
-      if (isRecentlyCreated || isFirstLogin) {
-        setIsNewUser(true);
-        setStep("set-password");
+      if (response.data?.error) {
+        toast.error(response.data.error);
+        setOtp("");
+        setLoading(false);
+        return;
+      }
+
+      if (response.data?.isNewUser) {
         toast.success("OTP verified! Please set your password.");
+        setStep("set-password");
+      } else if (response.data?.actionLink) {
+        // User exists - follow the magic link to sign in
+        window.location.href = response.data.actionLink;
       } else {
         toast.success("Logged in successfully!");
         navigate("/community");
       }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to verify OTP");
+      setOtp("");
     }
     
     setLoading(false);
@@ -174,15 +171,32 @@ const Auth = () => {
     setLoading(true);
     setPasswordError(undefined);
 
-    const { error } = await supabase.auth.updateUser({
-      password: password,
-    });
+    try {
+      const response = await supabase.functions.invoke("verify-otp", {
+        body: { email: email.toLowerCase(), otp, password },
+      });
 
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Password set successfully! Welcome to LBPL Community!");
-      navigate("/community");
+      if (response.error) {
+        toast.error(response.error.message || "Failed to create account");
+        setLoading(false);
+        return;
+      }
+
+      if (response.data?.error) {
+        toast.error(response.data.error);
+        setLoading(false);
+        return;
+      }
+
+      if (response.data?.actionLink) {
+        toast.success("Account created! Signing you in...");
+        window.location.href = response.data.actionLink;
+      } else {
+        toast.success("Account created successfully!");
+        navigate("/community");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create account");
     }
     
     setLoading(false);
@@ -196,19 +210,20 @@ const Auth = () => {
     
     setLoading(true);
     
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        shouldCreateUser: true,
-      },
-    });
+    try {
+      const response = await supabase.functions.invoke("send-otp", {
+        body: { email: email.toLowerCase() },
+      });
 
-    if (error) {
-      toast.error(error.message);
-    } else {
-      setLastOtpSentAt(Date.now());
-      setCooldownRemaining(30);
-      toast.success("New OTP sent!");
+      if (response.error || response.data?.error) {
+        toast.error(response.data?.error || response.error?.message || "Failed to resend OTP");
+      } else {
+        setLastOtpSentAt(Date.now());
+        setCooldownRemaining(60);
+        toast.success("New OTP sent!");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to resend OTP");
     }
     
     setLoading(false);
@@ -218,8 +233,6 @@ const Auth = () => {
     if (step === "otp") {
       setStep("email");
       setOtp("");
-    } else if (step === "set-password") {
-      // Can't go back from password step as user is already authenticated
     }
   };
 
@@ -433,23 +446,14 @@ const Auth = () => {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Setting Password...
+                  Creating Account...
                 </>
               ) : (
                 <>
                   <Lock className="mr-2 h-4 w-4" />
-                  Set Password & Continue
+                  Create Account
                 </>
               )}
-            </Button>
-            
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full"
-              onClick={() => navigate("/community")}
-            >
-              Skip for now
             </Button>
           </form>
         </Card>
