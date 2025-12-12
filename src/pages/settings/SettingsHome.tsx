@@ -21,8 +21,8 @@ const SettingsHome = () => {
     {
       title: "Preferences",
       items: [
-        { icon: Palette, label: "Appearance", description: "Theme, colors, display", path: null },
-        { icon: Bell, label: "Notifications", description: "Alerts and updates", path: null },
+        { icon: Palette, label: "Appearance", description: "Theme, colors, display", path: "/settings/appearance" },
+        { icon: Bell, label: "Notifications", description: "Alerts and updates", path: "/settings/notifications" },
       ],
     },
     {

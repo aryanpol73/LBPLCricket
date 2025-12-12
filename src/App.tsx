@@ -25,6 +25,9 @@ import SettingsHome from "./pages/settings/SettingsHome";
 import SettingsAbout from "./pages/settings/SettingsAbout";
 import SettingsRules from "./pages/settings/SettingsRules";
 import SettingsDeveloper from "./pages/settings/SettingsDeveloper";
+import AppearanceSettings from "./components/settings/AppearanceSettings";
+import NotificationSettings from "./components/settings/NotificationSettings";
+import LiveScoreWidget from "./pages/widget/LiveScoreWidget";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +58,9 @@ const App = () => (
                 <Route path="/settings/about" element={<SettingsAbout />} />
                 <Route path="/settings/rules" element={<SettingsRules />} />
                 <Route path="/settings/developer" element={<SettingsDeveloper />} />
+                <Route path="/settings/appearance" element={<AppearanceSettings />} />
+                <Route path="/settings/notifications" element={<NotificationSettings />} />
+                <Route path="/widget/live" element={<LiveScoreWidget />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
