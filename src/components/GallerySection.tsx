@@ -41,41 +41,10 @@ export const GallerySection = () => {
             <p className="text-muted-foreground">Capturing the best moments of LBPL</p>
           </div>
 
-        {/* Auto-scrolling horizontal carousel */}
-        <Carousel
-          plugins={[plugin.current]}
-          className="w-full mb-6"
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-        >
-          <CarouselContent>
-            {galleryImages.map((image, index) => (
-              <CarouselItem key={`gallery-${image.id}-${index}`} className="basis-1/2 md:basis-1/3 lg:basis-1/5 xl:basis-1/6">
-                <Card 
-                  className="overflow-hidden cursor-pointer shadow-sm hover:shadow-glow transition-all duration-300 hover:scale-105 group rounded-lg"
-                  onClick={() => setSelectedImage(image.image_url)}
-                  onMouseEnter={() => plugin.current.stop()}
-                  onMouseLeave={() => plugin.current.play()}
-                >
-                  <img
-                    src={image.image_url}
-                    alt={image.title || 'Gallery image'}
-                    className="w-full h-32 sm:h-40 object-cover rounded-lg"
-                  />
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
-
-          {/* View Full Gallery Button */}
-          <div className="text-center">
-            <Button asChild size="lg" className="font-semibold">
-              <Link to="/gallery">View Full Gallery</Link>
-            </Button>
-          </div>
+        {/* Gallery Coming Soon */}
+        <div className="flex flex-col items-center justify-center py-12">
+          <p className="text-xl font-semibold text-muted-foreground">Gallery Coming Soon...</p>
+        </div>
         </div>
       </section>
 
