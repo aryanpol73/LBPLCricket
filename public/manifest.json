@@ -4,10 +4,10 @@
   "start_url": "/?utm_source=homescreen",
   "display": "standalone",
   "scope": "/",
-  "background_color": "#ffffff",
-  "theme_color": "#0033a0",
+  "background_color": "##002c54",
+  "theme_color": "##002c54",
   "description": "LBPL Official — fixtures, scores and news",
-"icons": [
+  "icons": [
     {
       "src": "/android-icon-192.png",
       "sizes": "192x192",
