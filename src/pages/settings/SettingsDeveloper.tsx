@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Code, Github, Mail, Globe } from "lucide-react";
+import { ArrowLeft, Code, User, Lightbulb, Layers } from "lucide-react";
 
 const SettingsDeveloper = () => {
   const navigate = useNavigate();
@@ -46,40 +46,52 @@ const SettingsDeveloper = () => {
               <Code size={40} className="text-white" />
             </div>
             <h2 className="text-2xl font-bold text-white">Aryan Pol</h2>
-            <p className="text-[#f0b429] font-medium mt-1">Full Stack Developer</p>
+            <p className="text-[#f0b429] font-medium mt-1">AI Product Developer</p>
           </div>
 
-          {/* Bio */}
-          <p className="text-gray-300 text-center mb-6">
-            Designed & Developed the LBPL Official App with passion for cricket 
-            and modern web technologies.
-          </p>
+          {/* Info Cards */}
+          <div className="space-y-4">
+            {/* About Me Card */}
+            <div className="flex items-start gap-4 p-4 bg-white/5 rounded-lg">
+              <User size={20} className="text-[#f0b429] mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-white font-medium mb-1">About Me</p>
+                <p className="text-gray-300 text-sm">
+                  I enjoy building apps and exploring AI whenever I can, and I like turning small ideas into real projects.
+                </p>
+              </div>
+            </div>
 
-          {/* Links */}
-          <div className="space-y-3">
-            {[
-              { icon: Globe, label: "Website", value: "Coming Soon" },
-              { icon: Github, label: "GitHub", value: "Coming Soon" },
-              { icon: Mail, label: "Contact", value: "Coming Soon" },
-            ].map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.label}
-                  className="flex items-center gap-4 p-3 bg-white/5 rounded-lg"
-                >
-                  <Icon size={20} className="text-[#f0b429]" />
-                  <div className="flex-1">
-                    <p className="text-white font-medium">{item.label}</p>
-                    <p className="text-gray-400 text-sm">{item.value}</p>
-                  </div>
-                </div>
-              );
-            })}
+            {/* Project Purpose Card */}
+            <div className="flex items-start gap-4 p-4 bg-white/5 rounded-lg">
+              <Lightbulb size={20} className="text-[#f0b429] mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-white font-medium mb-1">Project Purpose</p>
+                <p className="text-gray-300 text-sm">
+                  The LBPL Official App was created to bring league updates, teams, fixtures, results, and community features into one smooth platform.
+                </p>
+              </div>
+            </div>
+
+            {/* Tech Stack Card */}
+            <div className="flex items-start gap-4 p-4 bg-white/5 rounded-lg">
+              <Layers size={20} className="text-[#f0b429] mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-white font-medium mb-1">Tech Stack</p>
+                <p className="text-gray-300 text-sm">
+                  TypeScript • React • PWA • Supabase • TailwindCSS • AI APIs • Node.js • Figma
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div className="mt-6 pt-6 border-t border-white/10 text-center">
+            <p className="text-sm text-gray-300">📧 Contact: aryanpol0305@gmail.com</p>
           </div>
 
           {/* App Version */}
-          <div className="mt-6 pt-6 border-t border-white/10 text-center">
+          <div className="mt-4 text-center">
             <p className="text-sm text-gray-400">LBPL Official App</p>
             <p className="text-xs text-gray-500 mt-1">Version 1.0.0</p>
           </div>
