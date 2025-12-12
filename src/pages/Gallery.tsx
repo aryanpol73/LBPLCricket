@@ -29,11 +29,9 @@ const Gallery = () => {
           </p>
         </div>
 
-        {/* Gallery Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {allGalleryImages.map(image => <Card key={image.id} className="overflow-hidden cursor-pointer hover:shadow-glow transition-all duration-300 hover:scale-105" onClick={() => setSelectedImage(image.image_url)}>
-              <img src={image.image_url} alt={image.title || 'Gallery image'} className="w-full aspect-video object-cover" loading="lazy" />
-            </Card>)}
+        {/* Gallery Coming Soon */}
+        <div className="flex flex-col items-center justify-center py-20">
+          <p className="text-2xl font-semibold text-muted-foreground">Gallery Coming Soon...</p>
         </div>
       </div>
 
