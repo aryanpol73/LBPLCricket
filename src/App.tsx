@@ -7,6 +7,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ThemeProvider } from "next-themes";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import Footer from "@/components/Footer";
+import PwaBottomNav from "@/components/PwaBottomNav";
 import Index from "./pages/Index";
 import Matches from "./pages/Matches";
 import Results from "./pages/Results";
@@ -50,6 +51,7 @@ const App = () => (
               </Routes>
             </div>
             <Footer />
+            <PwaBottomNav />
           </div>
         </BrowserRouter>
       </TooltipProvider>
