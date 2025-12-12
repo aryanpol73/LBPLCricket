@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +9,7 @@ import { ThemeProvider } from "next-themes";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import Footer from "@/components/Footer";
 import PwaBottomNav from "@/components/PwaBottomNav";
+import SplashScreen from "@/components/SplashScreen";
 import Index from "./pages/Index";
 import Matches from "./pages/Matches";
 import Results from "./pages/Results";
@@ -31,46 +33,60 @@ import LiveScoreWidget from "./pages/widget/LiveScoreWidget";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <div className="min-h-screen flex flex-col">
-            <div className="flex-1">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/matches" element={<Matches />} />
-                <Route path="/results" element={<Results />} />
-                <Route path="/points-table" element={<PointsTable />} />
-                <Route path="/teams" element={<Teams />} />
-                <Route path="/stats" element={<Stats />} />
-                <Route path="/gallery" element={<Gallery />} />
-                <Route path="/community" element={<Community />} />
-                <Route path="/sponsors" element={<Sponsors />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
-                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-                <Route path="/settings" element={<SettingsHome />} />
-                <Route path="/settings/about" element={<SettingsAbout />} />
-                <Route path="/settings/rules" element={<SettingsRules />} />
-                <Route path="/settings/developer" element={<SettingsDeveloper />} />
-                <Route path="/settings/appearance" element={<AppearanceSettings />} />
-                <Route path="/settings/notifications" element={<NotificationSettings />} />
-                <Route path="/widget/live" element={<LiveScoreWidget />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+const App = () => {
+  const [showSplash, setShowSplash] = useState(() => {
+    // Only show splash on initial app load, not on route changes
+    const hasSeenSplash = sessionStorage.getItem('lbpl_splash_shown');
+    return !hasSeenSplash;
+  });
+
+  const handleSplashComplete = () => {
+    sessionStorage.setItem('lbpl_splash_shown', 'true');
+    setShowSplash(false);
+  };
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+        <TooltipProvider>
+          {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ScrollToTop />
+            <div className="min-h-screen flex flex-col">
+              <div className="flex-1">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/matches" element={<Matches />} />
+                  <Route path="/results" element={<Results />} />
+                  <Route path="/points-table" element={<PointsTable />} />
+                  <Route path="/teams" element={<Teams />} />
+                  <Route path="/stats" element={<Stats />} />
+                  <Route path="/gallery" element={<Gallery />} />
+                  <Route path="/community" element={<Community />} />
+                  <Route path="/sponsors" element={<Sponsors />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
+                  <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+                  <Route path="/settings" element={<SettingsHome />} />
+                  <Route path="/settings/about" element={<SettingsAbout />} />
+                  <Route path="/settings/rules" element={<SettingsRules />} />
+                  <Route path="/settings/developer" element={<SettingsDeveloper />} />
+                  <Route path="/settings/appearance" element={<AppearanceSettings />} />
+                  <Route path="/settings/notifications" element={<NotificationSettings />} />
+                  <Route path="/widget/live" element={<LiveScoreWidget />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+              <Footer />
+              <PwaBottomNav />
             </div>
-            <Footer />
-            <PwaBottomNav />
-          </div>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
