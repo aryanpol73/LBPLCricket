@@ -6,27 +6,39 @@ const AuthCallback = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Supabase handles the token exchange automatically
-    // Just check for session and redirect
+    // Listen for auth state changes - this catches OAuth token exchange
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          // Force redirect to community - use window.location for PWA compatibility
+          window.location.href = `${window.location.origin}/community`;
+        }
+      }
+    );
+
+    // Check for existing session
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-        navigate("/community", { replace: true });
-      } else {
-        // If no session after a moment, redirect to auth
-        setTimeout(async () => {
-          const { data: { session: retrySession } } = await supabase.auth.getSession();
-          if (retrySession) {
-            navigate("/community", { replace: true });
-          } else {
-            navigate("/auth", { replace: true });
-          }
-        }, 1000);
+        window.location.href = `${window.location.origin}/community`;
+        return;
       }
+
+      // Fallback: If no session after 3 seconds, redirect to auth
+      setTimeout(async () => {
+        const { data: { session: retrySession } } = await supabase.auth.getSession();
+        if (retrySession) {
+          window.location.href = `${window.location.origin}/community`;
+        } else {
+          window.location.href = `${window.location.origin}/auth`;
+        }
+      }, 3000);
     };
 
     checkSession();
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   return (
