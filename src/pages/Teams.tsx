@@ -172,7 +172,7 @@ const Teams = () => {
             >
               <div className="flex items-start gap-4 mb-4">
               {team.logo_url && (
-                  <div className="w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform duration-300 hover:scale-110 hover:rotate-6 overflow-hidden rounded-full">
+                  <div className="w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform duration-300 hover:scale-110 hover:rotate-6 overflow-hidden rounded-full border-2 border-primary/30">
                     <img 
                       src={team.logo_url} 
                       alt={team.name} 

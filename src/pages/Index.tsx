@@ -654,7 +654,7 @@ const Index = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(showAllTeams ? teams : teams.slice(0, 3)).map(team => <Card key={team.id} className="reveal-zoom-fade p-6 bg-gradient-team-card shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer border-2 border-primary/20 bg-blue-500/5" onClick={() => handleTeamClick(team)}>
               <div className="flex items-start gap-4 mb-4">
-                {team.logo_url && <div className="w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform duration-300 hover:scale-110 hover:rotate-6 overflow-hidden rounded-full">
+                {team.logo_url && <div className="w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform duration-300 hover:scale-110 hover:rotate-6 overflow-hidden rounded-full border-2 border-primary/30">
                     <img src={team.logo_url} alt={team.name} className="w-full h-full object-cover" />
                   </div>}
                 <div className="flex-1">

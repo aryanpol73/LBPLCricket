@@ -67,11 +67,11 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
         <DialogHeader>
           <div className="flex items-center gap-4 mb-4 animate-slide-in-left">
             {team.logo_url && (
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center flex-shrink-0 transition-transform duration-500 hover:scale-110 hover:rotate-12">
+              <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0 transition-transform duration-500 hover:scale-110 hover:rotate-12 border-2 border-primary/30">
                 <img 
                   src={team.logo_url} 
                   alt={team.name} 
-                  className="w-12 h-12 object-contain"
+                  className="w-full h-full object-cover"
                 />
               </div>
             )}
