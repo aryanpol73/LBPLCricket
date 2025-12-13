@@ -89,13 +89,6 @@ export const PlayerProfileDialog = ({ player, open, onOpenChange }: PlayerProfil
                     {player.role}
                   </Badge>
                 )}
-                {player.name === "Aryan Pol" && (
-                  <Badge 
-                    className="text-sm px-3 py-1 bg-gradient-to-r from-yellow-500 to-amber-600 border-0 text-white font-semibold"
-                  >
-                    Owner
-                  </Badge>
-                )}
               </div>
             </div>
           </div>

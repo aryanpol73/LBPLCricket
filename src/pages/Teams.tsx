@@ -130,11 +130,6 @@ const Teams = () => {
                       <Badge variant="outline" className="text-xs border-[#F9C846]/50 text-[#F9C846]">
                         {player.role || 'Player'}
                       </Badge>
-                      {player.name === "Aryan Pol" && (
-                        <Badge className="text-xs bg-gradient-to-r from-yellow-500 to-amber-600 border-0 text-white">
-                          Owner
-                        </Badge>
-                      )}
                     </div>
                     {player.teams && (
                       <p className="text-xs text-muted-foreground">

@@ -119,11 +119,6 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
                       <span className="text-sm font-medium text-foreground hover:text-primary transition-colors">
                         {player.name}
                       </span>
-                      {player.name === "Aryan Pol" && (
-                        <Badge className="text-xs bg-gradient-to-r from-yellow-500 to-amber-600 border-0 text-white">
-                          Owner
-                        </Badge>
-                      )}
                     </div>
                   </div>
                 ))}
@@ -150,11 +145,6 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
                       <span className="text-sm font-medium text-foreground hover:text-primary transition-colors">
                         {player.name}
                       </span>
-                      {player.name === "Aryan Pol" && (
-                        <Badge className="text-xs bg-gradient-to-r from-yellow-500 to-amber-600 border-0 text-white">
-                          Owner
-                        </Badge>
-                      )}
                     </div>
                   </div>
                 ))}
@@ -180,11 +170,6 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
                       <span className="text-sm font-medium text-foreground hover:text-primary transition-colors">
                         {player.name}
                       </span>
-                      {player.name === "Aryan Pol" && (
-                        <Badge className="text-xs bg-gradient-to-r from-yellow-500 to-amber-600 border-0 text-white">
-                          Owner
-                        </Badge>
-                      )}
                     </div>
                   </div>
                 ))}
