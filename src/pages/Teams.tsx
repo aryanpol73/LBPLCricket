@@ -171,12 +171,12 @@ const Teams = () => {
               onClick={() => handleTeamClick(team)}
             >
               <div className="flex items-start gap-4 mb-4">
-                {team.logo_url && (
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 transition-transform duration-300 hover:scale-110 hover:rotate-6">
+              {team.logo_url && (
+                  <div className="w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform duration-300 hover:scale-110 hover:rotate-6 overflow-hidden rounded-full">
                     <img 
                       src={team.logo_url} 
                       alt={team.name} 
-                      className="w-12 h-12 object-contain"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 )}
