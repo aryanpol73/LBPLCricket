@@ -76,7 +76,7 @@ serve(async (req: Request): Promise<Response> => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "LBPL Official <onboarding@resend.dev>",
+        from: "LBPL Official <noreply@lbplofficial.com>",
         to: [email],
         subject: "Your LBPL Login Code",
         html: `
