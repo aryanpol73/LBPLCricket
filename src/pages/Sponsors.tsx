@@ -62,6 +62,7 @@ const sponsors: Sponsor[] = [
   { name: "Dr. Harshal Saoji", firmName: "Dr. Saoji's Ortho Pain Clinic", city: "Pune", tier: "Silver", amount: "₹25,000" },
   { name: "Dr. Girish Saoji", city: "CSN", tier: "Silver", amount: "₹25,000" },
   { name: "Dr. Rajesh Saoji & Dr. Sonali Saoji", firmName: "Saoji Cancer Clinic & Rainbow Pathology Laboratory", city: "CSN", tier: "Silver", amount: "₹25,000" },
+  { name: "Mr. Pankaj Mahajan", city: "Nagpur", tier: "Silver", amount: "₹25,000" },
   { name: "Dr. Sachin Saoji", city: "CSN", tier: "Advertiser", amount: "₹11,000" },
   { name: "Dr. Kedar Saoji", firmName: "Anay Dental & Implant Clinic", city: "Pune", tier: "Advertiser", amount: "₹11,000" },
   { name: "Mrunmay Saoji", firmName: "First Step Marketers", city: "Mehkar", tier: "Advertiser", amount: "₹11,000" },
