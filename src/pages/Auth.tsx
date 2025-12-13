@@ -13,7 +13,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 const emailSchema = z.string().email("Please enter a valid email address");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
 
-type AuthStep = "email" | "otp" | "set-password";
+type AuthStep = "email" | "otp" | "set-password" | "enter-password";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const Auth = () => {
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/community");
+        navigate("/community", { replace: true });
       }
     });
 
@@ -40,7 +40,7 @@ const Auth = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === 'SIGNED_IN' && session) {
-          navigate("/community");
+          navigate("/community", { replace: true });
         }
       }
     );
@@ -139,16 +139,55 @@ const Auth = () => {
       if (response.data?.isNewUser) {
         toast.success("OTP verified! Please set your password.");
         setStep("set-password");
-      } else if (response.data?.actionLink) {
-        // User exists - follow the magic link to sign in
-        window.location.href = response.data.actionLink;
+      } else if (response.data?.requiresPassword) {
+        toast.success("OTP verified! Please enter your password.");
+        setStep("enter-password");
       } else {
         toast.success("Logged in successfully!");
-        navigate("/community");
+        navigate("/community", { replace: true });
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to verify OTP");
       setOtp("");
+    }
+    
+    setLoading(false);
+  };
+
+  const handleSignInWithPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const passwordResult = passwordSchema.safeParse(password);
+    if (!passwordResult.success) {
+      setPasswordError(passwordResult.error.errors[0].message);
+      return;
+    }
+
+    setLoading(true);
+    setPasswordError(undefined);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.toLowerCase(),
+        password,
+      });
+
+      if (error) {
+        if (error.message.includes("Invalid login credentials")) {
+          setPasswordError("Incorrect password. Please try again.");
+        } else {
+          toast.error(error.message);
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (data.session) {
+        toast.success("Logged in successfully!");
+        navigate("/community", { replace: true });
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to sign in");
     }
     
     setLoading(false);
@@ -172,6 +211,7 @@ const Auth = () => {
     setPasswordError(undefined);
 
     try {
+      // Create user via edge function
       const response = await supabase.functions.invoke("verify-otp", {
         body: { email: email.toLowerCase(), otp, password },
       });
@@ -188,12 +228,21 @@ const Auth = () => {
         return;
       }
 
-      if (response.data?.actionLink) {
-        toast.success("Account created! Signing you in...");
-        window.location.href = response.data.actionLink;
-      } else {
-        toast.success("Account created successfully!");
-        navigate("/community");
+      // User created successfully, now sign in with password
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.toLowerCase(),
+        password,
+      });
+
+      if (error) {
+        toast.error(error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data.session) {
+        toast.success("Account created! Welcome to LBPL Community!");
+        navigate("/community", { replace: true });
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to create account");
@@ -233,6 +282,10 @@ const Auth = () => {
     if (step === "otp") {
       setStep("email");
       setOtp("");
+    } else if (step === "enter-password") {
+      setStep("otp");
+      setPassword("");
+      setPasswordError(undefined);
     }
   };
 
@@ -384,7 +437,75 @@ const Auth = () => {
     );
   }
 
-  // Set Password Screen
+  // Enter Password Screen (for existing users)
+  if (step === "enter-password") {
+    return (
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-4">
+        <Card className="w-full max-w-md p-8 bg-card shadow-glow border-primary/20">
+          <button
+            onClick={goBack}
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6"
+          >
+            <ArrowLeft size={16} />
+            Back
+          </button>
+          
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Lock className="text-primary" size={32} />
+            <h1 className="text-2xl font-bold text-foreground">Welcome Back</h1>
+          </div>
+          
+          <p className="text-center text-muted-foreground mb-6">
+            Enter your password to sign in
+          </p>
+
+          <form onSubmit={handleSignInWithPassword} className="space-y-4">
+            <div>
+              <Label htmlFor="password" className="flex items-center gap-2">
+                <Lock className="h-4 w-4" /> Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError(undefined);
+                }}
+                required
+                placeholder="Enter your password"
+                className={passwordError ? "border-destructive" : ""}
+                autoFocus
+              />
+              {passwordError && (
+                <p className="text-sm text-destructive mt-1">{passwordError}</p>
+              )}
+            </div>
+            
+            <Button
+              type="submit"
+              className="w-full bg-gradient-hero text-white"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  <Lock className="mr-2 h-4 w-4" />
+                  Sign In
+                </>
+              )}
+            </Button>
+          </form>
+        </Card>
+      </div>
+    );
+  }
+
+  // Set Password Screen (for new users)
   if (step === "set-password") {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-4">

@@ -83,38 +83,29 @@ serve(async (req: Request): Promise<Response> => {
     );
 
     if (existingUser) {
-      // User exists - sign them in
+      // User exists - they need to sign in with password
       if (password) {
-        // Update password if provided
+        // Update password if provided (for password reset flow)
         const { error: updateError } = await supabase.auth.admin.updateUserById(
           existingUser.id,
           { password }
         );
         if (updateError) {
           console.error("Error updating password:", updateError);
+          return new Response(
+            JSON.stringify({ error: "Failed to update password" }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
         }
       }
 
-      // Generate a session for the user
-      const { data: signInData, error: signInError } = await supabase.auth.admin.generateLink({
-        type: "magiclink",
-        email: email.toLowerCase(),
-      });
-
-      if (signInError) {
-        console.error("Error generating session:", signInError);
-        return new Response(
-          JSON.stringify({ error: "Failed to sign in" }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
+      // Return success - frontend will handle sign in with password
       return new Response(
         JSON.stringify({ 
           success: true, 
           isNewUser: false,
-          message: "OTP verified successfully",
-          actionLink: signInData.properties?.action_link
+          requiresPassword: true,
+          message: "OTP verified. Please enter your password to sign in."
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
@@ -146,22 +137,13 @@ serve(async (req: Request): Promise<Response> => {
         );
       }
 
-      // Generate session for new user
-      const { data: signInData, error: signInError } = await supabase.auth.admin.generateLink({
-        type: "magiclink",
-        email: email.toLowerCase(),
-      });
-
-      if (signInError) {
-        console.error("Error generating session:", signInError);
-      }
-
+      // Return success - frontend will handle sign in with password
       return new Response(
         JSON.stringify({ 
           success: true, 
           isNewUser: false,
-          message: "Account created successfully",
-          actionLink: signInData?.properties?.action_link
+          userCreated: true,
+          message: "Account created successfully. Please sign in."
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
