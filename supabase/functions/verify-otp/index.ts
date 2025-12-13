@@ -64,6 +64,71 @@ serve(async (req: Request): Promise<Response> => {
         );
       }
 
+      // Check if OTP was already used (user setting password)
+      const { data: usedOtp } = await supabase
+        .from("email_otps")
+        .select("id")
+        .eq("email", email.toLowerCase())
+        .eq("otp", otp)
+        .eq("used", true)
+        .limit(1);
+
+      // If OTP was used and password is provided, this is a password setup request
+      if (usedOtp && usedOtp.length > 0 && password) {
+        // Check if user exists
+        const { data: existingUsers } = await supabase.auth.admin.listUsers();
+        const existingUser = existingUsers?.users?.find(
+          (u) => u.email?.toLowerCase() === email.toLowerCase()
+        );
+
+        if (existingUser) {
+          // User exists - update password (password reset flow)
+          const { error: updateError } = await supabase.auth.admin.updateUserById(
+            existingUser.id,
+            { password }
+          );
+          if (updateError) {
+            console.error("Error updating password:", updateError);
+            return new Response(
+              JSON.stringify({ error: "Failed to update password" }),
+              { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          return new Response(
+            JSON.stringify({ 
+              success: true, 
+              userCreated: true,
+              message: "Password updated successfully."
+            }),
+            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        } else {
+          // Create new user with password
+          const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+            email: email.toLowerCase(),
+            password,
+            email_confirm: true,
+          });
+
+          if (createError) {
+            console.error("Error creating user:", createError);
+            return new Response(
+              JSON.stringify({ error: "Failed to create account" }),
+              { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+
+          return new Response(
+            JSON.stringify({ 
+              success: true, 
+              userCreated: true,
+              message: "Account created successfully."
+            }),
+            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+
       return new Response(
         JSON.stringify({ error: "Invalid OTP" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -84,22 +149,6 @@ serve(async (req: Request): Promise<Response> => {
 
     if (existingUser) {
       // User exists - they need to sign in with password
-      if (password) {
-        // Update password if provided (for password reset flow)
-        const { error: updateError } = await supabase.auth.admin.updateUserById(
-          existingUser.id,
-          { password }
-        );
-        if (updateError) {
-          console.error("Error updating password:", updateError);
-          return new Response(
-            JSON.stringify({ error: "Failed to update password" }),
-            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-      }
-
-      // Return success - frontend will handle sign in with password
       return new Response(
         JSON.stringify({ 
           success: true, 
@@ -111,39 +160,11 @@ serve(async (req: Request): Promise<Response> => {
       );
     } else {
       // New user - they need to set password
-      if (!password) {
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            isNewUser: true,
-            message: "OTP verified. Please set your password."
-          }),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      // Create user with password
-      const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
-        email: email.toLowerCase(),
-        password,
-        email_confirm: true,
-      });
-
-      if (createError) {
-        console.error("Error creating user:", createError);
-        return new Response(
-          JSON.stringify({ error: "Failed to create account" }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      // Return success - frontend will handle sign in with password
       return new Response(
         JSON.stringify({ 
           success: true, 
-          isNewUser: false,
-          userCreated: true,
-          message: "Account created successfully. Please sign in."
+          isNewUser: true,
+          message: "OTP verified. Please set your password."
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
