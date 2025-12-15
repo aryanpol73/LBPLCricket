@@ -2,6 +2,7 @@ import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { useEffect, useState } from "react";
 import { Trophy } from "lucide-react";
+import { WinProbabilityBar } from "./WinProbabilityBar";
 
 interface LiveMatchCardProps {
   teamA: string;
@@ -11,6 +12,7 @@ interface LiveMatchCardProps {
   isLive: boolean;
   teamAScore?: string;
   teamBScore?: string;
+  matchPhase?: string;
 }
 
 export const LiveMatchCard = ({ 
@@ -20,7 +22,8 @@ export const LiveMatchCard = ({
   teamBLogo, 
   isLive,
   teamAScore,
-  teamBScore 
+  teamBScore,
+  matchPhase
 }: LiveMatchCardProps) => {
   const [pulse, setPulse] = useState(true);
 
@@ -82,6 +85,17 @@ export const LiveMatchCard = ({
           )}
         </div>
       </div>
+
+      {/* Win Probability - Only for live matches */}
+      {isLive && (
+        <WinProbabilityBar
+          teamAName={teamA}
+          teamBName={teamB}
+          teamAScore={teamAScore}
+          teamBScore={teamBScore}
+          matchPhase={matchPhase}
+        />
+      )}
     </Card>
   );
 };
