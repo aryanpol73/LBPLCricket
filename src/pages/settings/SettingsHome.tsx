@@ -116,7 +116,7 @@ const SettingsHome = () => {
       ],
     },
     {
-      title: "PWA Controls",
+      title: "App Controls",
       items: [
         { icon: Pin, label: "Pin Live Widget", description: "Add score widget to home screen", path: null, action: handlePinWidget },
         { icon: RefreshCw, label: "Refresh App", description: "Reload the application", path: null, action: handleRefreshApp },
