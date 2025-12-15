@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Palette, Bell, Info, Code, Smartphone, ChevronRight, Pin, ExternalLink } from "lucide-react";
+import { ArrowLeft, Palette, Bell, Info, Code, ChevronRight, Pin, ExternalLink, Share2, Trash2, RefreshCw, HelpCircle, Star, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 
 const SettingsHome = () => {
@@ -47,6 +47,53 @@ const SettingsHome = () => {
     toast.success("Widget URL copied! Open in browser and add to home screen.");
   };
 
+  const handleShareApp = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "LBPL Official App",
+          text: "Check out the official LBPL Cricket League app!",
+          url: window.location.origin,
+        });
+      } catch (err) {
+        // User cancelled
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.origin);
+      toast.success("App link copied to clipboard!");
+    }
+  };
+
+  const handleClearCache = async () => {
+    try {
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+      }
+      localStorage.removeItem('lbpl_theme');
+      localStorage.removeItem('lbpl_notification_settings');
+      toast.success("Cache cleared! Restart app for changes.");
+    } catch (err) {
+      toast.error("Failed to clear cache");
+    }
+  };
+
+  const handleRateApp = () => {
+    toast.success("Thanks for your support! Rating feature coming soon.", {
+      icon: "⭐",
+    });
+  };
+
+  const handleFeedback = () => {
+    window.open("mailto:aryanpol0305@gmail.com?subject=LBPL App Feedback", "_blank");
+    toast.success("Opening email client...");
+  };
+
+  const handleRefreshApp = () => {
+    window.location.reload();
+    toast.success("Refreshing app...");
+  };
+
   const sections = [
     {
       title: "Preferences",
@@ -72,7 +119,17 @@ const SettingsHome = () => {
       title: "PWA Controls",
       items: [
         { icon: Pin, label: "Pin Live Widget", description: "Add score widget to home screen", path: null, action: handlePinWidget },
-        { icon: Smartphone, label: "App Settings", description: "PWA-specific options", path: null, action: null },
+        { icon: RefreshCw, label: "Refresh App", description: "Reload the application", path: null, action: handleRefreshApp },
+        { icon: Trash2, label: "Clear Cache", description: "Clear app data and cache", path: null, action: handleClearCache },
+      ],
+    },
+    {
+      title: "Support",
+      items: [
+        { icon: Share2, label: "Share App", description: "Share LBPL with friends", path: null, action: handleShareApp },
+        { icon: Star, label: "Rate App", description: "Rate us on store", path: null, action: handleRateApp },
+        { icon: MessageSquare, label: "Send Feedback", description: "Help us improve", path: null, action: handleFeedback },
+        { icon: HelpCircle, label: "Help & FAQ", description: "Common questions", path: "/settings/help", action: null },
       ],
     },
   ];
