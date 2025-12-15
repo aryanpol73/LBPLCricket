@@ -251,6 +251,29 @@ const Community = () => {
     return urlData.publicUrl;
   };
 
+  const moderateContent = async (content: string): Promise<{ acceptable: boolean; reason: string | null; reply: string | null }> => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/moderate-content`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ message: content }),
+      });
+      
+      if (!response.ok) {
+        console.error("Moderation failed:", response.status);
+        return { acceptable: true, reason: null, reply: null };
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error("Moderation error:", error);
+      return { acceptable: true, reason: null, reply: null };
+    }
+  };
+
   const createPost = async () => {
     if (!user) {
       toast({ title: "Please login to post", variant: "destructive" });
@@ -259,6 +282,28 @@ const Community = () => {
     if (!newPostContent.trim() && !selectedImage) {
       toast({ title: "Please add some content or an image", variant: "destructive" });
       return;
+    }
+
+    // Moderate content before posting
+    if (newPostContent.trim()) {
+      const modResult = await moderateContent(newPostContent);
+      
+      if (!modResult.acceptable) {
+        toast({ 
+          title: "Post not allowed", 
+          description: modResult.reason || "Content violates community guidelines",
+          variant: "destructive" 
+        });
+        return;
+      }
+      
+      // If AI has a helpful reply (for questions), show it
+      if (modResult.reply) {
+        toast({ 
+          title: "Quick Answer", 
+          description: modResult.reply,
+        });
+      }
     }
 
     let imageUrl = null;
@@ -365,6 +410,18 @@ const Community = () => {
 
   const addComment = async () => {
     if (!user || !selectedPost || !newComment.trim()) return;
+
+    // Moderate comment before posting
+    const modResult = await moderateContent(newComment);
+    
+    if (!modResult.acceptable) {
+      toast({ 
+        title: "Comment not allowed", 
+        description: modResult.reason || "Content violates community guidelines",
+        variant: "destructive" 
+      });
+      return;
+    }
 
     const { error } = await supabase.from('community_comments').insert({
       post_id: selectedPost.id,
