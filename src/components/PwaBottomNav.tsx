@@ -135,26 +135,9 @@ export default function PwaBottomNav() {
 
   return (
     <>
-      {/* Fixed Developer Credit Bar - above nav */}
-      <div
-        className="fixed left-0 right-0 z-50 py-1.5 border-t border-border/20"
-        style={{
-          bottom: "calc(56px + env(safe-area-inset-bottom, 0px))",
-          background: "linear-gradient(to bottom, #0a1628, #081220)",
-        }}
-      >
-        <p className="text-center text-[11px] text-muted-foreground font-medium tracking-wide">
-          Designed & Developed by{" "}
-          <span className="text-[#F9C846] font-semibold">Aryan Pol</span>
-        </p>
-      </div>
-
       <nav
         ref={navRef}
         className="fixed bottom-0 left-0 right-0 z-50"
-        style={{
-          paddingBottom: "env(safe-area-inset-bottom, 0px)",
-        }}
       >
         {/* Upper shadow gradient */}
         <div className="absolute inset-x-0 -top-4 h-4 bg-gradient-to-t from-[#081428]/80 to-transparent pointer-events-none" />
@@ -225,6 +208,20 @@ export default function PwaBottomNav() {
               More
             </span>
           </button>
+        </div>
+
+        {/* Developer Credit Bar - below nav */}
+        <div
+          className="py-1.5 border-t border-border/20"
+          style={{
+            background: "linear-gradient(to bottom, #081220, #050d18)",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          }}
+        >
+          <p className="text-center text-[11px] text-muted-foreground font-medium tracking-wide">
+            Designed & Developed by{" "}
+            <span className="text-[#F9C846] font-semibold">Aryan Pol</span>
+          </p>
         </div>
       </nav>
 
