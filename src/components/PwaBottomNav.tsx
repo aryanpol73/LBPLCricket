@@ -57,7 +57,8 @@ export default function PwaBottomNav() {
 
   useEffect(() => {
     if (isPwa) {
-      document.body.style.paddingBottom = "calc(64px + env(safe-area-inset-bottom, 0px))";
+      // Account for footer bar (28px) + nav bar (64px) + safe area
+      document.body.style.paddingBottom = "calc(92px + env(safe-area-inset-bottom, 0px))";
     } else {
       document.body.style.paddingBottom = "";
     }
@@ -134,6 +135,20 @@ export default function PwaBottomNav() {
 
   return (
     <>
+      {/* Fixed Developer Credit Bar - above nav */}
+      <div
+        className="fixed left-0 right-0 z-50 py-1.5 border-t border-border/20"
+        style={{
+          bottom: "calc(56px + env(safe-area-inset-bottom, 0px))",
+          background: "linear-gradient(to bottom, #0a1628, #081220)",
+        }}
+      >
+        <p className="text-center text-[11px] text-muted-foreground font-medium tracking-wide">
+          Designed & Developed by{" "}
+          <span className="text-[#F9C846] font-semibold">Aryan Pol</span>
+        </p>
+      </div>
+
       <nav
         ref={navRef}
         className="fixed bottom-0 left-0 right-0 z-50"
