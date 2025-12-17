@@ -1,9 +1,9 @@
-
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useState } from "react";
-import { Trophy, TrendingUp, Target, Award, Medal } from "lucide-react";
+import { Trophy, TrendingUp, Target, Award, Medal, ExternalLink } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 // Dummy player data for preview (30 players)
 const dummyPlayers = [
@@ -58,6 +58,25 @@ const Stats = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogPlayers, setDialogPlayers] = useState<{ player: DummyPlayer; value: string }[]>([]);
+  const [cricherosUrl, setCricherosUrl] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    const { data } = await supabase
+      .from('tournament_settings')
+      .select('setting_value')
+      .eq('setting_key', 'cricheroes_stats_url')
+      .maybeSingle();
+    
+    if (data?.setting_value) {
+      setCricherosUrl(data.setting_value);
+    }
+    setLoading(false);
+  };
 
   const getTopBatsmen = () => [...players].sort((a, b) => b.runs_scored - a.runs_scored).slice(0, 30);
   const getTopBowlers = () => [...players].sort((a, b) => b.wickets_taken - a.wickets_taken).slice(0, 30);
@@ -95,7 +114,6 @@ const Stats = () => {
                 index === 0 ? 'bg-[#F9C846]/10 border border-[#F9C846]/30' : 'bg-[#0F1B35]/50'
               }`}
             >
-              {/* Rank Badge */}
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
                 index === 0 ? 'bg-gradient-to-br from-[#F9C846] to-[#d4a837] text-[#0A1325]' :
                 index === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-white' :
@@ -104,13 +122,11 @@ const Stats = () => {
                 {index + 1}
               </div>
               
-              {/* Player Info */}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-white truncate">{player.name}</p>
                 <p className="text-xs text-gray-400 truncate">{player.team_name}</p>
               </div>
               
-              {/* Stat Value */}
               <div className="text-right flex-shrink-0">
                 <p className={`text-sm font-bold ${index === 0 ? 'text-[#F9C846]' : 'text-white'}`}>
                   {stat(player)}
@@ -136,13 +152,16 @@ const Stats = () => {
     return 'bg-[#2E73FF]/30 text-white';
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0A1325] via-[#0F1B35] to-[#0A1325] flex items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A1325] via-[#0F1B35] to-[#0A1325]">
-      {/* Demo Banner */}
-      <div className="bg-[#F9C846]/20 border-b border-[#F9C846]/30 py-2 text-center">
-        <p className="text-[#F9C846] text-sm font-medium">🎯 Demo Preview - Showing sample player statistics</p>
-      </div>
-
       <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="flex items-center gap-3 mb-6 md:mb-8">
           <div className="p-2 rounded-lg bg-[#F9C846]/10 border border-[#F9C846]/30">
@@ -151,68 +170,111 @@ const Stats = () => {
           <h1 className="text-2xl md:text-4xl font-bold text-white">Player Statistics</h1>
         </div>
 
-        <Tabs defaultValue="batting" className="space-y-4 md:space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-[#0F1B35] border border-[#F9C846]/30">
-            <TabsTrigger value="batting" className="text-sm data-[state=active]:bg-[#2E73FF] data-[state=active]:text-white">Batting</TabsTrigger>
-            <TabsTrigger value="bowling" className="text-sm data-[state=active]:bg-[#2E73FF] data-[state=active]:text-white">Bowling</TabsTrigger>
-            <TabsTrigger value="fielding" className="text-sm data-[state=active]:bg-[#2E73FF] data-[state=active]:text-white">Fielding</TabsTrigger>
+        {/* Main Tabs: Live Stats vs Preview */}
+        <Tabs defaultValue={cricherosUrl ? "live" : "preview"} className="space-y-4 md:space-y-6">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 bg-[#0F1B35] border border-[#F9C846]/30">
+            <TabsTrigger value="live" className="flex items-center gap-2 text-sm data-[state=active]:bg-[#2E73FF] data-[state=active]:text-white">
+              <ExternalLink className="w-4 h-4" />
+              Tournament Stats
+            </TabsTrigger>
+            <TabsTrigger value="preview" className="text-sm data-[state=active]:bg-[#2E73FF] data-[state=active]:text-white">
+              Preview Stats
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="batting" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <StatCard
-                title="Top Run Scorers"
-                players={getTopBatsmen()}
-                stat={(p) => `${p.runs_scored} runs`}
-                icon={Trophy}
-                onClick={() => openDialog("Top Run Scorers", getTopBatsmen(), (p) => `${p.runs_scored} runs`)}
-              />
-              <StatCard
-                title="Highest Strike Rate"
-                players={getHighestStrikeRate()}
-                stat={(p) => `${p.strike_rate.toFixed(1)} SR`}
-                icon={TrendingUp}
-                onClick={() => openDialog("Highest Strike Rate", getHighestStrikeRate(), (p) => `${p.strike_rate.toFixed(2)} SR`)}
-              />
-              <StatCard
-                title="Best Batting Average"
-                players={getHighestAverage()}
-                stat={(p) => `${p.batting_average.toFixed(1)} avg`}
-                icon={Award}
-                onClick={() => openDialog("Best Batting Average", getHighestAverage(), (p) => `${p.batting_average.toFixed(2)} avg`)}
-              />
-            </div>
+          {/* Live CricHeroes Stats */}
+          <TabsContent value="live">
+            {cricherosUrl ? (
+              <div className="w-full h-[75vh] rounded-lg overflow-hidden border border-[#F9C846]/30">
+                <iframe
+                  src={cricherosUrl}
+                  className="w-full h-full border-0"
+                  title="CricHeroes Tournament Stats"
+                  allow="fullscreen"
+                />
+              </div>
+            ) : (
+              <Card className="p-8 bg-gradient-to-br from-[#2E73FF]/20 via-[#2E73FF]/10 to-transparent border-[#F9C846]/30 text-center">
+                <Trophy className="mx-auto mb-4 text-[#F9C846]" size={64} />
+                <h2 className="text-2xl font-bold text-white mb-2">Live Stats Coming Soon</h2>
+                <p className="text-gray-400 text-lg">
+                  Tournament statistics will be available once the tournament starts
+                </p>
+              </Card>
+            )}
           </TabsContent>
 
-          <TabsContent value="bowling" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <StatCard
-                title="Top Wicket Takers"
-                players={getTopBowlers()}
-                stat={(p) => `${p.wickets_taken} wkts`}
-                icon={Target}
-                onClick={() => openDialog("Top Wicket Takers", getTopBowlers(), (p) => `${p.wickets_taken} wickets`)}
-              />
-              <StatCard
-                title="Best Economy Rate"
-                players={getBestEconomy()}
-                stat={(p) => `${p.economy_rate.toFixed(2)} eco`}
-                icon={TrendingUp}
-                onClick={() => openDialog("Best Economy Rate", getBestEconomy(), (p) => `${p.economy_rate.toFixed(2)} eco`)}
-              />
+          {/* Preview Stats (Existing Dummy Data) */}
+          <TabsContent value="preview">
+            {/* Demo Banner */}
+            <div className="bg-[#F9C846]/20 border border-[#F9C846]/30 rounded-lg py-2 mb-4 text-center">
+              <p className="text-[#F9C846] text-sm font-medium">🎯 Demo Preview - Showing sample player statistics</p>
             </div>
-          </TabsContent>
 
-          <TabsContent value="fielding" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <StatCard
-                title="Top Fielders"
-                players={getTopFielders()}
-                stat={(p) => `${p.catches + p.stumpings} dis`}
-                icon={Award}
-                onClick={() => openDialog("Top Fielders", getTopFielders(), (p) => `${p.catches + p.stumpings} dismissals`)}
-              />
-            </div>
+            <Tabs defaultValue="batting" className="space-y-4 md:space-y-6">
+              <TabsList className="grid w-full grid-cols-3 bg-[#0F1B35] border border-[#F9C846]/30">
+                <TabsTrigger value="batting" className="text-sm data-[state=active]:bg-[#2E73FF] data-[state=active]:text-white">Batting</TabsTrigger>
+                <TabsTrigger value="bowling" className="text-sm data-[state=active]:bg-[#2E73FF] data-[state=active]:text-white">Bowling</TabsTrigger>
+                <TabsTrigger value="fielding" className="text-sm data-[state=active]:bg-[#2E73FF] data-[state=active]:text-white">Fielding</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="batting" className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <StatCard
+                    title="Top Run Scorers"
+                    players={getTopBatsmen()}
+                    stat={(p) => `${p.runs_scored} runs`}
+                    icon={Trophy}
+                    onClick={() => openDialog("Top Run Scorers", getTopBatsmen(), (p) => `${p.runs_scored} runs`)}
+                  />
+                  <StatCard
+                    title="Highest Strike Rate"
+                    players={getHighestStrikeRate()}
+                    stat={(p) => `${p.strike_rate.toFixed(1)} SR`}
+                    icon={TrendingUp}
+                    onClick={() => openDialog("Highest Strike Rate", getHighestStrikeRate(), (p) => `${p.strike_rate.toFixed(2)} SR`)}
+                  />
+                  <StatCard
+                    title="Best Batting Average"
+                    players={getHighestAverage()}
+                    stat={(p) => `${p.batting_average.toFixed(1)} avg`}
+                    icon={Award}
+                    onClick={() => openDialog("Best Batting Average", getHighestAverage(), (p) => `${p.batting_average.toFixed(2)} avg`)}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="bowling" className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <StatCard
+                    title="Top Wicket Takers"
+                    players={getTopBowlers()}
+                    stat={(p) => `${p.wickets_taken} wkts`}
+                    icon={Target}
+                    onClick={() => openDialog("Top Wicket Takers", getTopBowlers(), (p) => `${p.wickets_taken} wickets`)}
+                  />
+                  <StatCard
+                    title="Best Economy Rate"
+                    players={getBestEconomy()}
+                    stat={(p) => `${p.economy_rate.toFixed(2)} eco`}
+                    icon={TrendingUp}
+                    onClick={() => openDialog("Best Economy Rate", getBestEconomy(), (p) => `${p.economy_rate.toFixed(2)} eco`)}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="fielding" className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <StatCard
+                    title="Top Fielders"
+                    players={getTopFielders()}
+                    stat={(p) => `${p.catches + p.stumpings} dis`}
+                    icon={Award}
+                    onClick={() => openDialog("Top Fielders", getTopFielders(), (p) => `${p.catches + p.stumpings} dismissals`)}
+                  />
+                </div>
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         </Tabs>
       </div>
@@ -234,18 +296,15 @@ const Stats = () => {
                   index < 3 ? 'bg-[#F9C846]/10 border border-[#F9C846]/30' : 'bg-[#0F1B35]/50 border border-transparent hover:border-[#2E73FF]/30'
                 }`}
               >
-                {/* Rank */}
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${getRankBadgeStyle(index)}`}>
                   {index + 1}
                 </div>
                 
-                {/* Player Info */}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-white">{player.name}</p>
                   <p className="text-xs text-gray-400">{player.team_name}</p>
                 </div>
                 
-                {/* Stat */}
                 <div className="text-right flex-shrink-0">
                   <p className={`text-sm font-bold ${index < 3 ? 'text-[#F9C846]' : 'text-white'}`}>
                     {value}
