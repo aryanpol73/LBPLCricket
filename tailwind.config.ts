@@ -137,22 +137,22 @@ export default {
           "100%": { transform: "scale(1)", opacity: "1" },
         },
         "scroll-left": {
-          "0%": { transform: "translateX(0)" },
-          "100%": { transform: "translateX(-33.333%)" },
+          "0%": { transform: "translate3d(0, 0, 0)" },
+          "100%": { transform: "translate3d(-33.333%, 0, 0)" },
         },
         "gradient-shift": {
           "0%, 100%": { backgroundPosition: "0% 50%" },
           "50%": { backgroundPosition: "100% 50%" },
         },
         "float": {
-          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
-          "33%": { transform: "translate(30px, -30px) scale(1.1)" },
-          "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+          "0%, 100%": { transform: "translate3d(0, 0, 0) scale(1)" },
+          "33%": { transform: "translate3d(30px, -30px, 0) scale(1.1)" },
+          "66%": { transform: "translate3d(-20px, 20px, 0) scale(0.9)" },
         },
         "float-delayed": {
-          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
-          "33%": { transform: "translate(-30px, 30px) scale(1.1)" },
-          "66%": { transform: "translate(20px, -20px) scale(0.9)" },
+          "0%, 100%": { transform: "translate3d(0, 0, 0) scale(1)" },
+          "33%": { transform: "translate3d(-30px, 30px, 0) scale(1.1)" },
+          "66%": { transform: "translate3d(20px, -20px, 0) scale(0.9)" },
         },
         "gradient-x": {
           "0%, 100%": { backgroundPosition: "0% 50%" },

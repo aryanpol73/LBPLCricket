@@ -26,8 +26,8 @@ export const LiveTicker = () => {
     }
   };
   if (!tickerMessage) return null;
-  return <div className="bg-gradient-gold border-y border-secondary/20 overflow-hidden">
-      <div className="animate-scroll-left whitespace-nowrap py-2">
+  return <div className="bg-gradient-gold border-y border-secondary/20 overflow-hidden contain-paint">
+      <div className="animate-scroll-left whitespace-nowrap py-2 gpu-accelerated">
         <span className="inline-block px-8 text-sm font-semibold text-[hsl(220,70%,15%)]">
           {tickerMessage}
         </span>

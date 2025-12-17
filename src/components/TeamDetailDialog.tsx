@@ -70,7 +70,11 @@ export const TeamDetailDialog = ({ team, open, onOpenChange }: TeamDetailDialogP
               <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0 transition-transform duration-500 hover:scale-110 hover:rotate-12 border-2 border-primary/30">
                 <img 
                   src={team.logo_url} 
-                  alt={team.name} 
+                  alt={team.name}
+                  width={80}
+                  height={80}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
               </div>
