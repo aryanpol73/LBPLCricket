@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import Footer from "@/components/Footer";
 import PwaBottomNav from "@/components/PwaBottomNav";
 import PwaInstallPrompt from "@/components/PwaInstallPrompt";
+import AppRatingDialog from "@/components/AppRatingDialog";
 import Index from "./pages/Index";
 import Matches from "./pages/Matches";
 import Results from "./pages/Results";
@@ -33,6 +35,85 @@ import LiveScoreWidget from "./pages/widget/LiveScoreWidget";
 
 const queryClient = new QueryClient();
 
+// Auto rating prompt logic
+const useAutoRatingPrompt = () => {
+  const [showRating, setShowRating] = useState(false);
+
+  useEffect(() => {
+    // Don't show if already rated
+    if (localStorage.getItem("lbpl_app_rated") === "true") return;
+
+    // Check dismissal cooldown (7 days)
+    const dismissedAt = localStorage.getItem("lbpl_rating_dismissed");
+    if (dismissedAt) {
+      const daysSinceDismissed = (Date.now() - parseInt(dismissedAt)) / (1000 * 60 * 60 * 24);
+      if (daysSinceDismissed < 7) return;
+    }
+
+    // Track session count
+    const sessionCount = parseInt(localStorage.getItem("lbpl_session_count") || "0") + 1;
+    localStorage.setItem("lbpl_session_count", sessionCount.toString());
+
+    // Show prompt after 5 sessions with a delay
+    if (sessionCount >= 5) {
+      const timer = setTimeout(() => {
+        setShowRating(true);
+      }, 15000); // 15 seconds after app load
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleClose = () => {
+    setShowRating(false);
+    // Set dismissal timestamp if not rated
+    if (localStorage.getItem("lbpl_app_rated") !== "true") {
+      localStorage.setItem("lbpl_rating_dismissed", Date.now().toString());
+    }
+  };
+
+  return { showRating, handleClose };
+};
+
+const AppContent = () => {
+  const { showRating, handleClose } = useAutoRatingPrompt();
+
+  return (
+    <>
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-1">
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/matches" element={<Matches />} />
+            <Route path="/results" element={<Results />} />
+            <Route path="/points-table" element={<PointsTable />} />
+            <Route path="/teams" element={<Teams />} />
+            <Route path="/stats" element={<Stats />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/sponsors" element={<Sponsors />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+            <Route path="/settings" element={<SettingsHome />} />
+            <Route path="/settings/about" element={<SettingsAbout />} />
+            <Route path="/settings/rules" element={<SettingsRules />} />
+            <Route path="/settings/developer" element={<SettingsDeveloper />} />
+            <Route path="/settings/appearance" element={<AppearanceSettings />} />
+            <Route path="/settings/notifications" element={<NotificationSettings />} />
+            <Route path="/settings/help" element={<SettingsHelp />} />
+            <Route path="/widget/live" element={<LiveScoreWidget />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+        <Footer />
+        <PwaInstallPrompt />
+        <PwaBottomNav />
+      </div>
+      <AppRatingDialog open={showRating} onClose={handleClose} />
+    </>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
@@ -41,36 +122,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <div className="min-h-screen flex flex-col">
-            <div className="flex-1">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/matches" element={<Matches />} />
-                <Route path="/results" element={<Results />} />
-                <Route path="/points-table" element={<PointsTable />} />
-                <Route path="/teams" element={<Teams />} />
-                <Route path="/stats" element={<Stats />} />
-                <Route path="/gallery" element={<Gallery />} />
-                <Route path="/community" element={<Community />} />
-                <Route path="/sponsors" element={<Sponsors />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
-                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-                <Route path="/settings" element={<SettingsHome />} />
-                <Route path="/settings/about" element={<SettingsAbout />} />
-                <Route path="/settings/rules" element={<SettingsRules />} />
-                <Route path="/settings/developer" element={<SettingsDeveloper />} />
-                <Route path="/settings/appearance" element={<AppearanceSettings />} />
-                <Route path="/settings/notifications" element={<NotificationSettings />} />
-                <Route path="/settings/help" element={<SettingsHelp />} />
-                <Route path="/widget/live" element={<LiveScoreWidget />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-            <Footer />
-            <PwaInstallPrompt />
-            <PwaBottomNav />
-          </div>
+          <AppContent />
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
