@@ -8,6 +8,7 @@ import { ThemeProvider } from "next-themes";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import Footer from "@/components/Footer";
 import PwaBottomNav from "@/components/PwaBottomNav";
+import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 import Index from "./pages/Index";
 import Matches from "./pages/Matches";
 import Results from "./pages/Results";
@@ -67,6 +68,7 @@ const App = () => (
               </Routes>
             </div>
             <Footer />
+            <PwaInstallPrompt />
             <PwaBottomNav />
           </div>
         </BrowserRouter>
