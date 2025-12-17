@@ -321,13 +321,76 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Match Timeline Section - Coming Soon */}
+      {/* Match Timeline Section */}
       <section id="matchTimeline" className="reveal-left container mx-auto px-4 py-8">
         <h2 className="text-3xl font-bold mb-6 text-center text-primary">Match Timeline</h2>
-        <Card className="p-8 bg-card border border-border text-center">
-          <Calendar className="mx-auto mb-4 text-secondary" size={48} />
-          <p className="text-muted-foreground text-lg">Fixtures will be updated soon</p>
-        </Card>
+        {liveMatch ? (
+          <Card className="p-6 bg-gradient-to-br from-[#0F1B35] via-[#0A1325] to-[#0F1B35] border-2 border-[#F9C846]/50 shadow-[0_0_30px_rgba(249,200,70,0.3)]">
+            {/* LIVE Badge */}
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="flex items-center gap-2 px-3 py-1 bg-red-500 text-white text-sm font-bold rounded-full animate-pulse">
+                <span className="w-2 h-2 bg-white rounded-full"></span>
+                LIVE
+              </span>
+              <span className="text-[#F9C846] font-semibold">Match {liveMatch.match_no}</span>
+            </div>
+            
+            {/* Teams */}
+            <div className="flex items-center justify-center gap-4 md:gap-8">
+              {/* Team A */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-[#F9C846]/50 bg-[#0A1325]">
+                  <img 
+                    src={liveMatch.team_a?.logo_url || '/placeholder.svg'} 
+                    alt={liveMatch.team_a?.name}
+                    className="w-full h-full object-cover"
+                    width={80}
+                    height={80}
+                    loading="eager"
+                  />
+                </div>
+                <p className="text-white font-bold text-sm md:text-base text-center max-w-[100px] md:max-w-[120px]">{liveMatch.team_a?.name}</p>
+                <p className="text-[#F9C846] font-bold text-lg">{liveMatch.team_a_score || '-'}</p>
+              </div>
+              
+              {/* VS */}
+              <div className="text-2xl md:text-3xl font-bold text-[#F9C846]">VS</div>
+              
+              {/* Team B */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-[#F9C846]/50 bg-[#0A1325]">
+                  <img 
+                    src={liveMatch.team_b?.logo_url || '/placeholder.svg'} 
+                    alt={liveMatch.team_b?.name}
+                    className="w-full h-full object-cover"
+                    width={80}
+                    height={80}
+                    loading="eager"
+                  />
+                </div>
+                <p className="text-white font-bold text-sm md:text-base text-center max-w-[100px] md:max-w-[120px]">{liveMatch.team_b?.name}</p>
+                <p className="text-[#F9C846] font-bold text-lg">{liveMatch.team_b_score || '-'}</p>
+              </div>
+            </div>
+            
+            {/* Venue */}
+            {liveMatch.venue && (
+              <p className="text-center text-gray-400 text-sm mt-4">📍 {liveMatch.venue}</p>
+            )}
+            
+            {/* View Match Button */}
+            <div className="text-center mt-4">
+              <Button asChild size="sm" className="bg-[#F9C846] text-[#0A1325] hover:bg-[#F9C846]/90 font-bold">
+                <Link to="/matches">View Match Details</Link>
+              </Button>
+            </div>
+          </Card>
+        ) : (
+          <Card className="p-8 bg-card border border-border text-center">
+            <Calendar className="mx-auto mb-4 text-secondary" size={48} />
+            <p className="text-muted-foreground text-lg">Fixtures will be updated soon</p>
+          </Card>
+        )}
       </section>
 
 
