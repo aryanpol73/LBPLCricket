@@ -10,20 +10,45 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, Users, Calendar, Crown, Award, Star, TrendingUp, Target } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Trophy, Users, Calendar, Crown, Award, Star, TrendingUp, Target, X } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 import { TeamDetailDialog } from "@/components/TeamDetailDialog";
 import { Link } from "react-router-dom";
+import { format } from "date-fns";
+
+const MATCH_TIMES: Record<number, string> = {
+  1: "7:00 AM - 7:40 AM",
+  2: "7:50 AM - 8:30 AM",
+  3: "8:40 AM - 9:20 AM",
+  4: "9:30 AM - 10:10 AM",
+  5: "10:20 AM - 11:00 AM",
+  6: "11:10 AM - 11:50 AM",
+  7: "12:00 PM - 12:40 PM",
+  8: "12:50 PM - 1:30 PM",
+  9: "1:40 PM - 2:20 PM",
+  10: "2:30 PM - 3:10 PM",
+  11: "3:20 PM - 4:00 PM",
+  12: "4:10 PM - 4:50 PM",
+  13: "5:00 PM - 5:40 PM",
+  14: "5:50 PM - 6:30 PM",
+  15: "6:40 PM - 7:20 PM",
+  16: "7:30 PM - 8:10 PM",
+  17: "8:20 PM - 9:00 PM",
+};
 
 const Index = () => {
   const location = useLocation();
   const [liveMatch, setLiveMatch] = useState<any>(null);
+  const [allMatches, setAllMatches] = useState<any[]>([]);
   const [stats, setStats] = useState<any[]>([]);
   const [players, setPlayers] = useState<any[]>([]);
   const [teams, setTeams] = useState<any[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showAllTeams, setShowAllTeams] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState<any>(null);
+  const [matchDialogOpen, setMatchDialogOpen] = useState(false);
   const {
     count: teamsCount,
     startCounting: startTeamsCount
@@ -77,8 +102,25 @@ const Index = () => {
         *,
         team_a:teams!matches_team_a_id_fkey(*),
         team_b:teams!matches_team_b_id_fkey(*)
-      `).eq('status', 'live').order('match_date', { ascending: true }).limit(1).single();
+      `).eq('status', 'live').order('match_date', { ascending: true }).limit(1).maybeSingle();
     setLiveMatch(live);
+    
+    // Load all matches for timeline
+    const { data: matches } = await supabase.from('matches').select(`
+        *,
+        team_a:teams!matches_team_a_id_fkey(*),
+        team_b:teams!matches_team_b_id_fkey(*)
+      `).order('match_no', { ascending: true });
+    setAllMatches(matches || []);
+  };
+
+  const handleMatchClick = (match: any) => {
+    setSelectedMatch(match);
+    setMatchDialogOpen(true);
+  };
+
+  const getMatchTime = (matchNo: number) => {
+    return MATCH_TIMES[matchNo] || "";
   };
 
   const loadStats = async () => {
@@ -324,67 +366,65 @@ const Index = () => {
       {/* Match Timeline Section */}
       <section id="matchTimeline" className="reveal-left container mx-auto px-4 py-8">
         <h2 className="text-3xl font-bold mb-6 text-center text-primary">Match Timeline</h2>
-        {liveMatch ? (
-          <Card className="p-6 bg-gradient-to-br from-[#0F1B35] via-[#0A1325] to-[#0F1B35] border-2 border-[#F9C846]/50 shadow-[0_0_30px_rgba(249,200,70,0.3)]">
-            {/* LIVE Badge */}
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <span className="flex items-center gap-2 px-3 py-1 bg-red-500 text-white text-sm font-bold rounded-full animate-pulse">
-                <span className="w-2 h-2 bg-white rounded-full"></span>
-                LIVE
-              </span>
-              <span className="text-[#F9C846] font-semibold">Match {liveMatch.match_no}</span>
+        {allMatches.length > 0 ? (
+          <div className="relative">
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" style={{ touchAction: 'pan-y pan-x' }}>
+              {allMatches.map((match) => (
+                <Card 
+                  key={match.id}
+                  onClick={() => handleMatchClick(match)}
+                  className={`flex-shrink-0 w-[280px] md:w-[300px] p-4 cursor-pointer transition-all duration-300 hover:scale-105 snap-start ${
+                    match.status === 'live' 
+                      ? 'bg-gradient-to-br from-red-500/20 to-red-600/10 border-2 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' 
+                      : 'bg-gradient-to-br from-[#1a9a8a] to-[#147a6d] border border-[#1a9a8a]/50'
+                  }`}
+                >
+                  {/* Status Badge */}
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`px-2 py-1 text-xs font-bold rounded ${
+                      match.status === 'live' 
+                        ? 'bg-red-500 text-white animate-pulse' 
+                        : match.status === 'completed'
+                        ? 'bg-gray-600 text-white'
+                        : 'bg-[#0A1325] text-white'
+                    }`}>
+                      {match.status === 'live' ? '🔴 LIVE' : match.status === 'completed' ? 'Completed' : 'Upcoming'}
+                    </span>
+                  </div>
+                  
+                  {/* Match Info */}
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[#F9C846] font-bold text-sm">Match {match.match_no}</span>
+                    <span className="text-white/80 text-xs">
+                      {match.match_date ? format(new Date(match.match_date), 'MMM d') : ''} • {getMatchTime(match.match_no)}
+                    </span>
+                  </div>
+                  
+                  {/* Team A */}
+                  <p className="text-white font-semibold text-sm truncate">{match.team_a?.name}</p>
+                  
+                  {/* VS Divider */}
+                  <div className="flex items-center gap-2 my-2">
+                    <div className="flex-1 h-px bg-white/30"></div>
+                    <span className="text-[#F9C846] font-bold text-xs">VS</span>
+                    <div className="flex-1 h-px bg-white/30"></div>
+                  </div>
+                  
+                  {/* Team B */}
+                  <p className="text-white font-semibold text-sm truncate">{match.team_b?.name}</p>
+                  
+                  {/* Scores if live or completed */}
+                  {(match.status === 'live' || match.status === 'completed') && (match.team_a_score || match.team_b_score) && (
+                    <div className="mt-2 pt-2 border-t border-white/20 text-center">
+                      <span className="text-[#F9C846] text-xs font-semibold">
+                        {match.team_a_score || '-'} vs {match.team_b_score || '-'}
+                      </span>
+                    </div>
+                  )}
+                </Card>
+              ))}
             </div>
-            
-            {/* Teams */}
-            <div className="flex items-center justify-center gap-4 md:gap-8">
-              {/* Team A */}
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-[#F9C846]/50 bg-[#0A1325]">
-                  <img 
-                    src={liveMatch.team_a?.logo_url || '/placeholder.svg'} 
-                    alt={liveMatch.team_a?.name}
-                    className="w-full h-full object-cover"
-                    width={80}
-                    height={80}
-                    loading="eager"
-                  />
-                </div>
-                <p className="text-white font-bold text-sm md:text-base text-center max-w-[100px] md:max-w-[120px]">{liveMatch.team_a?.name}</p>
-                <p className="text-[#F9C846] font-bold text-lg">{liveMatch.team_a_score || '-'}</p>
-              </div>
-              
-              {/* VS */}
-              <div className="text-2xl md:text-3xl font-bold text-[#F9C846]">VS</div>
-              
-              {/* Team B */}
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-[#F9C846]/50 bg-[#0A1325]">
-                  <img 
-                    src={liveMatch.team_b?.logo_url || '/placeholder.svg'} 
-                    alt={liveMatch.team_b?.name}
-                    className="w-full h-full object-cover"
-                    width={80}
-                    height={80}
-                    loading="eager"
-                  />
-                </div>
-                <p className="text-white font-bold text-sm md:text-base text-center max-w-[100px] md:max-w-[120px]">{liveMatch.team_b?.name}</p>
-                <p className="text-[#F9C846] font-bold text-lg">{liveMatch.team_b_score || '-'}</p>
-              </div>
-            </div>
-            
-            {/* Venue */}
-            {liveMatch.venue && (
-              <p className="text-center text-gray-400 text-sm mt-4">📍 {liveMatch.venue}</p>
-            )}
-            
-            {/* View Match Button */}
-            <div className="text-center mt-4">
-              <Button asChild size="sm" className="bg-[#F9C846] text-[#0A1325] hover:bg-[#F9C846]/90 font-bold">
-                <Link to="/matches">View Match Details</Link>
-              </Button>
-            </div>
-          </Card>
+          </div>
         ) : (
           <Card className="p-8 bg-card border border-border text-center">
             <Calendar className="mx-auto mb-4 text-secondary" size={48} />
@@ -392,6 +432,38 @@ const Index = () => {
           </Card>
         )}
       </section>
+
+      {/* Match Score Dialog */}
+      <Dialog open={matchDialogOpen} onOpenChange={setMatchDialogOpen}>
+        <DialogContent className="max-w-4xl h-[80vh] p-0 bg-[#0A1325] border-[#F9C846]/30">
+          <DialogHeader className="p-4 border-b border-[#F9C846]/20">
+            <DialogTitle className="text-white flex items-center justify-between">
+              <span>
+                {selectedMatch?.status === 'live' && <span className="text-red-500 animate-pulse mr-2">🔴 LIVE</span>}
+                Match {selectedMatch?.match_no}: {selectedMatch?.team_a?.name} vs {selectedMatch?.team_b?.name}
+              </span>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 h-full">
+            {selectedMatch?.scorer_link ? (
+              <iframe
+                src={selectedMatch.scorer_link}
+                className="w-full h-[calc(80vh-80px)]"
+                title="Live Score"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <div className="flex items-center justify-center h-[calc(80vh-80px)] text-muted-foreground">
+                <div className="text-center">
+                  <Calendar className="mx-auto mb-4 text-secondary" size={48} />
+                  <p>Live score not available for this match</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
 
       {/* Points Table Section - Coming Soon */}
