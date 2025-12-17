@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Palette, Bell, Info, Code, ChevronRight, Pin, ExternalLink, Share2, Trash2, RefreshCw, HelpCircle, Star, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
+import AppRatingDialog from "@/components/AppRatingDialog";
 
 const SettingsHome = () => {
   const navigate = useNavigate();
   const [showPinInstructions, setShowPinInstructions] = useState(false);
+  const [showRatingDialog, setShowRatingDialog] = useState(false);
 
   // Check if PWA mode
   useEffect(() => {
@@ -79,9 +81,7 @@ const SettingsHome = () => {
   };
 
   const handleRateApp = () => {
-    toast.success("Thanks for your support! Rating feature coming soon.", {
-      icon: "⭐",
-    });
+    setShowRatingDialog(true);
   };
 
   const handleFeedback = () => {
@@ -127,7 +127,7 @@ const SettingsHome = () => {
       title: "Support",
       items: [
         { icon: Share2, label: "Share App", description: "Share LBPL with friends", path: null, action: handleShareApp },
-        { icon: Star, label: "Rate App", description: "Rate us on store", path: null, action: handleRateApp },
+        { icon: Star, label: "Rate App", description: "Share your experience", path: null, action: handleRateApp },
         { icon: MessageSquare, label: "Send Feedback", description: "Help us improve", path: null, action: handleFeedback },
         { icon: HelpCircle, label: "Help & FAQ", description: "Common questions", path: "/settings/help", action: null },
       ],
@@ -246,6 +246,12 @@ const SettingsHome = () => {
           </div>
         </div>
       )}
+
+      {/* App Rating Dialog */}
+      <AppRatingDialog 
+        open={showRatingDialog} 
+        onClose={() => setShowRatingDialog(false)} 
+      />
 
       <style>{`
         @keyframes slideInRight {
