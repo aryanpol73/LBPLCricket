@@ -3,6 +3,26 @@
 @tailwind utilities;
 
 @layer utilities {
+  /* Performance optimizations */
+  .contain-paint {
+    contain: paint;
+  }
+  
+  .contain-layout {
+    contain: layout;
+  }
+  
+  .contain-strict {
+    contain: strict;
+  }
+  
+  /* GPU acceleration for animations */
+  .gpu-accelerated {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -16,9 +36,11 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Infinite scroll animation for sponsors carousel */
+  /* Infinite scroll animation for sponsors carousel - GPU optimized */
   .animate-infinite-scroll {
     animation: infinite-scroll 30s linear infinite;
+    will-change: transform;
+    transform: translateZ(0);
   }
   
   .animate-infinite-scroll:hover {
@@ -330,5 +352,16 @@ All colors MUST be HSL.
   /* Scroll margin for all sections to prevent navbar overlap */
   section[id] {
     scroll-margin-top: 80px;
+  }
+  
+  /* Performance: defer rendering of off-screen content */
+  section:not(:first-of-type) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+  }
+  
+  /* Optimize images for performance */
+  img {
+    content-visibility: auto;
   }
 }

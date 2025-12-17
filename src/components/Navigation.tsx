@@ -117,6 +117,8 @@ export const Navigation = () => {
               <img 
                 src={lbplLogo} 
                 alt="LBPL Logo" 
+                width={40}
+                height={40}
                 className="w-10 h-10 rounded-full object-cover border-2 border-secondary/50"
               />
               <div className="flex flex-col items-center text-center">

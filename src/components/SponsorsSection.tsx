@@ -80,8 +80,8 @@ export const SponsorsSection = () => {
           Season 3 Sponsors
         </h2>
         
-        {/* Infinite Scroll Container */}
-        <div className="relative w-full overflow-hidden mb-8 mx-auto">
+        {/* Infinite Scroll Container - GPU optimized */}
+        <div className="relative w-full overflow-hidden mb-8 mx-auto contain-paint">
           <div 
             className="flex gap-4 animate-infinite-scroll pl-4"
             style={{
