@@ -127,8 +127,7 @@ const PwaInstallPrompt = () => {
             onClick={handleInstallClick}
             className="bg-gradient-to-r from-[#1a3a6e] to-[#0f2340] hover:from-[#1f4580] hover:to-[#153050] text-white px-5 py-3 rounded-full shadow-lg shadow-black/30 border border-[#f0b429]/30 flex items-center gap-2 font-medium"
           >
-            <span className="text-lg">📲</span>
-            <span>Install LBPL App</span>
+            <span>📲 Install LBPL Cricket App</span>
           </Button>
           <button
             onClick={handleDismiss}
@@ -151,7 +150,7 @@ const PwaInstallPrompt = () => {
             <div className="w-12 h-1 bg-gray-600 rounded-full mx-auto mb-6" />
             
             <h3 className="text-white text-lg font-semibold text-center mb-6">
-              Install LBPL App
+              📲 Install LBPL Cricket App
             </h3>
 
             {/* iOS Instructions Image */}
