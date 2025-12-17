@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Star, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -14,8 +14,6 @@ const AppRatingDialog = ({ open, onClose }: AppRatingDialogProps) => {
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [hasRated, setHasRated] = useState(false);
-  const [existingRating, setExistingRating] = useState<number | null>(null);
 
   // Get unique user identifier
   const getUserIdentifier = () => {
@@ -27,28 +25,8 @@ const AppRatingDialog = ({ open, onClose }: AppRatingDialogProps) => {
     return identifier;
   };
 
-  // Check if user has already rated
-  useEffect(() => {
-    if (open) {
-      checkExistingRating();
-    }
-  }, [open]);
-
-  const checkExistingRating = async () => {
-    const userIdentifier = getUserIdentifier();
-    const { data, error } = await supabase
-      .from("app_ratings")
-      .select("rating, feedback")
-      .eq("user_identifier", userIdentifier)
-      .maybeSingle();
-
-    if (data && !error) {
-      setHasRated(true);
-      setExistingRating(data.rating);
-      setRating(data.rating);
-      setFeedback(data.feedback || "");
-    }
-  };
+  // Check if user has already rated (via localStorage only - database is write-only for privacy)
+  const hasRated = localStorage.getItem("lbpl_app_rated") === "true";
 
   const handleSubmit = async () => {
     if (rating === 0) {
@@ -60,28 +38,14 @@ const AppRatingDialog = ({ open, onClose }: AppRatingDialogProps) => {
     const userIdentifier = getUserIdentifier();
 
     try {
-      if (hasRated) {
-        // Update existing rating
-        const { error } = await supabase
-          .from("app_ratings")
-          .update({
-            rating,
-            feedback: feedback.trim() || null,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("user_identifier", userIdentifier);
+      // Always insert new rating (database is write-only for privacy)
+      const { error } = await supabase.from("app_ratings").insert({
+        user_identifier: userIdentifier,
+        rating,
+        feedback: feedback.trim() || null,
+      });
 
-        if (error) throw error;
-      } else {
-        // Insert new rating
-        const { error } = await supabase.from("app_ratings").insert({
-          user_identifier: userIdentifier,
-          rating,
-          feedback: feedback.trim() || null,
-        });
-
-        if (error) throw error;
-      }
+      if (error) throw error;
 
       setSubmitted(true);
       localStorage.setItem("lbpl_app_rated", "true");
@@ -92,8 +56,6 @@ const AppRatingDialog = ({ open, onClose }: AppRatingDialogProps) => {
         setSubmitted(false);
         setRating(0);
         setFeedback("");
-        setHasRated(false);
-        setExistingRating(null);
       }, 2000);
     } catch (error: any) {
       console.error("Rating error:", error);
@@ -129,7 +91,7 @@ const AppRatingDialog = ({ open, onClose }: AppRatingDialogProps) => {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-white">
-                {hasRated ? "Update Your Rating" : "Rate LBPL App"}
+                Rate LBPL App
               </h3>
               <button
                 onClick={onClose}
@@ -196,8 +158,6 @@ const AppRatingDialog = ({ open, onClose }: AppRatingDialogProps) => {
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-[#0b1c3d]/30 border-t-[#0b1c3d] rounded-full animate-spin" />
-              ) : hasRated ? (
-                "Update Rating"
               ) : (
                 "Submit Rating"
               )}
