@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Users, Mail, Loader2, Home, Lock, ArrowLeft, KeyRound } from "lucide-react";
 import { z } from "zod";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { checkPasswordBreach } from "@/lib/passwordCheck";
 
 const emailSchema = z.string().email("Please enter a valid email address");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
@@ -209,6 +210,16 @@ const Auth = () => {
 
     setLoading(true);
     setPasswordError(undefined);
+
+    // Check if password has been exposed in data breaches
+    const { breached, count } = await checkPasswordBreach(password);
+    if (breached) {
+      setPasswordError(
+        `This password has been exposed in ${count.toLocaleString()} data breaches. Please choose a different password.`
+      );
+      setLoading(false);
+      return;
+    }
 
     try {
       // Create user via edge function
