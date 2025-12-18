@@ -5,6 +5,22 @@ import { Users, Trophy } from "lucide-react";
 
 const TOTAL_MATCHES = 33;
 
+const getMatchColor = (matchNo: number) => {
+  if (matchNo >= 1 && matchNo <= 18) {
+    // Teal color for league matches
+    return "bg-gradient-to-br from-[#1a9a8a] to-[#147a6d] border-[#1a9a8a]/50 hover:shadow-[0_0_20px_rgba(26,154,138,0.4)]";
+  } else if (matchNo >= 19 && matchNo <= 30) {
+    // Dark blue for knockout/super league
+    return "bg-gradient-to-br from-[#1e3a5f] to-[#0f2744] border-[#2E73FF]/50 hover:shadow-[0_0_20px_rgba(46,115,255,0.4)]";
+  } else if (matchNo >= 31 && matchNo <= 32) {
+    // Orange for semi-finals
+    return "bg-gradient-to-br from-[#e67e22] to-[#d35400] border-[#e67e22]/50 hover:shadow-[0_0_20px_rgba(230,126,34,0.4)]";
+  } else {
+    // Yellow/Gold for final
+    return "bg-gradient-to-br from-[#f1c40f] to-[#d4a837] border-[#F9C846]/50 hover:shadow-[0_0_20px_rgba(249,200,70,0.4)]";
+  }
+};
+
 export const MatchTimeline = () => {
   const [selectedMatch, setSelectedMatch] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -20,8 +36,11 @@ export const MatchTimeline = () => {
       
       <div className="relative">
         <div 
-          className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" 
-          style={{ touchAction: 'pan-y pan-x' }}
+          className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory"
+          style={{ 
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#1a9a8a #0A1325'
+          }}
         >
           {Array.from({ length: TOTAL_MATCHES }, (_, index) => {
             const matchNo = index + 1;
@@ -29,7 +48,7 @@ export const MatchTimeline = () => {
               <Card 
                 key={matchNo}
                 onClick={() => handleMatchClick(matchNo)}
-                className="flex-shrink-0 w-[280px] md:w-[300px] p-4 cursor-pointer transition-all duration-300 hover:scale-105 snap-start bg-gradient-to-br from-[#1a9a8a] to-[#147a6d] border border-[#1a9a8a]/50 hover:shadow-[0_0_20px_rgba(26,154,138,0.4)]"
+                className={`flex-shrink-0 w-[280px] md:w-[300px] p-4 cursor-pointer transition-all duration-300 hover:scale-105 snap-start border ${getMatchColor(matchNo)}`}
               >
                 {/* Status Badge */}
                 <div className="flex items-center justify-between mb-3">
@@ -96,6 +115,24 @@ export const MatchTimeline = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Custom scrollbar styles */}
+      <style>{`
+        #matchTimeline .overflow-x-auto::-webkit-scrollbar {
+          height: 8px;
+        }
+        #matchTimeline .overflow-x-auto::-webkit-scrollbar-track {
+          background: #0A1325;
+          border-radius: 4px;
+        }
+        #matchTimeline .overflow-x-auto::-webkit-scrollbar-thumb {
+          background: #1a9a8a;
+          border-radius: 4px;
+        }
+        #matchTimeline .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+          background: #147a6d;
+        }
+      `}</style>
     </section>
   );
 };
