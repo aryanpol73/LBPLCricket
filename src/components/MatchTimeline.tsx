@@ -8,7 +8,7 @@ const TOTAL_MATCHES = 33;
 const getMatchColor = (matchNo: number) => {
   if (matchNo >= 1 && matchNo <= 18) {
     // Teal color for league matches
-    return "bg-gradient-to-br from-[#1a9a8a] to-[#147a6d] border-[#1a9a8a]/50 hover:shadow-[0_0_20px_rgba(26,154,138,0.4)]";
+    return "bg-gradient-to-br from-[#00C8C8] to-[#00A5A5] border-[#00C8C8]/50 hover:shadow-[0_0_20px_rgba(0,200,200,0.4)]";
   } else if (matchNo >= 19 && matchNo <= 30) {
     // Dark blue for knockout/super league
     return "bg-gradient-to-br from-[#1e3a5f] to-[#0f2744] border-[#2E73FF]/50 hover:shadow-[0_0_20px_rgba(46,115,255,0.4)]";
@@ -39,7 +39,7 @@ export const MatchTimeline = () => {
           className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory"
           style={{ 
             scrollbarWidth: 'thin',
-            scrollbarColor: '#1a9a8a #0A1325'
+            scrollbarColor: '#00C8C8 #0A1325'
           }}
         >
           {Array.from({ length: TOTAL_MATCHES }, (_, index) => {
@@ -126,11 +126,11 @@ export const MatchTimeline = () => {
           border-radius: 4px;
         }
         #matchTimeline .overflow-x-auto::-webkit-scrollbar-thumb {
-          background: #1a9a8a;
+          background: #00C8C8;
           border-radius: 4px;
         }
         #matchTimeline .overflow-x-auto::-webkit-scrollbar-thumb:hover {
-          background: #147a6d;
+          background: #00A5A5;
         }
       `}</style>
     </section>
