@@ -59,7 +59,7 @@ export const MatchTimeline = () => {
                 
                 {/* Match Info */}
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[#F9C846] font-bold text-sm">Match {matchNo}</span>
+                  <span className="text-white font-bold text-sm">Match {matchNo}</span>
                   <span className="text-white/80 text-xs">TBD</span>
                 </div>
                 
