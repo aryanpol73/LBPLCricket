@@ -98,7 +98,7 @@ const Stats = () => {
             </TabsContent>
 
             <div className="text-center mt-8">
-              <Button asChild size="lg" className="font-semibold bg-[#2E73FF] hover:bg-[#2E73FF]/90">
+              <Button asChild size="lg" className="font-semibold bg-primary hover:bg-primary/90">
                 <Link to="/stats">View Full Statistics</Link>
               </Button>
             </div>

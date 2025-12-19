@@ -84,14 +84,14 @@ const PointsTable = () => {
   };
 
   const GroupTable = ({ groupName, teams }: { groupName: string; teams: any[] }) => (
-    <Card className="bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-[#2E73FF]/50 overflow-hidden">
+    <Card className="bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-primary/50 overflow-hidden">
       {/* Group Header */}
-      <div className="bg-gradient-to-r from-[#2E73FF] to-[#2E73FF]/80 px-4 py-3">
+      <div className="bg-gradient-to-r from-primary to-primary/80 px-4 py-3">
         <h3 className="text-lg font-bold text-white">{groupName}</h3>
       </div>
       
       {/* Table Header */}
-      <div className="grid grid-cols-7 gap-2 px-4 py-2 text-xs text-gray-400 border-b border-[#2E73FF]/20">
+      <div className="grid grid-cols-7 gap-2 px-4 py-2 text-xs text-gray-400 border-b border-primary/20">
         <div>Rank</div>
         <div className="col-span-2">Team</div>
         <div className="text-center">P</div>
@@ -104,7 +104,7 @@ const PointsTable = () => {
       {teams.map((team, index) => (
         <div 
           key={index}
-          className="grid grid-cols-7 gap-2 px-4 py-3 text-sm border-b border-[#2E73FF]/10 last:border-b-0 hover:bg-[#2E73FF]/10 transition-colors"
+          className="grid grid-cols-7 gap-2 px-4 py-3 text-sm border-b border-primary/10 last:border-b-0 hover:bg-primary/10 transition-colors"
         >
           <div className="text-white font-semibold">{team.rank}</div>
           <div className="col-span-2 text-white font-medium truncate">{team.name}</div>
@@ -119,7 +119,7 @@ const PointsTable = () => {
       <div className="absolute right-4 top-[52px]">
         {teams.map((team, index) => (
           <div key={index} className="h-[45px] flex items-center justify-center">
-            <span className="px-3 py-1 bg-[#2E73FF] text-white text-sm font-bold rounded-full">
+            <span className="px-3 py-1 bg-primary text-white text-sm font-bold rounded-full">
               {team.pts}
             </span>
           </div>
@@ -130,14 +130,14 @@ const PointsTable = () => {
 
   // Better table design with Pts column
   const GroupTableV2 = ({ groupName, teams }: { groupName: string; teams: any[] }) => (
-    <Card className="bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-[#2E73FF]/50 overflow-hidden">
+    <Card className="bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-primary/50 overflow-hidden">
       {/* Group Header */}
-      <div className="bg-gradient-to-r from-[#2E73FF] to-[#2E73FF]/80 px-4 py-3">
+      <div className="bg-gradient-to-r from-primary to-primary/80 px-4 py-3">
         <h3 className="text-lg font-bold text-white">{groupName}</h3>
       </div>
       
       {/* Table Header */}
-      <div className="grid grid-cols-8 gap-1 px-4 py-2 text-xs text-gray-400 border-b border-[#2E73FF]/20">
+      <div className="grid grid-cols-8 gap-1 px-4 py-2 text-xs text-gray-400 border-b border-primary/20">
         <div>Rank</div>
         <div className="col-span-2">Team</div>
         <div className="text-center">P</div>
@@ -151,7 +151,7 @@ const PointsTable = () => {
       {teams.map((team, index) => (
         <div 
           key={index}
-          className="grid grid-cols-8 gap-1 px-4 py-3 text-sm border-b border-[#2E73FF]/10 last:border-b-0 hover:bg-[#2E73FF]/10 transition-colors"
+          className="grid grid-cols-8 gap-1 px-4 py-3 text-sm border-b border-primary/10 last:border-b-0 hover:bg-primary/10 transition-colors"
         >
           <div className="text-white font-semibold">{team.rank}</div>
           <div className="col-span-2 text-white font-medium truncate">{team.name}</div>
@@ -160,7 +160,7 @@ const PointsTable = () => {
           <div className="text-center text-red-400 font-semibold">{team.l}</div>
           <div className="text-center text-white">{team.nrr}</div>
           <div className="text-center">
-            <span className="inline-flex items-center justify-center w-7 h-7 bg-[#2E73FF] text-white text-xs font-bold rounded-full">
+            <span className="inline-flex items-center justify-center w-7 h-7 bg-primary text-white text-xs font-bold rounded-full">
               {team.pts}
             </span>
           </div>
