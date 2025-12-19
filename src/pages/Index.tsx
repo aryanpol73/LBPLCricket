@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, Users, Calendar, Crown, Award, Star, TrendingUp, Target } from "lucide-react";
+import { Trophy, Users, Calendar, Crown, TrendingUp, Target, Award } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 import { TeamDetailDialog } from "@/components/TeamDetailDialog";
 import { Link } from "react-router-dom";
@@ -20,11 +20,11 @@ const Index = () => {
   const location = useLocation();
   const [liveMatch, setLiveMatch] = useState<any>(null);
   const [stats, setStats] = useState<any[]>([]);
-  const [players, setPlayers] = useState<any[]>([]);
   const [teams, setTeams] = useState<any[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showAllTeams, setShowAllTeams] = useState(false);
+  const [cricherosStatsUrl, setCricherosStatsUrl] = useState<string>('');
   const {
     count: teamsCount,
     startCounting: startTeamsCount
@@ -40,8 +40,8 @@ const Index = () => {
   useEffect(() => {
     loadLiveMatch();
     loadStats();
-    loadPlayerStats();
     loadTeams();
+    loadCricherosUrl();
   }, []);
 
   // Handle hash navigation from other pages
@@ -87,14 +87,6 @@ const Index = () => {
     setStats(data || []);
   };
 
-  const loadPlayerStats = async () => {
-    const { data } = await supabase.from('players').select(`
-        *,
-        teams(name, logo_url)
-      `).order('runs_scored', { ascending: false });
-    setPlayers(data || []);
-  };
-
   const loadTeams = async () => {
     const { data } = await supabase.from('teams').select(`
         *,
@@ -103,146 +95,35 @@ const Index = () => {
     setTeams(data || []);
   };
 
-  const getTopBatsmen = () => {
-    return [...players].filter(p => p.runs_scored > 0).sort((a, b) => b.runs_scored - a.runs_scored).slice(0, 10);
-  };
-  const getTopBowlers = () => {
-    return [...players].filter(p => p.wickets_taken > 0).sort((a, b) => b.wickets_taken - a.wickets_taken).slice(0, 10);
-  };
-  const getHighestStrikeRate = () => {
-    return [...players].filter(p => p.strike_rate > 0).sort((a, b) => b.strike_rate - a.strike_rate).slice(0, 10);
-  };
-  const getHighestAverage = () => {
-    return [...players].filter(p => p.batting_average > 0).sort((a, b) => b.batting_average - a.batting_average).slice(0, 10);
-  };
-  const getBestEconomy = () => {
-    return [...players].filter(p => p.economy_rate > 0).sort((a, b) => a.economy_rate - b.economy_rate).slice(0, 10);
-  };
-  const getTopFielders = () => {
-    return [...players].filter(p => p.catches + p.stumpings > 0).sort((a, b) => b.catches + b.stumpings - (a.catches + a.stumpings)).slice(0, 10);
+  const loadCricherosUrl = async () => {
+    const { data } = await supabase
+      .from('tournament_settings')
+      .select('setting_value')
+      .eq('setting_key', 'cricheroes_stats_url')
+      .maybeSingle();
+    
+    if (data?.setting_value) {
+      setCricherosStatsUrl(data.setting_value);
+    }
   };
   const handleTeamClick = (team: any) => {
     setSelectedTeam(team);
     setDialogOpen(true);
   };
-  const getRankBadgeStyles = (rank: number) => {
-    if (rank === 1) {
-      return {
-        bg: 'from-[#F9C846] to-[#d4a837]',
-        border: 'border-[#F9C846]',
-        shadow: 'shadow-[0_0_20px_rgba(249,200,70,0.6)]',
-        text: 'text-[#0A1325]',
-        icon: <Crown className="w-4 h-4" />
-      };
-    } else if (rank === 2) {
-      return {
-        bg: 'from-gray-300 to-gray-500',
-        border: 'border-gray-400',
-        shadow: 'shadow-[0_0_15px_rgba(200,200,200,0.4)]',
-        text: 'text-white',
-        icon: <Award className="w-4 h-4" />
-      };
-    } else if (rank === 3) {
-      return {
-        bg: 'from-amber-700 to-amber-900',
-        border: 'border-amber-600',
-        shadow: 'shadow-[0_0_15px_rgba(217,119,6,0.4)]',
-        text: 'text-white',
-        icon: <Star className="w-4 h-4" />
-      };
-    }
-    return {
-      bg: 'from-[#2E73FF]/30 to-[#2E73FF]/10',
-      border: 'border-[#2E73FF]/40',
-      shadow: '',
-      text: 'text-[#F9C846]',
-      icon: null
-    };
-  };
 
-
-  const StatCard = ({
-    title,
-    players,
-    stat,
-    icon: Icon
-  }: any) => {
-    const hasLiveData = players.length > 0;
-    
-    return <Card className="p-4 md:p-6 bg-gradient-to-br from-[#0F1B35] via-[#0A1325] to-[#0F1B35] border-[#F9C846]/30 shadow-2xl hover:shadow-[0_0_40px_rgba(249,200,70,0.3)] transition-all duration-500 animate-fade-in-up backdrop-blur-sm h-full">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 rounded-lg bg-[#F9C846]/10 border border-[#F9C846]/30">
-            <Icon className="text-[#F9C846]" size={20} />
-          </div>
-          <h3 className="text-lg md:text-xl font-bold text-white">{title}</h3>
+  const ComingSoonCard = ({ title, icon: Icon }: { title: string; icon: any }) => (
+    <Card className="p-4 md:p-6 bg-gradient-to-br from-[#0F1B35] via-[#0A1325] to-[#0F1B35] border-[#F9C846]/30 shadow-2xl h-full">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="p-2 rounded-lg bg-[#F9C846]/10 border border-[#F9C846]/30">
+          <Icon className="text-[#F9C846]" size={20} />
         </div>
-        
-        {hasLiveData ? (
-          <div className="space-y-2">
-            {players.slice(0, 3).map((player: any, index: number) => {
-              const rank = index + 1;
-              const rankStyles = getRankBadgeStyles(rank);
-              
-              return (
-                <div 
-                  key={player.id}
-                  className={`
-                    group relative flex items-center gap-2 md:gap-3 p-2 md:p-3 rounded-lg
-                    bg-gradient-to-r from-[#2E73FF]/10 via-[#2E73FF]/5 to-transparent
-                    border border-[#F9C846]/20
-                    hover:border-[#F9C846]/50 hover:bg-[#2E73FF]/20
-                    transition-all duration-300
-                    ${rank <= 3 ? 'hover:shadow-[0_0_15px_rgba(249,200,70,0.2)]' : ''}
-                  `}
-                >
-                  {/* Rank Badge */}
-                  <div className={`
-                    relative flex-shrink-0 w-8 h-8 md:w-10 md:h-10
-                    rounded-full bg-gradient-to-br ${rankStyles.bg}
-                    border-2 ${rankStyles.border} ${rankStyles.shadow}
-                    flex items-center justify-center
-                    font-bold text-sm md:text-base ${rankStyles.text}
-                  `}>
-                    {rank <= 3 && rankStyles.icon && (
-                      <div className="absolute -top-1 -right-1 scale-75">
-                        {rankStyles.icon}
-                      </div>
-                    )}
-                    {rank}
-                  </div>
-
-                  {/* Player Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-white text-xs md:text-sm truncate group-hover:text-[#F9C846] transition-colors">
-                      {player.name}
-                    </p>
-                    {player.teams && (
-                      <p className="text-[10px] md:text-xs text-gray-400 truncate">
-                        {player.teams.name}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Stat Value */}
-                  <div className={`
-                    flex-shrink-0 px-2 md:px-3 py-1 rounded-full
-                    ${rank === 1 ? 'bg-gradient-to-r from-[#F9C846]/30 to-[#F9C846]/10 border border-[#F9C846]/50' : 'bg-[#2E73FF]/20 border border-[#2E73FF]/30'}
-                    font-bold text-xs md:text-sm
-                    ${rank === 1 ? 'text-[#F9C846]' : 'text-white'}
-                  `}>
-                    {stat(player)}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Statistics will be available once the tournament starts</p>
-          </div>
-        )}
-      </Card>;
-  };
+        <h3 className="text-lg md:text-xl font-bold text-white">{title}</h3>
+      </div>
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">Statistics will be available once the tournament starts</p>
+      </div>
+    </Card>
+  );
   return <div className="min-h-screen bg-background relative pt-16">
       <AnimatedBackground />
       
@@ -335,11 +216,11 @@ const Index = () => {
         {/* Preview of Points Table */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Group A Preview */}
-          <Card className="bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-[#2E73FF]/50 overflow-hidden">
-            <div className="bg-gradient-to-r from-[#2E73FF] to-[#2E73FF]/80 px-4 py-3">
+          <Card className="bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-primary/50 overflow-hidden">
+            <div className="bg-gradient-to-r from-primary to-primary/80 px-4 py-3">
               <h3 className="text-lg font-bold text-white">Group A</h3>
             </div>
-            <div className="grid grid-cols-8 gap-1 px-4 py-2 text-xs text-gray-400 border-b border-[#2E73FF]/20">
+            <div className="grid grid-cols-8 gap-1 px-4 py-2 text-xs text-gray-400 border-b border-primary/20">
               <div>Rank</div>
               <div className="col-span-2">Team</div>
               <div className="text-center">P</div>
@@ -349,7 +230,7 @@ const Index = () => {
               <div className="text-center">Pts</div>
             </div>
             {[{rank: 1, name: 'Team 1'}, {rank: 2, name: 'Team 2'}, {rank: 3, name: 'Team 3'}].map((team) => (
-              <div key={team.rank} className="grid grid-cols-8 gap-1 px-4 py-3 text-sm border-b border-[#2E73FF]/10 last:border-b-0">
+              <div key={team.rank} className="grid grid-cols-8 gap-1 px-4 py-3 text-sm border-b border-primary/10 last:border-b-0">
                 <div className="text-white font-semibold">{team.rank}</div>
                 <div className="col-span-2 text-white font-medium truncate">{team.name}</div>
                 <div className="text-center text-white">0</div>
@@ -357,18 +238,18 @@ const Index = () => {
                 <div className="text-center text-red-400 font-semibold">0</div>
                 <div className="text-center text-white">0.00</div>
                 <div className="text-center">
-                  <span className="inline-flex items-center justify-center w-7 h-7 bg-[#2E73FF] text-white text-xs font-bold rounded-full">0</span>
+                  <span className="inline-flex items-center justify-center w-7 h-7 bg-primary text-white text-xs font-bold rounded-full">0</span>
                 </div>
               </div>
             ))}
           </Card>
 
           {/* Group B Preview */}
-          <Card className="bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-[#2E73FF]/50 overflow-hidden">
-            <div className="bg-gradient-to-r from-[#2E73FF] to-[#2E73FF]/80 px-4 py-3">
+          <Card className="bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-primary/50 overflow-hidden">
+            <div className="bg-gradient-to-r from-primary to-primary/80 px-4 py-3">
               <h3 className="text-lg font-bold text-white">Group B</h3>
             </div>
-            <div className="grid grid-cols-8 gap-1 px-4 py-2 text-xs text-gray-400 border-b border-[#2E73FF]/20">
+            <div className="grid grid-cols-8 gap-1 px-4 py-2 text-xs text-gray-400 border-b border-primary/20">
               <div>Rank</div>
               <div className="col-span-2">Team</div>
               <div className="text-center">P</div>
@@ -378,7 +259,7 @@ const Index = () => {
               <div className="text-center">Pts</div>
             </div>
             {[{rank: 1, name: 'Team 4'}, {rank: 2, name: 'Team 5'}, {rank: 3, name: 'Team 6'}].map((team) => (
-              <div key={team.rank} className="grid grid-cols-8 gap-1 px-4 py-3 text-sm border-b border-[#2E73FF]/10 last:border-b-0">
+              <div key={team.rank} className="grid grid-cols-8 gap-1 px-4 py-3 text-sm border-b border-primary/10 last:border-b-0">
                 <div className="text-white font-semibold">{team.rank}</div>
                 <div className="col-span-2 text-white font-medium truncate">{team.name}</div>
                 <div className="text-center text-white">0</div>
@@ -386,7 +267,7 @@ const Index = () => {
                 <div className="text-center text-red-400 font-semibold">0</div>
                 <div className="text-center text-white">0.00</div>
                 <div className="text-center">
-                  <span className="inline-flex items-center justify-center w-7 h-7 bg-[#2E73FF] text-white text-xs font-bold rounded-full">0</span>
+                  <span className="inline-flex items-center justify-center w-7 h-7 bg-primary text-white text-xs font-bold rounded-full">0</span>
                 </div>
               </div>
             ))}
@@ -435,34 +316,45 @@ const Index = () => {
           <h2 className="text-4xl font-bold text-white">Player Statistics</h2>
         </div>
 
-        <Tabs defaultValue="batting" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid bg-[#0F1B35] border-[#F9C846]/30">
-            <TabsTrigger value="batting">Batting</TabsTrigger>
-            <TabsTrigger value="bowling">Bowling</TabsTrigger>
-            <TabsTrigger value="fielding">Fielding</TabsTrigger>
-          </TabsList>
+        {cricherosStatsUrl ? (
+          <div className="w-full h-[50vh] rounded-lg overflow-hidden border border-[#F9C846]/30 mb-8">
+            <iframe
+              src={cricherosStatsUrl}
+              className="w-full h-full border-0"
+              title="Tournament Stats"
+              allow="fullscreen"
+            />
+          </div>
+        ) : (
+          <Tabs defaultValue="batting" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid bg-[#0F1B35] border-[#F9C846]/30">
+              <TabsTrigger value="batting">Batting</TabsTrigger>
+              <TabsTrigger value="bowling">Bowling</TabsTrigger>
+              <TabsTrigger value="fielding">Fielding</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="batting" className="space-y-6">
-            <div className="flex lg:grid lg:grid-cols-3 gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" style={{ touchAction: 'pan-y pan-x' }}>
-              <div className="min-w-[280px] lg:min-w-0 snap-start"><StatCard title="Top Run Scorers" players={getTopBatsmen()} stat={(p: any) => `${p.runs_scored} runs`} icon={Trophy} /></div>
-              <div className="min-w-[280px] lg:min-w-0 snap-start"><StatCard title="Highest Strike Rate" players={getHighestStrikeRate()} stat={(p: any) => `${p.strike_rate.toFixed(2)}`} icon={TrendingUp} /></div>
-              <div className="min-w-[280px] lg:min-w-0 snap-start"><StatCard title="Best Batting Average" players={getHighestAverage()} stat={(p: any) => `${p.batting_average.toFixed(2)}`} icon={Award} /></div>
-            </div>
-          </TabsContent>
+            <TabsContent value="batting" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <ComingSoonCard title="Top Run Scorers" icon={Trophy} />
+                <ComingSoonCard title="Highest Strike Rate" icon={TrendingUp} />
+                <ComingSoonCard title="Best Batting Average" icon={Award} />
+              </div>
+            </TabsContent>
 
-          <TabsContent value="bowling" className="space-y-6">
-            <div className="flex lg:grid lg:grid-cols-2 gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" style={{ touchAction: 'pan-y pan-x' }}>
-              <div className="min-w-[280px] lg:min-w-0 snap-start"><StatCard title="Top Wicket Takers" players={getTopBowlers()} stat={(p: any) => `${p.wickets_taken} wickets`} icon={Target} /></div>
-              <div className="min-w-[280px] lg:min-w-0 snap-start"><StatCard title="Best Economy Rate" players={getBestEconomy()} stat={(p: any) => `${p.economy_rate.toFixed(2)}`} icon={TrendingUp} /></div>
-            </div>
-          </TabsContent>
+            <TabsContent value="bowling" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <ComingSoonCard title="Top Wicket Takers" icon={Target} />
+                <ComingSoonCard title="Best Economy Rate" icon={TrendingUp} />
+              </div>
+            </TabsContent>
 
-          <TabsContent value="fielding" className="space-y-6">
-            <div className="flex lg:grid lg:grid-cols-1 max-w-2xl mx-auto gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" style={{ touchAction: 'pan-y pan-x' }}>
-              <div className="min-w-[280px] lg:min-w-0 snap-start"><StatCard title="Top Fielders" players={getTopFielders()} stat={(p: any) => `${p.catches + p.stumpings} dismissals`} icon={Award} /></div>
-            </div>
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="fielding" className="space-y-6">
+              <div className="grid grid-cols-1 max-w-2xl mx-auto gap-4">
+                <ComingSoonCard title="Top Fielders" icon={Award} />
+              </div>
+            </TabsContent>
+          </Tabs>
+        )}
         
         {/* View More Button for Stats - Always visible */}
         <div className="text-center mt-8">
