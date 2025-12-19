@@ -52,7 +52,7 @@ export const MatchTimeline = () => {
               >
                 {/* Status Badge */}
                 <div className="flex items-center justify-between mb-3">
-                  <span className="px-2 py-1 text-xs font-bold rounded bg-black/40 text-[#F9C846]">
+                  <span className="px-2 py-1 text-xs font-bold rounded bg-black/40 text-white">
                     Upcoming
                   </span>
                 </div>
