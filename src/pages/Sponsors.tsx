@@ -68,6 +68,7 @@ const sponsors: Sponsor[] = [
   { name: "Mrunmay Saoji", firmName: "First Step Marketers", city: "Mehkar", tier: "Advertiser", amount: "₹11,000" },
   { name: "Pankaj Vyawahare", firmName: "Pankaj Vyawahare and Associates", city: "CSN", tier: "Advertiser", amount: "₹11,000" },
   { name: "Dr. Amit Vinay Saoji & Dr. Priya Amit Saoji", firmName: "Ortho Sports Care", city: "Nagpur", tier: "Advertiser", amount: "₹11,000" },
+  { name: "Adv. Abhishek Kulkarni", city: "Mumbai", tier: "Advertiser", amount: "₹11,000" },
 ];
 
 const Sponsors = () => {
