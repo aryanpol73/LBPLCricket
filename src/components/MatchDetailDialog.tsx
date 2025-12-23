@@ -33,7 +33,7 @@ export const MatchDetailDialog = ({
             Match {matchNo} - {teamA} vs {teamB}
           </DialogTitle>
           <p className="text-muted-foreground text-sm">
-            {day} • {time} • Venue TBD
+            {day} • {time} • 4 Lions, Ravet
           </p>
         </DialogHeader>
 

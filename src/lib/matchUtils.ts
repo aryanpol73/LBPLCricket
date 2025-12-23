@@ -84,22 +84,22 @@ export const getMatchStyle = (matchNo: number): React.CSSProperties => {
   return {};
 };
 
-// Get Tailwind classes for timeline cards (synced with MatchesSection colors)
+// Get Tailwind classes for timeline cards (original colors)
 export const getMatchTimelineClasses = (matchNo: number): string => {
-  // Match 1-18: Blue (same as MatchesSection)
+  // Match 1-18: Teal color (original)
   if (matchNo >= 1 && matchNo <= 18) {
-    return "bg-gradient-to-br from-[#1e3a5f] to-[#2a5298] border-[#3b82f6] hover:shadow-[0_0_20px_rgba(59,130,246,0.4)]";
+    return "bg-gradient-to-br from-[#00C8C8] to-[#00A5A5] border-[#00C8C8]/50 hover:shadow-[0_0_20px_rgba(0,200,200,0.4)]";
   }
-  // Match 19-30: Purple (same as MatchesSection)
+  // Match 19-30: Dark blue (original)
   if (matchNo >= 19 && matchNo <= 30) {
-    return "bg-gradient-to-br from-[#7c3aed] to-[#a855f7] border-[#a855f7] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]";
+    return "bg-gradient-to-br from-[#1e3a5f] to-[#0f2744] border-[#2E73FF]/50 hover:shadow-[0_0_20px_rgba(46,115,255,0.4)]";
   }
   // Match 31-32: Orange (Semi Finals)
   if (matchNo >= 31 && matchNo <= 32) {
-    return "bg-gradient-to-br from-[#ea580c] to-[#f97316] border-[#f97316] hover:shadow-[0_0_20px_rgba(249,115,22,0.4)]";
+    return "bg-gradient-to-br from-[#e67e22] to-[#d35400] border-[#e67e22]/50 hover:shadow-[0_0_20px_rgba(230,126,34,0.4)]";
   }
-  // Match 33: Yellow (Final)
-  return "bg-gradient-to-br from-[#eab308] to-[#facc15] border-[#facc15] hover:shadow-[0_0_20px_rgba(250,204,21,0.4)]";
+  // Match 33: Yellow/Gold (Final)
+  return "bg-gradient-to-br from-[#f1c40f] to-[#d4a837] border-[#F9C846]/50 hover:shadow-[0_0_20px_rgba(249,200,70,0.4)]";
 };
 
 // Get text colors based on match number
