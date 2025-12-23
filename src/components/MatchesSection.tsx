@@ -119,12 +119,21 @@ const MatchCard = ({ matchNo, teamA = "TBD", teamB = "TBD" }: MatchCardProps) =>
   );
 };
 
-export const MatchesSection = () => {
+interface MatchesSectionProps {
+  limit?: number;
+}
+
+export const MatchesSection = ({ limit }: MatchesSectionProps) => {
   // Day 1 matches (1-18)
   const day1Matches = Array.from({ length: 18 }, (_, i) => i + 1);
   
   // Day 2 matches (19-33)
   const day2Matches = Array.from({ length: 15 }, (_, i) => i + 19);
+
+  // Apply limit if provided
+  const displayedDay1Matches = limit ? day1Matches.slice(0, limit) : day1Matches;
+  const displayedDay2Matches = limit ? day2Matches.slice(0, limit) : day2Matches;
+  const hasMoreMatches = limit && (day1Matches.length > limit || day2Matches.length > limit);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -138,7 +147,7 @@ export const MatchesSection = () => {
 
         <TabsContent value="day1">
           <div className="space-y-4 max-w-4xl mx-auto">
-            {day1Matches.map((matchNo) => (
+            {displayedDay1Matches.map((matchNo) => (
               <MatchCard key={matchNo} matchNo={matchNo} />
             ))}
           </div>
@@ -146,7 +155,7 @@ export const MatchesSection = () => {
 
         <TabsContent value="day2">
           <div className="space-y-4 max-w-4xl mx-auto">
-            {day2Matches.map((matchNo) => (
+            {displayedDay2Matches.map((matchNo) => (
               <MatchCard key={matchNo} matchNo={matchNo} />
             ))}
           </div>
@@ -155,7 +164,7 @@ export const MatchesSection = () => {
 
       <div className="text-center mt-8">
         <Button asChild size="lg" className="font-semibold">
-          <Link to="/matches">View All Matches</Link>
+          <Link to="/matches">{hasMoreMatches ? "View More" : "View All Matches"}</Link>
         </Button>
       </div>
     </div>
