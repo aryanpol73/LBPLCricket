@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Calendar, Clock, Trophy } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
+import { Navigation } from "@/components/Navigation";
 
 interface Match {
   id: string;
@@ -28,11 +27,130 @@ interface Team {
   logo_url: string | null;
 }
 
-const MATCH_TIMES: Record<number, string> = {
-  1: "8:00 AM", 2: "8:45 AM", 3: "9:30 AM", 4: "10:15 AM", 5: "11:00 AM",
-  6: "11:45 AM", 7: "12:30 PM", 8: "1:15 PM", 9: "2:00 PM", 10: "2:45 PM",
-  11: "3:30 PM", 12: "4:15 PM", 13: "5:00 PM", 14: "5:45 PM", 15: "6:30 PM",
-  16: "7:15 PM", 17: "8:00 PM", 18: "8:45 PM", 19: "9:30 PM", 20: "10:15 PM"
+// Match time slots
+const getMatchTime = (matchNo: number): string => {
+  const times: Record<number, string> = {
+    1: "7:00 AM - 7:40 AM",
+    2: "7:50 AM - 8:30 AM",
+    3: "8:40 AM - 9:20 AM",
+    4: "9:30 AM - 10:10 AM",
+    5: "10:20 AM - 11:00 AM",
+    6: "11:10 AM - 11:50 AM",
+    7: "12:00 PM - 12:40 PM",
+    8: "12:50 PM - 1:30 PM",
+    9: "1:40 PM - 2:20 PM",
+    10: "2:30 PM - 3:10 PM",
+    11: "3:20 PM - 4:00 PM",
+    12: "4:10 PM - 4:50 PM",
+    13: "5:00 PM - 5:40 PM",
+    14: "5:50 PM - 6:30 PM",
+    15: "6:40 PM - 7:20 PM",
+    16: "7:30 PM - 8:10 PM",
+    17: "8:20 PM - 9:00 PM",
+    18: "9:10 PM - 9:50 PM",
+    19: "7:00 AM - 7:40 AM",
+    20: "7:50 AM - 8:30 AM",
+    21: "8:40 AM - 9:20 AM",
+    22: "9:30 AM - 10:10 AM",
+    23: "10:20 AM - 11:00 AM",
+    24: "11:10 AM - 11:50 AM",
+    25: "12:00 PM - 12:40 PM",
+    26: "12:50 PM - 1:30 PM",
+    27: "1:40 PM - 2:20 PM",
+    28: "2:30 PM - 3:10 PM",
+    29: "3:20 PM - 4:00 PM",
+    30: "4:10 PM - 4:50 PM",
+    31: "5:10 PM - 5:50 PM",
+    32: "6:00 PM - 6:40 PM",
+    33: "7:00 PM - 7:40 PM",
+  };
+  return times[matchNo] || "TBD";
+};
+
+// Get match phase label
+const getMatchPhase = (matchNo: number): string => {
+  if (matchNo >= 1 && matchNo <= 18) return "Match yet to begin";
+  if (matchNo >= 19 && matchNo <= 30) return "Match yet to begin";
+  if (matchNo >= 31 && matchNo <= 32) return "Semi Final";
+  if (matchNo === 33) return "Grand Final";
+  return "";
+};
+
+// Get background color style based on match number
+const getMatchStyle = (matchNo: number): React.CSSProperties => {
+  // Match 1-18: Blue
+  if (matchNo >= 1 && matchNo <= 18) {
+    return {
+      background: "linear-gradient(135deg, #1e3a5f 0%, #2a5298 50%, #1e3a5f 100%)",
+      border: "2px solid #3b82f6",
+    };
+  }
+  // Match 19-30: Purple
+  if (matchNo >= 19 && matchNo <= 30) {
+    return {
+      background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #7c3aed 100%)",
+      border: "2px solid #a855f7",
+    };
+  }
+  // Match 31-32: Orange (Semi Finals)
+  if (matchNo >= 31 && matchNo <= 32) {
+    return {
+      background: "linear-gradient(135deg, #ea580c 0%, #f97316 50%, #ea580c 100%)",
+      border: "2px solid #f97316",
+    };
+  }
+  // Match 33: Yellow (Final)
+  if (matchNo === 33) {
+    return {
+      background: "linear-gradient(135deg, #eab308 0%, #facc15 50%, #eab308 100%)",
+      border: "2px solid #facc15",
+    };
+  }
+  return {};
+};
+
+interface MatchCardProps {
+  matchNo: number;
+  teamA?: string;
+  teamB?: string;
+  match?: Match | null;
+  onMatchClick?: (match: Match) => void;
+}
+
+const MatchCard = ({ matchNo, teamA = "TBD", teamB = "TBD", match, onMatchClick }: MatchCardProps) => {
+  const phase = getMatchPhase(matchNo);
+  const time = getMatchTime(matchNo);
+  const style = getMatchStyle(matchNo);
+  
+  // Text color for final match (yellow bg needs dark text)
+  const textColor = matchNo === 33 ? "text-gray-900" : "text-white";
+  const subtextColor = matchNo === 33 ? "text-gray-700" : "text-white/80";
+
+  const handleClick = () => {
+    if (match && onMatchClick) {
+      onMatchClick(match);
+    }
+  };
+
+  return (
+    <div 
+      className="rounded-xl p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl cursor-pointer"
+      style={style}
+      onClick={handleClick}
+    >
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          <h3 className={`font-bold text-lg ${textColor}`}>{teamA}</h3>
+          <h3 className={`font-bold text-lg ${textColor}`}>{teamB}</h3>
+          <p className={`text-sm mt-1 ${subtextColor}`}>{phase}</p>
+        </div>
+        <div className="text-right">
+          <p className={`font-bold text-lg ${textColor}`}>Match {matchNo}</p>
+          <p className={`text-sm ${subtextColor}`}>{time}</p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const Matches = () => {
@@ -74,112 +192,29 @@ const Matches = () => {
     return team?.short_name || team?.name || 'TBD';
   };
 
-  const getTeamLogo = (teamId: string) => {
-    const team = teams.find(t => t.id === teamId);
-    return team?.logo_url;
-  };
-
-  const getMatchTime = (matchNo: number | null) => {
-    if (!matchNo) return '';
-    return MATCH_TIMES[matchNo] || '';
-  };
-
-  const getStatusColor = (status: string | null) => {
-    switch (status) {
-      case 'live': return 'bg-red-500 text-white';
-      case 'completed': return 'bg-green-500/20 text-green-400';
-      default: return 'bg-secondary/20 text-secondary';
-    }
-  };
-
-  const getStatusText = (status: string | null) => {
-    switch (status) {
-      case 'live': return 'LIVE';
-      case 'completed': return 'Completed';
-      default: return 'Upcoming';
-    }
-  };
-
   const handleMatchClick = (match: Match) => {
     setSelectedMatch(match);
     setMatchDialogOpen(true);
   };
 
-  // Group matches by round
-  const round1Matches = matches.filter(m => m.round_no === 1);
-  const round2Matches = matches.filter(m => m.round_no === 2);
+  // Create match data with fallback for TBD
+  const getMatchData = (matchNo: number) => {
+    const match = matches.find(m => m.match_no === matchNo);
+    if (match) {
+      return {
+        match,
+        teamA: getTeamName(match.team_a_id),
+        teamB: getTeamName(match.team_b_id)
+      };
+    }
+    return { match: null, teamA: "TBD", teamB: "TBD" };
+  };
 
-  const MatchCard = ({ match }: { match: Match }) => (
-    <Card
-      className="min-w-[280px] p-4 bg-card/80 border border-border/50 hover:border-secondary/50 cursor-pointer transition-all hover:scale-[1.02]"
-      onClick={() => handleMatchClick(match)}
-    >
-      <div className="flex justify-between items-center mb-3">
-        <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(match.status)}`}>
-          {getStatusText(match.status)}
-        </span>
-        <span className="text-xs text-muted-foreground">
-          Match {match.match_no}
-        </span>
-      </div>
-
-      <div className="space-y-3">
-        {/* Team A */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {getTeamLogo(match.team_a_id) ? (
-              <img src={getTeamLogo(match.team_a_id)!} alt="" className="w-8 h-8 rounded-full object-cover" />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <Trophy className="w-4 h-4 text-primary" />
-              </div>
-            )}
-            <span className={`font-medium ${match.winner_id === match.team_a_id ? 'text-secondary' : 'text-foreground'}`}>
-              {getTeamName(match.team_a_id)}
-            </span>
-          </div>
-          {match.team_a_score && (
-            <span className="font-bold text-foreground">{match.team_a_score}</span>
-          )}
-        </div>
-
-        <div className="text-center text-xs text-muted-foreground">vs</div>
-
-        {/* Team B */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {getTeamLogo(match.team_b_id) ? (
-              <img src={getTeamLogo(match.team_b_id)!} alt="" className="w-8 h-8 rounded-full object-cover" />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <Trophy className="w-4 h-4 text-primary" />
-              </div>
-            )}
-            <span className={`font-medium ${match.winner_id === match.team_b_id ? 'text-secondary' : 'text-foreground'}`}>
-              {getTeamName(match.team_b_id)}
-            </span>
-          </div>
-          {match.team_b_score && (
-            <span className="font-bold text-foreground">{match.team_b_score}</span>
-          )}
-        </div>
-      </div>
-
-      <div className="mt-3 pt-3 border-t border-border/30 flex items-center justify-between text-xs text-muted-foreground">
-        <div className="flex items-center gap-1">
-          <Calendar className="w-3 h-3" />
-          {format(new Date(match.match_date), 'MMM d')}
-        </div>
-        <div className="flex items-center gap-1">
-          <Clock className="w-3 h-3" />
-          {getMatchTime(match.match_no)}
-        </div>
-        {match.group_name && (
-          <span className="text-secondary">{match.group_name}</span>
-        )}
-      </div>
-    </Card>
-  );
+  // Day 1 matches (1-18)
+  const day1Matches = Array.from({ length: 18 }, (_, i) => i + 1);
+  
+  // Day 2 matches (19-33)
+  const day2Matches = Array.from({ length: 15 }, (_, i) => i + 19);
 
   if (loading) {
     return (
@@ -191,46 +226,50 @@ const Matches = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Navigation />
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-8">
-          <Trophy className="text-secondary" size={32} />
-          <h1 className="text-4xl font-bold text-primary">Fixtures</h1>
-        </div>
+        <h1 className="text-4xl md:text-5xl font-bold text-primary italic mb-8">Fixtures</h1>
 
-        <Tabs defaultValue="round1" className="w-full">
+        <Tabs defaultValue="day1" className="w-full">
           <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
-            <TabsTrigger value="round1">Round 1 ({round1Matches.length})</TabsTrigger>
-            <TabsTrigger value="round2">Round 2 ({round2Matches.length})</TabsTrigger>
+            <TabsTrigger value="day1">Day 1 Fixtures</TabsTrigger>
+            <TabsTrigger value="day2">Day 2 Fixtures</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="round1">
-            {round1Matches.length > 0 ? (
-              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide" style={{ touchAction: 'pan-y pan-x' }}>
-                {round1Matches.map((match) => (
-                  <MatchCard key={match.id} match={match} />
-                ))}
-              </div>
-            ) : (
-              <Card className="p-8 bg-card border border-border text-center">
-                <Calendar className="mx-auto mb-4 text-secondary" size={48} />
-                <p className="text-muted-foreground text-lg">Round 1 fixtures will be updated soon</p>
-              </Card>
-            )}
+          <TabsContent value="day1">
+            <div className="space-y-4 max-w-4xl mx-auto">
+              {day1Matches.map((matchNo) => {
+                const { match, teamA, teamB } = getMatchData(matchNo);
+                return (
+                  <MatchCard 
+                    key={matchNo} 
+                    matchNo={matchNo} 
+                    teamA={teamA}
+                    teamB={teamB}
+                    match={match}
+                    onMatchClick={handleMatchClick}
+                  />
+                );
+              })}
+            </div>
           </TabsContent>
 
-          <TabsContent value="round2">
-            {round2Matches.length > 0 ? (
-              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide" style={{ touchAction: 'pan-y pan-x' }}>
-                {round2Matches.map((match) => (
-                  <MatchCard key={match.id} match={match} />
-                ))}
-              </div>
-            ) : (
-              <Card className="p-8 bg-card border border-border text-center">
-                <Calendar className="mx-auto mb-4 text-secondary" size={48} />
-                <p className="text-muted-foreground text-lg">Round 2 fixtures will be updated soon</p>
-              </Card>
-            )}
+          <TabsContent value="day2">
+            <div className="space-y-4 max-w-4xl mx-auto">
+              {day2Matches.map((matchNo) => {
+                const { match, teamA, teamB } = getMatchData(matchNo);
+                return (
+                  <MatchCard 
+                    key={matchNo} 
+                    matchNo={matchNo}
+                    teamA={teamA}
+                    teamB={teamB}
+                    match={match}
+                    onMatchClick={handleMatchClick}
+                  />
+                );
+              })}
+            </div>
           </TabsContent>
         </Tabs>
       </div>
