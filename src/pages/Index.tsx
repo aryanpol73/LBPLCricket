@@ -329,7 +329,7 @@ const Index = () => {
 
       {/* Matches Section */}
       <section id="matches" className="reveal-scale">
-        <MatchesSection />
+        <MatchesSection limit={3} />
       </section>
 
       {/* Teams Section */}
