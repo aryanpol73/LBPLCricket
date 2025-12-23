@@ -5,6 +5,7 @@ import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { LiveTicker } from "@/components/LiveTicker";
 import { CommunitySection } from "@/components/CommunitySection";
 import { MatchTimeline } from "@/components/MatchTimeline";
+import { MatchesSection } from "@/components/MatchesSection";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -326,18 +327,9 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Matches Section - Coming Soon */}
-      <section id="matches" className="reveal-scale container mx-auto px-4 py-8">
-        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8 text-center">Match Fixtures</h2>
-        <Card className="p-8 bg-card border border-border text-center">
-          <Calendar className="mx-auto mb-4 text-secondary" size={48} />
-          <p className="text-muted-foreground text-lg">Fixtures will be updated soon</p>
-        </Card>
-        <div className="text-center mt-8">
-          <Button asChild size="lg" className="font-semibold">
-            <Link to="/matches">View All Matches</Link>
-          </Button>
-        </div>
+      {/* Matches Section */}
+      <section id="matches" className="reveal-scale">
+        <MatchesSection />
       </section>
 
       {/* Teams Section */}
