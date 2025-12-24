@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Share, Plus, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -11,7 +11,9 @@ const PwaInstallPrompt = () => {
   const [showPrompt, setShowPrompt] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
   const [showIOSSheet, setShowIOSSheet] = useState(false);
+  const [showAndroidSheet, setShowAndroidSheet] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   // Check if already installed or dismissed
@@ -34,55 +36,52 @@ const PwaInstallPrompt = () => {
   };
 
   useEffect(() => {
-    // Don't show if installed, not mobile, or recently dismissed
-    if (isInstalled() || !isMobile() || wasDismissed()) return;
+    // Don't show if installed or recently dismissed
+    if (isInstalled() || wasDismissed()) return;
+
+    // Only show on mobile
+    if (!isMobile()) return;
 
     // Detect iOS
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(iOS);
 
+    // Detect Android
+    const android = /Android/i.test(navigator.userAgent);
+    setIsAndroid(android);
+
     // Listen for beforeinstallprompt (Android/Chrome)
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
+      // Show prompt immediately when event is captured
+      setShowPrompt(true);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
 
-    // Show prompt after delay or scroll
-    let timeoutId: NodeJS.Timeout;
-    let hasScrolled = false;
-
-    const triggerShow = () => {
-      if (!showPrompt && !dismissed && !isInstalled()) {
+    // For iOS or if beforeinstallprompt doesn't fire, show after delay
+    const timeoutId = setTimeout(() => {
+      if (!dismissed && !isInstalled()) {
         setShowPrompt(true);
       }
-    };
-
-    const handleScroll = () => {
-      if (!hasScrolled) {
-        hasScrolled = true;
-        triggerShow();
-      }
-    };
-
-    // Show after 12 seconds or first scroll
-    timeoutId = setTimeout(triggerShow, 12000);
-    window.addEventListener('scroll', handleScroll, { once: true });
+    }, 5000); // Show after 5 seconds
 
     // Listen for app installed
-    window.addEventListener('appinstalled', () => {
+    const handleAppInstalled = () => {
       localStorage.setItem('lbpl_pwa_installed', 'true');
       setShowPrompt(false);
       setDeferredPrompt(null);
-    });
+    };
+
+    window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('appinstalled', handleAppInstalled);
       clearTimeout(timeoutId);
     };
-  }, [showPrompt, dismissed]);
+  }, [dismissed]);
 
   const handleInstallClick = async () => {
     if (isIOS) {
@@ -100,12 +99,12 @@ const PwaInstallPrompt = () => {
         }
         setDeferredPrompt(null);
       } catch (err) {
-        // Fallback message for Android
-        alert('Tap ⋮ → Add to Home Screen');
+        // Fallback to instructions
+        setShowAndroidSheet(true);
       }
-    } else if (!isIOS) {
-      // No prompt available on Android
-      alert('Tap ⋮ → Add to Home Screen');
+    } else if (isAndroid) {
+      // No prompt available, show manual instructions
+      setShowAndroidSheet(true);
     }
   };
 
@@ -113,6 +112,7 @@ const PwaInstallPrompt = () => {
     setDismissed(true);
     setShowPrompt(false);
     setShowIOSSheet(false);
+    setShowAndroidSheet(false);
     localStorage.setItem('lbpl_install_dismissed', Date.now().toString());
   };
 
@@ -121,13 +121,14 @@ const PwaInstallPrompt = () => {
   return (
     <>
       {/* Floating Install Button */}
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
+      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 animate-bounce-subtle">
         <div className="relative">
           <Button
             onClick={handleInstallClick}
-            className="bg-gradient-to-r from-[#1a3a6e] to-[#0f2340] hover:from-[#1f4580] hover:to-[#153050] text-white px-5 py-3 rounded-full shadow-lg shadow-black/30 border border-[#f0b429]/30 flex items-center gap-2 font-medium"
+            className="bg-gradient-to-r from-[#1a3a6e] to-[#0f2340] hover:from-[#1f4580] hover:to-[#153050] text-white px-5 py-3 rounded-full shadow-lg shadow-black/40 border border-[#f0b429]/40 flex items-center gap-2 font-semibold text-sm"
           >
-            <span>📲 Install LBPL Cricket App</span>
+            <span className="text-lg">📲</span>
+            <span>Install LBPL Cricket App</span>
           </Button>
           <button
             onClick={handleDismiss}
@@ -137,6 +138,11 @@ const PwaInstallPrompt = () => {
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
+        
+        {/* Short message below button */}
+        <p className="text-center text-xs text-gray-400 mt-2 animate-pulse">
+          Get live scores & notifications!
+        </p>
       </div>
 
       {/* iOS Bottom Sheet */}
@@ -149,39 +155,91 @@ const PwaInstallPrompt = () => {
           >
             <div className="w-12 h-1 bg-gray-600 rounded-full mx-auto mb-6" />
             
-            <h3 className="text-white text-lg font-semibold text-center mb-6">
+            <h3 className="text-white text-lg font-semibold text-center mb-2">
               📲 Install LBPL Cricket App
             </h3>
+            <p className="text-gray-400 text-sm text-center mb-6">
+              Add to your home screen for the best experience
+            </p>
 
-            {/* iOS Instructions Image */}
-            <div className="flex items-center justify-center gap-4 py-4">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-14 h-14 bg-[#1a3a6e] rounded-xl flex items-center justify-center">
-                  <svg className="w-7 h-7 text-[#007AFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                  </svg>
+            {/* iOS Instructions */}
+            <div className="bg-[#1a2744] rounded-xl p-4 mb-4">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-10 h-10 bg-[#007AFF] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Share className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-gray-400 text-xs">Share</span>
+                <div>
+                  <p className="text-white font-medium">Step 1</p>
+                  <p className="text-gray-400 text-sm">Tap the Share button in Safari</p>
+                </div>
               </div>
               
-              <svg className="w-6 h-6 text-[#f0b429]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-              
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-14 h-14 bg-[#1a3a6e] rounded-xl flex items-center justify-center">
-                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-[#34C759] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Plus className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-gray-400 text-xs">Add to Home</span>
+                <div>
+                  <p className="text-white font-medium">Step 2</p>
+                  <p className="text-gray-400 text-sm">Tap "Add to Home Screen"</p>
+                </div>
               </div>
             </div>
 
             <Button
               onClick={handleDismiss}
               variant="ghost"
-              className="w-full mt-4 text-gray-400 hover:text-white"
+              className="w-full text-gray-400 hover:text-white"
+            >
+              Maybe Later
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Android Bottom Sheet (fallback when no prompt) */}
+      {showAndroidSheet && (
+        <div className="fixed inset-0 z-[100]" onClick={handleDismiss}>
+          <div className="absolute inset-0 bg-black/60" />
+          <div 
+            className="absolute bottom-0 left-0 right-0 bg-[#0f1b2e] rounded-t-3xl p-6 pb-10 animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-1 bg-gray-600 rounded-full mx-auto mb-6" />
+            
+            <h3 className="text-white text-lg font-semibold text-center mb-2">
+              📲 Install LBPL Cricket App
+            </h3>
+            <p className="text-gray-400 text-sm text-center mb-6">
+              Add to your home screen for the best experience
+            </p>
+
+            {/* Android Instructions */}
+            <div className="bg-[#1a2744] rounded-xl p-4 mb-4">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <MoreVertical className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-white font-medium">Step 1</p>
+                  <p className="text-gray-400 text-sm">Tap the menu (⋮) in your browser</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-[#34C759] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Plus className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-white font-medium">Step 2</p>
+                  <p className="text-gray-400 text-sm">Tap "Add to Home Screen" or "Install App"</p>
+                </div>
+              </div>
+            </div>
+
+            <Button
+              onClick={handleDismiss}
+              variant="ghost"
+              className="w-full text-gray-400 hover:text-white"
             >
               Maybe Later
             </Button>
@@ -190,16 +248,16 @@ const PwaInstallPrompt = () => {
       )}
 
       <style>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: translate(-50%, 20px); }
-          to { opacity: 1; transform: translate(-50%, 0); }
+        @keyframes bounce-subtle {
+          0%, 100% { transform: translate(-50%, 0); }
+          50% { transform: translate(-50%, -6px); }
         }
         @keyframes slide-up {
           from { transform: translateY(100%); }
           to { transform: translateY(0); }
         }
-        .animate-fade-in {
-          animation: fade-in 0.4s ease-out;
+        .animate-bounce-subtle {
+          animation: bounce-subtle 2s ease-in-out infinite;
         }
         .animate-slide-up {
           animation: slide-up 0.3s ease-out;
