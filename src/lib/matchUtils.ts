@@ -104,9 +104,6 @@ export const getMatchTimelineClasses = (matchNo: number): string => {
 
 // Get text colors based on match number
 export const getMatchTextColors = (matchNo: number): { text: string; subtext: string } => {
-  // Final match has dark background with yellow, needs dark text
-  if (matchNo === 33) {
-    return { text: "text-gray-900", subtext: "text-gray-700" };
-  }
-  return { text: "text-white", subtext: "text-white/80" };
+  // All matches have dark backgrounds now, so use light text
+  return { text: "text-white", subtext: "text-white/70" };
 };
