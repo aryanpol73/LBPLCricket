@@ -34,12 +34,18 @@ const PwaInstallPrompt = () => {
   };
 
   useEffect(() => {
-    // Don't show if installed, not mobile, or recently dismissed
-    if (isInstalled() || !isMobile() || wasDismissed()) return;
+    // Don't show if installed or recently dismissed (removed mobile check - show on all devices)
+    if (isInstalled() || wasDismissed()) {
+      setShowPrompt(false);
+      return;
+    }
 
     // Detect iOS
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(iOS);
+
+    // Show prompt immediately
+    setShowPrompt(true);
 
     // Listen for beforeinstallprompt (Android/Chrome)
     const handleBeforeInstall = (e: Event) => {
@@ -49,40 +55,20 @@ const PwaInstallPrompt = () => {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
 
-    // Show prompt after delay or scroll
-    let timeoutId: NodeJS.Timeout;
-    let hasScrolled = false;
-
-    const triggerShow = () => {
-      if (!showPrompt && !dismissed && !isInstalled()) {
-        setShowPrompt(true);
-      }
-    };
-
-    const handleScroll = () => {
-      if (!hasScrolled) {
-        hasScrolled = true;
-        triggerShow();
-      }
-    };
-
-    // Show after 12 seconds or first scroll
-    timeoutId = setTimeout(triggerShow, 12000);
-    window.addEventListener('scroll', handleScroll, { once: true });
-
     // Listen for app installed
-    window.addEventListener('appinstalled', () => {
+    const handleAppInstalled = () => {
       localStorage.setItem('lbpl_pwa_installed', 'true');
       setShowPrompt(false);
       setDeferredPrompt(null);
-    });
+    };
+
+    window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(timeoutId);
+      window.removeEventListener('appinstalled', handleAppInstalled);
     };
-  }, [showPrompt, dismissed]);
+  }, [dismissed]);
 
   const handleInstallClick = async () => {
     if (isIOS) {
