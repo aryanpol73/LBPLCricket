@@ -21,7 +21,7 @@ export const MatchTimeline = () => {
           className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory"
           style={{ 
             scrollbarWidth: 'thin',
-            scrollbarColor: '#00C8C8 #0A1325'
+            scrollbarColor: '#2E73FF #0A1325'
           }}
         >
           {Array.from({ length: TOTAL_MATCHES }, (_, index) => {
@@ -84,11 +84,11 @@ export const MatchTimeline = () => {
           border-radius: 4px;
         }
         #matchTimeline .overflow-x-auto::-webkit-scrollbar-thumb {
-          background: #00C8C8;
+          background: #2E73FF;
           border-radius: 4px;
         }
         #matchTimeline .overflow-x-auto::-webkit-scrollbar-thumb:hover {
-          background: #00A5A5;
+          background: #1d5fd9;
         }
       `}</style>
     </section>
