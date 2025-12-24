@@ -11,7 +11,7 @@ const PwaInstallPrompt = () => {
   const [showPrompt, setShowPrompt] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
-  const [showIOSSheet, setShowIOSSheet] = useState(false);
+  const [showInstructionsSheet, setShowInstructionsSheet] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   // Check if already installed or dismissed
@@ -86,7 +86,7 @@ const PwaInstallPrompt = () => {
 
   const handleInstallClick = async () => {
     if (isIOS) {
-      setShowIOSSheet(true);
+      setShowInstructionsSheet(true);
       return;
     }
 
@@ -100,19 +100,19 @@ const PwaInstallPrompt = () => {
         }
         setDeferredPrompt(null);
       } catch (err) {
-        // Fallback message for Android
-        alert('Tap ⋮ → Add to Home Screen');
+        // Fallback to instructions sheet for Android
+        setShowInstructionsSheet(true);
       }
-    } else if (!isIOS) {
-      // No prompt available on Android
-      alert('Tap ⋮ → Add to Home Screen');
+    } else {
+      // No prompt available, show instructions sheet
+      setShowInstructionsSheet(true);
     }
   };
 
   const handleDismiss = () => {
     setDismissed(true);
     setShowPrompt(false);
-    setShowIOSSheet(false);
+    setShowInstructionsSheet(false);
     localStorage.setItem('lbpl_install_dismissed', Date.now().toString());
   };
 
@@ -139,8 +139,8 @@ const PwaInstallPrompt = () => {
         </div>
       </div>
 
-      {/* iOS Bottom Sheet */}
-      {showIOSSheet && (
+      {/* Instructions Bottom Sheet - Works for both iOS and Android */}
+      {showInstructionsSheet && (
         <div className="fixed inset-0 z-[100]" onClick={handleDismiss}>
           <div className="absolute inset-0 bg-black/60" />
           <div 
@@ -149,39 +149,53 @@ const PwaInstallPrompt = () => {
           >
             <div className="w-12 h-1 bg-gray-600 rounded-full mx-auto mb-6" />
             
-            <h3 className="text-white text-lg font-semibold text-center mb-6">
+            <h3 className="text-white text-lg font-semibold text-center mb-4">
               📲 Install LBPL Cricket App
             </h3>
+            
+            <p className="text-gray-400 text-sm text-center mb-4">
+              {isIOS ? 'iPhone/iPad' : 'Android'} - Follow these steps:
+            </p>
 
-            {/* iOS Instructions Image */}
-            <div className="flex items-center justify-center gap-4 py-4">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-14 h-14 bg-[#1a3a6e] rounded-xl flex items-center justify-center">
-                  <svg className="w-7 h-7 text-[#007AFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                  </svg>
-                </div>
-                <span className="text-gray-400 text-xs">Share</span>
-              </div>
-              
-              <svg className="w-6 h-6 text-[#f0b429]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-              
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-14 h-14 bg-[#1a3a6e] rounded-xl flex items-center justify-center">
-                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                </div>
-                <span className="text-gray-400 text-xs">Add to Home</span>
-              </div>
+            {/* Step-by-step Instructions */}
+            <div className="space-y-3 mb-6">
+              {isIOS ? (
+                <>
+                  <div className="flex items-center gap-3 bg-[#1a3a6e]/40 p-3 rounded-lg">
+                    <span className="w-6 h-6 bg-[#f0b429] text-black rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                    <span className="text-white text-sm">Tap the <strong>Share</strong> button ⬆️ at bottom</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-[#1a3a6e]/40 p-3 rounded-lg">
+                    <span className="w-6 h-6 bg-[#f0b429] text-black rounded-full flex items-center justify-center text-sm font-bold">2</span>
+                    <span className="text-white text-sm">Scroll & tap <strong>"Add to Home Screen"</strong> ➕</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-[#1a3a6e]/40 p-3 rounded-lg">
+                    <span className="w-6 h-6 bg-[#f0b429] text-black rounded-full flex items-center justify-center text-sm font-bold">3</span>
+                    <span className="text-white text-sm">Tap <strong>"Add"</strong> - Done! 🎉</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-3 bg-[#1a3a6e]/40 p-3 rounded-lg">
+                    <span className="w-6 h-6 bg-[#f0b429] text-black rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                    <span className="text-white text-sm">Tap <strong>⋮ Menu</strong> (3 dots) top-right</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-[#1a3a6e]/40 p-3 rounded-lg">
+                    <span className="w-6 h-6 bg-[#f0b429] text-black rounded-full flex items-center justify-center text-sm font-bold">2</span>
+                    <span className="text-white text-sm">Tap <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong></span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-[#1a3a6e]/40 p-3 rounded-lg">
+                    <span className="w-6 h-6 bg-[#f0b429] text-black rounded-full flex items-center justify-center text-sm font-bold">3</span>
+                    <span className="text-white text-sm">Confirm <strong>"Install"</strong> - Done! 🎉</span>
+                  </div>
+                </>
+              )}
             </div>
 
             <Button
               onClick={handleDismiss}
               variant="ghost"
-              className="w-full mt-4 text-gray-400 hover:text-white"
+              className="w-full text-gray-400 hover:text-white"
             >
               Maybe Later
             </Button>
