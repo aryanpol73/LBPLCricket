@@ -34,23 +34,29 @@ const PwaInstallPrompt = () => {
   };
 
   useEffect(() => {
-    // Don't show if installed or recently dismissed (removed mobile check - show on all devices)
-    if (isInstalled() || wasDismissed()) {
-      setShowPrompt(false);
-      return;
-    }
-
     // Detect iOS
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(iOS);
 
-    // Show prompt immediately
+    // Check conditions after mount
+    const installed = isInstalled();
+    const dismissed = wasDismissed();
+    
+    console.log('PWA Install Prompt - installed:', installed, 'dismissed:', dismissed);
+    
+    if (installed || dismissed) {
+      setShowPrompt(false);
+      return;
+    }
+
+    // Show prompt immediately on all devices
     setShowPrompt(true);
 
     // Listen for beforeinstallprompt (Android/Chrome)
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
+      console.log('PWA Install Prompt - beforeinstallprompt received');
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
@@ -68,7 +74,7 @@ const PwaInstallPrompt = () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
-  }, [dismissed]);
+  }, []);
 
   const handleInstallClick = async () => {
     if (isIOS) {
@@ -106,8 +112,8 @@ const PwaInstallPrompt = () => {
 
   return (
     <>
-      {/* Floating Install Button */}
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
+      {/* Floating Install Button - positioned above bottom nav */}
+      <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-[60] animate-fade-in">
         <div className="relative">
           <Button
             onClick={handleInstallClick}
