@@ -9,7 +9,7 @@ interface LiveScoreboardProps {
 }
 
 export const LiveScoreboard = ({ 
-  url = "https://cricheroes.com/live-score-widget", 
+  url = "https://cricheroes.com/tournament-embed/1/1735717/lbpl-season-3/matches/live-matches?pageno=past-matches&type=m", 
   title = "Live Scoreboard",
   height = "400px",
   className = ""
