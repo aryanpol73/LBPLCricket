@@ -119,11 +119,11 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
           <BrowserRouter>
             <ScrollToTop />
             <AppContent />
+            <Toaster />
+            <Sonner />
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>
