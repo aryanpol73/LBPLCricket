@@ -12,10 +12,32 @@ export const MatchTimeline = () => {
     setDialogOpen(true);
   };
 
+  const cricHeroesEmbedUrl = "https://cricheroes.com/tournament-embed/1/1735717/lbpl-season-3/matches/live-matches?pageno=past-matches&type=m";
+
   return (
     <section id="matchTimeline" className="container mx-auto px-4 py-8">
       <h2 className="text-3xl font-bold mb-6 text-center text-primary">Match Timeline</h2>
       
+      {/* CricHeroes Live Scores Embed */}
+      <div className="mb-8">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <span className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+          </span>
+          <h3 className="text-lg font-semibold text-foreground">Live Scores</h3>
+        </div>
+        <div className="rounded-xl overflow-hidden border-2 border-primary/30 bg-card shadow-lg">
+          <iframe
+            src={cricHeroesEmbedUrl}
+            title="LBPL Season 3 Live Scores"
+            className="w-full h-[400px] md:h-[500px]"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      </div>
+
       <div className="relative">
         <div 
           className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory"
