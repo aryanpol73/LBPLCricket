@@ -6,6 +6,7 @@ import { LiveTicker } from "@/components/LiveTicker";
 import { CommunitySection } from "@/components/CommunitySection";
 import { MatchTimeline } from "@/components/MatchTimeline";
 import { MatchesSection } from "@/components/MatchesSection";
+import { CricHeroesTournament } from "@/components/CricHeroesTournament";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -192,6 +193,9 @@ const Index = () => {
 
       {/* Match Timeline Section */}
       <MatchTimeline />
+
+      {/* CricHeroes Tournament Section */}
+      <CricHeroesTournament />
 
       {/* Points Table Section - Preview */}
       <section id="pointsTable" className="reveal-right container mx-auto px-4 py-8">
