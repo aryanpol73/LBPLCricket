@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { ExternalLink, Trophy, BarChart3, Users, Calendar, Image } from "lucide-react";
 
-const TOURNAMENT_BASE_URL = "https://cricheroes.com/tournament/1735717/lbpl-season-3";
+const TOURNAMENT_BASE_URL = "https://cricheroes.com/tournament/1/1735717/lbpl-season-3";
 
 const tournamentLinks = [
   { label: "Live Matches", path: "/matches/live-matches", icon: Calendar, color: "text-live" },
