@@ -1,22 +1,25 @@
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LiveScoreboardProps {
-  url?: string;
   title?: string;
   height?: string;
   className?: string;
 }
 
 export const LiveScoreboard = ({ 
-  url = "https://cricheroes.com/tournament-embed/1/1735717/lbpl-season-3/matches/live-matches?pageno=past-matches&type=m", 
   title = "Live Scoreboard",
   height = "400px",
   className = ""
 }: LiveScoreboardProps) => {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [matchesUrl, setMatchesUrl] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    loadMatchesUrl();
+    
     // Auto-refresh iframe every 60 seconds
     const interval = setInterval(() => {
       setRefreshKey(prev => prev + 1);
@@ -24,6 +27,33 @@ export const LiveScoreboard = ({
 
     return () => clearInterval(interval);
   }, []);
+
+  const loadMatchesUrl = async () => {
+    const { data } = await supabase
+      .from('tournament_settings')
+      .select('setting_value')
+      .eq('setting_key', 'cricheroes_matches_url')
+      .maybeSingle();
+    
+    if (data?.setting_value) {
+      setMatchesUrl(data.setting_value);
+    }
+    setLoading(false);
+  };
+
+  if (loading) {
+    return (
+      <section className={`container mx-auto px-4 mb-12 ${className}`}>
+        <Card className="p-4 bg-gradient-card shadow-card border-primary/20">
+          <div className="text-muted-foreground text-center py-8">Loading scores...</div>
+        </Card>
+      </section>
+    );
+  }
+
+  if (!matchesUrl) {
+    return null;
+  }
 
   return (
     <section className={`container mx-auto px-4 mb-12 ${className}`}>
@@ -40,7 +70,7 @@ export const LiveScoreboard = ({
           >
             <iframe
               key={refreshKey}
-              src={url}
+              src={matchesUrl}
               title={title}
               className="w-full h-full"
               style={{ border: 0 }}
