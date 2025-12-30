@@ -216,8 +216,10 @@ export const MatchDetailsDialog = ({
         )}
 
         {otherPlayers.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-xs font-semibold text-muted-foreground uppercase">Squad Members</h4>
+          <div 
+            className="space-y-2 max-h-[200px] overflow-y-auto"
+            style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}
+          >
             {otherPlayers.map((player) => (
               <div 
                 key={player.id} 
