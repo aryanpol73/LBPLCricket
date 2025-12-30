@@ -146,7 +146,7 @@ const Matches = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 pt-20 pb-8">
         <h1 className="text-4xl md:text-5xl font-bold text-primary italic mb-8">Fixtures</h1>
 
         <Tabs defaultValue="day1" className="w-full">
