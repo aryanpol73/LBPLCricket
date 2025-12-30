@@ -176,61 +176,55 @@ export const MatchDetailsDialog = ({
     const otherPlayers = players.filter(p => !p.role || (p.role !== 'Captain' && p.role !== 'Vice-Captain'));
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         <h3 className="font-semibold text-lg">{teamName}</h3>
         
-        {captains.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-xs font-semibold text-yellow-500 uppercase">{captains.length > 1 ? 'Captains' : 'Captain'}</h4>
-            {captains.map((player) => (
-              <div 
-                key={player.id} 
-                onClick={() => handlePlayerClick(player.id)}
-                className="flex items-center justify-between p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 transition-all cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                  <span className="font-medium hover:text-primary transition-colors">{player.name}</span>
-                </div>
+        {/* All players in one scrollable container */}
+        <div 
+          className="space-y-2 max-h-[280px] overflow-y-auto scrollbar-hide scroll-smooth-ios"
+          style={{ touchAction: 'pan-y' }}
+        >
+          {/* Captains */}
+          {captains.map((player) => (
+            <div 
+              key={player.id} 
+              onClick={() => handlePlayerClick(player.id)}
+              className="flex items-center justify-between p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 transition-all cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                <span className="font-medium hover:text-primary transition-colors">{player.name}</span>
               </div>
-            ))}
-          </div>
-        )}
+              <span className="text-xs text-yellow-500">(C)</span>
+            </div>
+          ))}
 
-        {viceCaptains.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-xs font-semibold text-orange-500 uppercase">{viceCaptains.length > 1 ? 'Vice-Captains' : 'Vice-Captain'}</h4>
-            {viceCaptains.map((player) => (
-              <div 
-                key={player.id} 
-                onClick={() => handlePlayerClick(player.id)}
-                className="flex items-center justify-between p-3 rounded-lg bg-orange-500/10 border border-orange-500/30 hover:bg-orange-500/20 transition-all cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-orange-500" />
-                  <span className="font-medium hover:text-primary transition-colors">{player.name}</span>
-                </div>
+          {/* Vice-Captains */}
+          {viceCaptains.map((player) => (
+            <div 
+              key={player.id} 
+              onClick={() => handlePlayerClick(player.id)}
+              className="flex items-center justify-between p-3 rounded-lg bg-orange-500/10 border border-orange-500/30 hover:bg-orange-500/20 transition-all cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-orange-500" />
+                <span className="font-medium hover:text-primary transition-colors">{player.name}</span>
               </div>
-            ))}
-          </div>
-        )}
+              <span className="text-xs text-orange-500">(VC)</span>
+            </div>
+          ))}
 
-        {otherPlayers.length > 0 && (
-          <div 
-            className="space-y-2 max-h-[200px] overflow-y-auto scrollbar-hide scroll-smooth-ios"
-            style={{ touchAction: 'pan-y' }}
-          >
-            {otherPlayers.map((player) => (
-              <div 
-                key={player.id} 
-                onClick={() => handlePlayerClick(player.id)}
-                className="flex items-center p-3 rounded-lg bg-card/50 border border-border/50 hover:bg-card/80 transition-all cursor-pointer"
-              >
-                <span className="hover:text-primary transition-colors">{player.name}</span>
-              </div>
-            ))}
-          </div>
-        )}
+          {/* Squad Members */}
+          {otherPlayers.map((player) => (
+            <div 
+              key={player.id} 
+              onClick={() => handlePlayerClick(player.id)}
+              className="flex items-center p-3 rounded-lg bg-card/50 border border-border/50 hover:bg-card/80 transition-all cursor-pointer"
+            >
+              <span className="hover:text-primary transition-colors">{player.name}</span>
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
