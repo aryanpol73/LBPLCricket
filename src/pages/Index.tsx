@@ -16,6 +16,18 @@ import { useCountUp } from "@/hooks/useCountUp";
 import { TeamDetailDialog } from "@/components/TeamDetailDialog";
 import { Link } from "react-router-dom";
 
+interface PointsTableEntry {
+  id: string;
+  team_id: string;
+  team_name: string | null;
+  group_name: string | null;
+  matches_played: number | null;
+  wins: number | null;
+  losses: number | null;
+  net_run_rate: number | null;
+  points: number | null;
+}
+
 const Index = () => {
   const location = useLocation();
   const [liveMatch, setLiveMatch] = useState<any>(null);
@@ -25,6 +37,8 @@ const Index = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showAllTeams, setShowAllTeams] = useState(false);
   const [cricherosStatsUrl, setCricherosStatsUrl] = useState<string>('');
+  const [groupATeams, setGroupATeams] = useState<PointsTableEntry[]>([]);
+  const [groupBTeams, setGroupBTeams] = useState<PointsTableEntry[]>([]);
   const {
     count: teamsCount,
     startCounting: startTeamsCount
@@ -42,7 +56,21 @@ const Index = () => {
     loadStats();
     loadTeams();
     loadCricherosUrl();
+    loadPointsTablePreview();
   }, []);
+
+  const loadPointsTablePreview = async () => {
+    const { data } = await supabase
+      .from('points_table')
+      .select('*')
+      .in('group_name', ['A', 'B'])
+      .order('points', { ascending: false });
+    
+    if (data) {
+      setGroupATeams(data.filter(t => t.group_name === 'A'));
+      setGroupBTeams(data.filter(t => t.group_name === 'B'));
+    }
+  };
 
   // Handle hash navigation from other pages
   useEffect(() => {
@@ -216,16 +244,16 @@ const Index = () => {
               <div className="text-center">NRR</div>
               <div className="text-center">Pts</div>
             </div>
-            {[{rank: 1, name: 'Team 1'}, {rank: 2, name: 'Team 2'}, {rank: 3, name: 'Team 3'}].map((team) => (
-              <div key={team.rank} className="grid grid-cols-8 gap-1 px-4 py-3 text-sm border-b border-primary/10 last:border-b-0">
-                <div className="text-white font-semibold">{team.rank}</div>
-                <div className="col-span-2 text-white font-medium truncate">{team.name}</div>
-                <div className="text-center text-white">0</div>
-                <div className="text-center text-green-400 font-semibold">0</div>
-                <div className="text-center text-red-400 font-semibold">0</div>
-                <div className="text-center text-white">0.00</div>
+            {groupATeams.map((team, index) => (
+              <div key={team.id} className="grid grid-cols-8 gap-1 px-4 py-3 text-sm border-b border-primary/10 last:border-b-0">
+                <div className="text-white font-semibold">{index + 1}</div>
+                <div className="col-span-2 text-white font-medium truncate">{team.team_name || 'TBD'}</div>
+                <div className="text-center text-white">{team.matches_played ?? 0}</div>
+                <div className="text-center text-green-400 font-semibold">{team.wins ?? 0}</div>
+                <div className="text-center text-red-400 font-semibold">{team.losses ?? 0}</div>
+                <div className="text-center text-white">{(team.net_run_rate ?? 0).toFixed(2)}</div>
                 <div className="text-center">
-                  <span className="inline-flex items-center justify-center w-7 h-7 bg-primary text-white text-xs font-bold rounded-full">0</span>
+                  <span className="inline-flex items-center justify-center w-7 h-7 bg-primary text-white text-xs font-bold rounded-full">{team.points ?? 0}</span>
                 </div>
               </div>
             ))}
@@ -245,16 +273,16 @@ const Index = () => {
               <div className="text-center">NRR</div>
               <div className="text-center">Pts</div>
             </div>
-            {[{rank: 1, name: 'Team 4'}, {rank: 2, name: 'Team 5'}, {rank: 3, name: 'Team 6'}].map((team) => (
-              <div key={team.rank} className="grid grid-cols-8 gap-1 px-4 py-3 text-sm border-b border-primary/10 last:border-b-0">
-                <div className="text-white font-semibold">{team.rank}</div>
-                <div className="col-span-2 text-white font-medium truncate">{team.name}</div>
-                <div className="text-center text-white">0</div>
-                <div className="text-center text-green-400 font-semibold">0</div>
-                <div className="text-center text-red-400 font-semibold">0</div>
-                <div className="text-center text-white">0.00</div>
+            {groupBTeams.map((team, index) => (
+              <div key={team.id} className="grid grid-cols-8 gap-1 px-4 py-3 text-sm border-b border-primary/10 last:border-b-0">
+                <div className="text-white font-semibold">{index + 1}</div>
+                <div className="col-span-2 text-white font-medium truncate">{team.team_name || 'TBD'}</div>
+                <div className="text-center text-white">{team.matches_played ?? 0}</div>
+                <div className="text-center text-green-400 font-semibold">{team.wins ?? 0}</div>
+                <div className="text-center text-red-400 font-semibold">{team.losses ?? 0}</div>
+                <div className="text-center text-white">{(team.net_run_rate ?? 0).toFixed(2)}</div>
                 <div className="text-center">
-                  <span className="inline-flex items-center justify-center w-7 h-7 bg-primary text-white text-xs font-bold rounded-full">0</span>
+                  <span className="inline-flex items-center justify-center w-7 h-7 bg-primary text-white text-xs font-bold rounded-full">{team.points ?? 0}</span>
                 </div>
               </div>
             ))}
