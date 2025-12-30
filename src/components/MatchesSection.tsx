@@ -1,18 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
 import { MatchDetailDialog } from "@/components/MatchDetailDialog";
 import { getMatchTime, getMatchPhase, getMatchStyle, getMatchTextColors } from "@/lib/matchUtils";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Match {
+  id: string;
+  match_no: number | null;
+  team_a_id: string;
+  team_b_id: string;
+  group_name: string | null;
+  status: string | null;
+}
+
+interface Team {
+  id: string;
+  name: string;
+}
 
 interface MatchCardProps {
   matchNo: number;
   teamA?: string;
   teamB?: string;
+  group?: string;
   onClick?: () => void;
 }
 
-const MatchCard = ({ matchNo, teamA = "TBD", teamB = "TBD", onClick }: MatchCardProps) => {
+const MatchCard = ({ matchNo, teamA = "TBD", teamB = "TBD", group, onClick }: MatchCardProps) => {
   const phase = getMatchPhase(matchNo);
   const time = getMatchTime(matchNo);
   const style = getMatchStyle(matchNo);
@@ -28,7 +44,7 @@ const MatchCard = ({ matchNo, teamA = "TBD", teamB = "TBD", onClick }: MatchCard
         <div className="flex-1">
           <h3 className={`font-bold text-lg ${colors.text}`}>{teamA}</h3>
           <h3 className={`font-bold text-lg ${colors.text}`}>{teamB}</h3>
-          <p className={`text-sm mt-1 ${colors.subtext}`}>{phase}</p>
+          <p className={`text-sm mt-1 ${colors.subtext}`}>{phase} {group ? `• Group ${group}` : ''}</p>
         </div>
         <div className="text-right">
           <p className={`font-bold text-lg ${colors.text}`}>Match {matchNo}</p>
@@ -46,6 +62,51 @@ interface MatchesSectionProps {
 export const MatchesSection = ({ limit }: MatchesSectionProps) => {
   const [selectedMatch, setSelectedMatch] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [teams, setTeams] = useState<Record<string, string>>({});
+  const [selectedTeamA, setSelectedTeamA] = useState<string>('TBD');
+  const [selectedTeamB, setSelectedTeamB] = useState<string>('TBD');
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    // Load teams
+    const { data: teamsData } = await supabase
+      .from('teams')
+      .select('id, name');
+    
+    if (teamsData) {
+      const teamMap: Record<string, string> = {};
+      teamsData.forEach((team: Team) => {
+        teamMap[team.id] = team.name;
+      });
+      setTeams(teamMap);
+    }
+
+    // Load matches
+    const { data: matchesData } = await supabase
+      .from('matches')
+      .select('id, match_no, team_a_id, team_b_id, group_name, status')
+      .order('match_no');
+    
+    if (matchesData) {
+      setMatches(matchesData);
+    }
+  };
+
+  const getMatchData = (matchNo: number) => {
+    const match = matches.find(m => m.match_no === matchNo);
+    if (match) {
+      return {
+        teamA: teams[match.team_a_id] || 'TBD',
+        teamB: teams[match.team_b_id] || 'TBD',
+        group: match.group_name || ''
+      };
+    }
+    return { teamA: 'TBD', teamB: 'TBD', group: '' };
+  };
 
   // Day 1 matches (1-18)
   const day1Matches = Array.from({ length: 18 }, (_, i) => i + 1);
@@ -59,6 +120,9 @@ export const MatchesSection = ({ limit }: MatchesSectionProps) => {
   const hasMoreMatches = limit && (day1Matches.length > limit || day2Matches.length > limit);
 
   const handleMatchClick = (matchNo: number) => {
+    const matchData = getMatchData(matchNo);
+    setSelectedTeamA(matchData.teamA);
+    setSelectedTeamB(matchData.teamB);
     setSelectedMatch(matchNo);
     setDialogOpen(true);
   };
@@ -75,25 +139,37 @@ export const MatchesSection = ({ limit }: MatchesSectionProps) => {
 
         <TabsContent value="day1">
           <div className="space-y-4 max-w-4xl mx-auto">
-            {displayedDay1Matches.map((matchNo) => (
-              <MatchCard 
-                key={matchNo} 
-                matchNo={matchNo} 
-                onClick={() => handleMatchClick(matchNo)}
-              />
-            ))}
+            {displayedDay1Matches.map((matchNo) => {
+              const matchData = getMatchData(matchNo);
+              return (
+                <MatchCard 
+                  key={matchNo} 
+                  matchNo={matchNo}
+                  teamA={matchData.teamA}
+                  teamB={matchData.teamB}
+                  group={matchData.group}
+                  onClick={() => handleMatchClick(matchNo)}
+                />
+              );
+            })}
           </div>
         </TabsContent>
 
         <TabsContent value="day2">
           <div className="space-y-4 max-w-4xl mx-auto">
-            {displayedDay2Matches.map((matchNo) => (
-              <MatchCard 
-                key={matchNo} 
-                matchNo={matchNo}
-                onClick={() => handleMatchClick(matchNo)}
-              />
-            ))}
+            {displayedDay2Matches.map((matchNo) => {
+              const matchData = getMatchData(matchNo);
+              return (
+                <MatchCard 
+                  key={matchNo} 
+                  matchNo={matchNo}
+                  teamA={matchData.teamA}
+                  teamB={matchData.teamB}
+                  group={matchData.group}
+                  onClick={() => handleMatchClick(matchNo)}
+                />
+              );
+            })}
           </div>
         </TabsContent>
       </Tabs>
@@ -109,6 +185,8 @@ export const MatchesSection = ({ limit }: MatchesSectionProps) => {
         matchNo={selectedMatch}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+        teamA={selectedTeamA}
+        teamB={selectedTeamB}
       />
     </div>
   );
