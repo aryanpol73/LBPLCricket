@@ -4,12 +4,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
+interface PointsEntry {
+  id: string;
+  team_id: string;
+  team_name: string | null;
+  group_name: string | null;
+  round: number | null;
+  matches_played: number | null;
+  wins: number | null;
+  losses: number | null;
+  points: number | null;
+  net_run_rate: number | null;
+}
+
 const PointsTable = () => {
   const [cricherosUrl, setCricherosUrl] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [pointsData, setPointsData] = useState<PointsEntry[]>([]);
 
   useEffect(() => {
     loadSettings();
+    loadPointsData();
   }, []);
 
   const loadSettings = async () => {
@@ -25,39 +40,37 @@ const PointsTable = () => {
     setLoading(false);
   };
 
-  // Placeholder teams for Round 1 (6 groups x 3 teams = 18 teams)
-  const round1Groups = {
-    'Group A': [
-      { rank: 1, name: 'Team 1', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-      { rank: 2, name: 'Team 2', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-      { rank: 3, name: 'Team 3', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-    ],
-    'Group B': [
-      { rank: 1, name: 'Team 4', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-      { rank: 2, name: 'Team 5', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-      { rank: 3, name: 'Team 6', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-    ],
-    'Group C': [
-      { rank: 1, name: 'Team 7', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-      { rank: 2, name: 'Team 8', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-      { rank: 3, name: 'Team 9', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-    ],
-    'Group D': [
-      { rank: 1, name: 'Team 10', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-      { rank: 2, name: 'Team 11', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-      { rank: 3, name: 'Team 12', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-    ],
-    'Group E': [
-      { rank: 1, name: 'Team 13', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-      { rank: 2, name: 'Team 14', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-      { rank: 3, name: 'Team 15', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-    ],
-    'Group F': [
-      { rank: 1, name: 'Team 16', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-      { rank: 2, name: 'Team 17', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-      { rank: 3, name: 'Team 18', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
-    ],
+  const loadPointsData = async () => {
+    const { data } = await supabase
+      .from('points_table')
+      .select('*')
+      .eq('round', 1)
+      .order('group_name')
+      .order('points', { ascending: false })
+      .order('net_run_rate', { ascending: false });
+    
+    if (data) {
+      setPointsData(data);
+    }
   };
+
+  // Group points data by group_name
+  const groupedData = pointsData.reduce((acc, entry) => {
+    const groupName = `Group ${entry.group_name || 'A'}`;
+    if (!acc[groupName]) {
+      acc[groupName] = [];
+    }
+    acc[groupName].push({
+      rank: acc[groupName].length + 1,
+      name: entry.team_name || 'TBD',
+      p: entry.matches_played || 0,
+      w: entry.wins || 0,
+      l: entry.losses || 0,
+      nrr: (entry.net_run_rate || 0).toFixed(2),
+      pts: entry.points || 0,
+    });
+    return acc;
+  }, {} as Record<string, { rank: number; name: string; p: number; w: number; l: number; nrr: string; pts: number }[]>);
 
   // Round 2: 12 teams in 4 groups
   const round2Groups = {
@@ -82,51 +95,6 @@ const PointsTable = () => {
       { rank: 3, name: 'TBD', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
     ],
   };
-
-  const GroupTable = ({ groupName, teams }: { groupName: string; teams: any[] }) => (
-    <Card className="bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-primary/50 overflow-hidden">
-      {/* Group Header */}
-      <div className="bg-gradient-to-r from-primary to-primary/80 px-4 py-3">
-        <h3 className="text-lg font-bold text-white">{groupName}</h3>
-      </div>
-      
-      {/* Table Header */}
-      <div className="grid grid-cols-7 gap-2 px-4 py-2 text-xs text-gray-400 border-b border-primary/20">
-        <div>Rank</div>
-        <div className="col-span-2">Team</div>
-        <div className="text-center">P</div>
-        <div className="text-center">W</div>
-        <div className="text-center">L</div>
-        <div className="text-center">NRR</div>
-      </div>
-      
-      {/* Table Body */}
-      {teams.map((team, index) => (
-        <div 
-          key={index}
-          className="grid grid-cols-7 gap-2 px-4 py-3 text-sm border-b border-primary/10 last:border-b-0 hover:bg-primary/10 transition-colors"
-        >
-          <div className="text-white font-semibold">{team.rank}</div>
-          <div className="col-span-2 text-white font-medium truncate">{team.name}</div>
-          <div className="text-center text-white">{team.p}</div>
-          <div className="text-center text-green-400 font-semibold">{team.w}</div>
-          <div className="text-center text-red-400 font-semibold">{team.l}</div>
-          <div className="text-center text-white">{team.nrr}</div>
-        </div>
-      ))}
-      
-      {/* Points column as badge */}
-      <div className="absolute right-4 top-[52px]">
-        {teams.map((team, index) => (
-          <div key={index} className="h-[45px] flex items-center justify-center">
-            <span className="px-3 py-1 bg-primary text-white text-sm font-bold rounded-full">
-              {team.pts}
-            </span>
-          </div>
-        ))}
-      </div>
-    </Card>
-  );
 
   // Better table design with Pts column
   const GroupTableV2 = ({ groupName, teams }: { groupName: string; teams: any[] }) => (
@@ -270,7 +238,7 @@ const PointsTable = () => {
 
             <TabsContent value="round1" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {Object.entries(round1Groups).map(([groupName, teams]) => (
+                {Object.entries(groupedData).sort().map(([groupName, teams]) => (
                   <GroupTableV2 key={groupName} groupName={groupName} teams={teams} />
                 ))}
               </div>
