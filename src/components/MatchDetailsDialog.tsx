@@ -217,8 +217,8 @@ export const MatchDetailsDialog = ({
 
         {otherPlayers.length > 0 && (
           <div 
-            className="space-y-2 max-h-[200px] overflow-y-auto"
-            style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}
+            className="space-y-2 max-h-[200px] overflow-y-auto scrollbar-hide scroll-smooth-ios"
+            style={{ touchAction: 'pan-y' }}
           >
             {otherPlayers.map((player) => (
               <div 

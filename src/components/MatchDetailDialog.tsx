@@ -110,19 +110,23 @@ export const MatchDetailDialog = ({
           </div>
         </div>
 
-        {/* Squad Members */}
-        {members.length > 0 && (
-          <div 
-            className="space-y-2 max-h-[200px] overflow-y-auto"
-            style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}
-          >
-            {members.map((player) => (
+        {/* Squad Members (names only) */}
+        <div 
+          className="space-y-2 max-h-[200px] overflow-y-auto scrollbar-hide scroll-smooth-ios"
+          style={{ touchAction: 'pan-y' }}
+        >
+          {members.length > 0 ? (
+            members.map((player) => (
               <div key={player.id} className="bg-[#1a2744] rounded-lg p-3 border border-border/30">
                 <span className="text-white/80">{player.name}</span>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          ) : (
+            <div className="bg-[#1a2744] rounded-lg p-3 border border-border/30">
+              <span className="text-white/80">--</span>
+            </div>
+          )}
+        </div>
       </div>
     );
   };

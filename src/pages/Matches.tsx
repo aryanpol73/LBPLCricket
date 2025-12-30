@@ -106,7 +106,8 @@ const Matches = () => {
 
   const getTeamName = (teamId: string) => {
     const team = teams.find(t => t.id === teamId);
-    return team?.short_name || team?.name || 'TBD';
+    // Always prefer the official full team name (short_name is legacy like Pune1/Nagpur1)
+    return team?.name || team?.short_name || 'TBD';
   };
 
   const handleMatchClick = (match: Match) => {
