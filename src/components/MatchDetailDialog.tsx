@@ -89,32 +89,33 @@ export const MatchDetailDialog = ({
     const members = getSquadMembers(squad);
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         <h3 className="text-xl font-bold text-white">{teamName}</h3>
         
-        {/* Captain */}
-        <div>
-          <p className="text-xs font-semibold text-secondary uppercase tracking-wider mb-2">Captain</p>
-          <div className="bg-gradient-to-r from-[#3d3520] to-[#2a2515] rounded-lg p-3 flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-orange-500"></span>
-            <span className="text-white font-medium">{captain?.name || '--'}</span>
-          </div>
-        </div>
-
-        {/* Vice-Captain */}
-        <div>
-          <p className="text-xs font-semibold text-orange-500 uppercase tracking-wider mb-2">Vice-Captain</p>
-          <div className="bg-gradient-to-r from-[#3d3520] to-[#2a2515] rounded-lg p-3 flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-orange-500"></span>
-            <span className="text-white font-medium">{viceCaptain?.name || '--'}</span>
-          </div>
-        </div>
-
-        {/* Squad Members (names only) */}
+        {/* All players in one scrollable container */}
         <div 
-          className="space-y-2 max-h-[200px] overflow-y-auto scrollbar-hide scroll-smooth-ios"
+          className="space-y-2 max-h-[280px] overflow-y-auto scrollbar-hide scroll-smooth-ios"
           style={{ touchAction: 'pan-y' }}
         >
+          {/* Captain */}
+          {captain && (
+            <div className="bg-gradient-to-r from-[#3d3520] to-[#2a2515] rounded-lg p-3 flex items-center gap-3">
+              <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+              <span className="text-white font-medium">{captain.name}</span>
+              <span className="text-xs text-yellow-500 ml-auto">(C)</span>
+            </div>
+          )}
+
+          {/* Vice-Captain */}
+          {viceCaptain && (
+            <div className="bg-gradient-to-r from-[#3d3520] to-[#2a2515] rounded-lg p-3 flex items-center gap-3">
+              <span className="w-2 h-2 rounded-full bg-orange-500"></span>
+              <span className="text-white font-medium">{viceCaptain.name}</span>
+              <span className="text-xs text-orange-500 ml-auto">(VC)</span>
+            </div>
+          )}
+
+          {/* Squad Members */}
           {members.length > 0 ? (
             members.map((player) => (
               <div key={player.id} className="bg-[#1a2744] rounded-lg p-3 border border-border/30">
@@ -122,9 +123,11 @@ export const MatchDetailDialog = ({
               </div>
             ))
           ) : (
-            <div className="bg-[#1a2744] rounded-lg p-3 border border-border/30">
-              <span className="text-white/80">--</span>
-            </div>
+            !captain && !viceCaptain && (
+              <div className="bg-[#1a2744] rounded-lg p-3 border border-border/30">
+                <span className="text-white/80">No squad data</span>
+              </div>
+            )
           )}
         </div>
       </div>
