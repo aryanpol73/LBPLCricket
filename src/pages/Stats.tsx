@@ -43,17 +43,26 @@ const Stats = () => {
         </div>
 
         {cricherosUrl ? (
-          <div className="w-full h-[75vh] rounded-lg overflow-hidden border border-[#F9C846]/30">
-            <div className="w-full h-full overflow-hidden" style={{ marginTop: '-320px', paddingTop: '320px' }}>
+          <>
+            <div className="w-full h-[75vh] rounded-lg overflow-hidden border border-[#F9C846]/30">
               <iframe
                 src={cricherosUrl}
-                className="w-full border-0"
-                style={{ height: 'calc(100% + 320px)', marginTop: '-320px' }}
+                className="w-full h-full border-0"
                 title="Tournament Stats"
                 allow="fullscreen"
               />
             </div>
-          </div>
+            <div className="text-center mt-4">
+              <a 
+                href={cricherosUrl.replace('tournament-embed/1/', 'tournament/')} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm text-muted-foreground hover:text-[#F9C846] underline"
+              >
+                Open Stats in Browser ↗
+              </a>
+            </div>
+          </>
         ) : (
           <Card className="p-8 bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-[#F9C846]/30 text-center">
             <Trophy className="mx-auto mb-4 text-[#F9C846]" size={48} />
