@@ -44,12 +44,15 @@ const Stats = () => {
 
         {cricherosUrl ? (
           <div className="w-full h-[75vh] rounded-lg overflow-hidden border border-[#F9C846]/30">
-            <iframe
-              src={cricherosUrl}
-              className="w-full h-full border-0"
-              title="Tournament Stats"
-              allow="fullscreen"
-            />
+            <div className="w-full h-full overflow-hidden" style={{ marginTop: '-320px', paddingTop: '320px' }}>
+              <iframe
+                src={cricherosUrl}
+                className="w-full border-0"
+                style={{ height: 'calc(100% + 320px)', marginTop: '-320px' }}
+                title="Tournament Stats"
+                allow="fullscreen"
+              />
+            </div>
           </div>
         ) : (
           <Card className="p-8 bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-[#F9C846]/30 text-center">
