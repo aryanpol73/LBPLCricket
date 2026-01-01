@@ -6,11 +6,14 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+// Store the deferred prompt globally so it's not lost on re-renders
+let globalDeferredPrompt: BeforeInstallPromptEvent | null = null;
+
 const PwaInstallPrompt = () => {
   const [showPrompt, setShowPrompt] = useState(true);
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [showInstructionsSheet, setShowInstructionsSheet] = useState(false);
+  const [isInstalling, setIsInstalling] = useState(false);
 
   // Check if already installed as PWA
   const isInstalled = () => {
@@ -32,16 +35,17 @@ const PwaInstallPrompt = () => {
     // Listen for beforeinstallprompt (Android/Chrome)
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      console.log('PWA Install Prompt - beforeinstallprompt received');
+      globalDeferredPrompt = e as BeforeInstallPromptEvent;
+      console.log('PWA: beforeinstallprompt captured');
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
 
     // Listen for app installed
     const handleAppInstalled = () => {
+      console.log('PWA: App installed successfully');
       setShowPrompt(false);
-      setDeferredPrompt(null);
+      globalDeferredPrompt = null;
     };
 
     window.addEventListener('appinstalled', handleAppInstalled);
@@ -53,22 +57,34 @@ const PwaInstallPrompt = () => {
   }, []);
 
   const handleInstallClick = async () => {
-    // On Android with deferred prompt - trigger native install directly
-    if (deferredPrompt) {
+    // iOS always shows instructions
+    if (isIOS) {
+      setShowInstructionsSheet(true);
+      return;
+    }
+
+    // Try to trigger native install prompt on Android
+    if (globalDeferredPrompt) {
+      setIsInstalling(true);
       try {
-        await deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
+        await globalDeferredPrompt.prompt();
+        const { outcome } = await globalDeferredPrompt.userChoice;
+        console.log('PWA: Install outcome:', outcome);
         if (outcome === 'accepted') {
           setShowPrompt(false);
         }
-        setDeferredPrompt(null);
-        return;
+        globalDeferredPrompt = null;
       } catch (err) {
-        console.log('Install prompt error:', err);
+        console.log('PWA: Install prompt error:', err);
+        // Fallback to instructions only if native prompt fails
+        setShowInstructionsSheet(true);
       }
+      setIsInstalling(false);
+      return;
     }
 
-    // Show instructions sheet for iOS or when native prompt isn't available
+    // No native prompt available - show instructions as fallback
+    console.log('PWA: No native prompt available, showing instructions');
     setShowInstructionsSheet(true);
   };
 
@@ -84,13 +100,14 @@ const PwaInstallPrompt = () => {
       <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-[60] animate-fade-in">
         <Button
           onClick={handleInstallClick}
-          className="bg-gradient-to-r from-[#1a3a6e] to-[#0f2340] hover:from-[#1f4580] hover:to-[#153050] text-white px-6 py-4 rounded-full shadow-xl shadow-black/40 border-2 border-[#f0b429]/50 flex items-center gap-2 font-semibold text-base"
+          disabled={isInstalling}
+          className="bg-gradient-to-r from-[#1a3a6e] to-[#0f2340] hover:from-[#1f4580] hover:to-[#153050] text-white px-6 py-4 rounded-full shadow-xl shadow-black/40 border-2 border-[#f0b429]/50 flex items-center gap-2 font-semibold text-base disabled:opacity-70"
         >
-          <span>📲 Install LBPL Cricket App</span>
+          <span>{isInstalling ? '⏳ Installing...' : '📲 Install LBPL Cricket App'}</span>
         </Button>
       </div>
 
-      {/* Instructions Bottom Sheet - for iOS or fallback */}
+      {/* Instructions Bottom Sheet - only for iOS or when native prompt unavailable */}
       {showInstructionsSheet && (
         <div className="fixed inset-0 z-[100]" onClick={closeInstructionsSheet}>
           <div className="absolute inset-0 bg-black/60" />
@@ -108,7 +125,6 @@ const PwaInstallPrompt = () => {
               {isIOS ? 'iPhone/iPad' : 'Android'} - Follow these steps:
             </p>
 
-            {/* Step-by-step Instructions */}
             <div className="space-y-3 mb-6">
               {isIOS ? (
                 <>
