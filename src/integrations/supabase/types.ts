@@ -253,6 +253,7 @@ export type Database = {
       matches: {
         Row: {
           created_at: string | null
+          cricheroes_match_id: string | null
           group_name: string | null
           id: string
           match_date: string
@@ -272,6 +273,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          cricheroes_match_id?: string | null
           group_name?: string | null
           id?: string
           match_date: string
@@ -291,6 +293,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          cricheroes_match_id?: string | null
           group_name?: string | null
           id?: string
           match_date?: string

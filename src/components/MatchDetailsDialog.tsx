@@ -108,16 +108,23 @@ export const MatchDetailsDialog = ({
     checkAdminStatus();
   }, []);
 
+  const generateCricHeroesUrl = (matchId: string) => {
+    return `https://cricheroes.com/scorecard/${matchId}/lbpl-season-3`;
+  };
+
   const loadScorerLink = async (matchId: string) => {
     const { data } = await supabase
       .from('matches')
-      .select('scorer_link')
+      .select('scorer_link, cricheroes_match_id')
       .eq('id', matchId)
       .maybeSingle();
     
-    if (data?.scorer_link) {
-      setScorerLink(data.scorer_link);
-      setSavedScorerLink(data.scorer_link);
+    if (data) {
+      // Prioritize manually set scorer_link, otherwise auto-generate from cricheroes_match_id
+      const effectiveLink = data.scorer_link || 
+        (data.cricheroes_match_id ? generateCricHeroesUrl(data.cricheroes_match_id) : "");
+      setScorerLink(data.scorer_link || "");
+      setSavedScorerLink(effectiveLink);
     } else {
       setScorerLink("");
       setSavedScorerLink("");
