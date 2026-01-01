@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
-import { X } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -8,29 +7,15 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const PwaInstallPrompt = () => {
-  const [showPrompt, setShowPrompt] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(true);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [showInstructionsSheet, setShowInstructionsSheet] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
 
-  // Check if already installed or dismissed
+  // Check if already installed as PWA
   const isInstalled = () => {
     return window.matchMedia('(display-mode: standalone)').matches || 
-           (window.navigator as any).standalone === true ||
-           localStorage.getItem('lbpl_pwa_installed') === 'true';
-  };
-
-  const wasDismissed = () => {
-    const dismissedTime = localStorage.getItem('lbpl_install_dismissed');
-    if (!dismissedTime) return false;
-    // Show again after 7 days
-    const daysSinceDismissed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60 * 24);
-    return daysSinceDismissed < 7;
-  };
-
-  const isMobile = () => {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+           (window.navigator as any).standalone === true;
   };
 
   useEffect(() => {
@@ -38,19 +23,11 @@ const PwaInstallPrompt = () => {
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(iOS);
 
-    // Check conditions after mount
-    const installed = isInstalled();
-    const dismissed = wasDismissed();
-    
-    console.log('PWA Install Prompt - installed:', installed, 'dismissed:', dismissed);
-    
-    if (installed || dismissed) {
+    // Hide only if already installed
+    if (isInstalled()) {
       setShowPrompt(false);
       return;
     }
-
-    // Show prompt immediately on all devices
-    setShowPrompt(true);
 
     // Listen for beforeinstallprompt (Android/Chrome)
     const handleBeforeInstall = (e: Event) => {
@@ -63,7 +40,6 @@ const PwaInstallPrompt = () => {
 
     // Listen for app installed
     const handleAppInstalled = () => {
-      localStorage.setItem('lbpl_pwa_installed', 'true');
       setShowPrompt(false);
       setDeferredPrompt(null);
     };
@@ -77,63 +53,46 @@ const PwaInstallPrompt = () => {
   }, []);
 
   const handleInstallClick = async () => {
-    if (isIOS) {
-      setShowInstructionsSheet(true);
-      return;
-    }
-
+    // On Android with deferred prompt - trigger native install directly
     if (deferredPrompt) {
       try {
         await deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         if (outcome === 'accepted') {
-          localStorage.setItem('lbpl_pwa_installed', 'true');
           setShowPrompt(false);
         }
         setDeferredPrompt(null);
+        return;
       } catch (err) {
-        // Fallback to instructions sheet for Android
-        setShowInstructionsSheet(true);
+        console.log('Install prompt error:', err);
       }
-    } else {
-      // No prompt available, show instructions sheet
-      setShowInstructionsSheet(true);
     }
+
+    // Show instructions sheet for iOS or when native prompt isn't available
+    setShowInstructionsSheet(true);
   };
 
-  const handleDismiss = () => {
-    setDismissed(true);
-    setShowPrompt(false);
+  const closeInstructionsSheet = () => {
     setShowInstructionsSheet(false);
-    localStorage.setItem('lbpl_install_dismissed', Date.now().toString());
   };
 
-  if (!showPrompt || dismissed) return null;
+  if (!showPrompt) return null;
 
   return (
     <>
-      {/* Floating Install Button - positioned above bottom nav */}
+      {/* Floating Install Button - always visible on all devices */}
       <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-[60] animate-fade-in">
-        <div className="relative">
-          <Button
-            onClick={handleInstallClick}
-            className="bg-gradient-to-r from-[#1a3a6e] to-[#0f2340] hover:from-[#1f4580] hover:to-[#153050] text-white px-5 py-3 rounded-full shadow-lg shadow-black/30 border border-[#f0b429]/30 flex items-center gap-2 font-medium"
-          >
-            <span>📲 Install LBPL Cricket App</span>
-          </Button>
-          <button
-            onClick={handleDismiss}
-            className="absolute -top-2 -right-2 w-6 h-6 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-gray-400 hover:text-white transition-colors border border-gray-600"
-            aria-label="Dismiss"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-        </div>
+        <Button
+          onClick={handleInstallClick}
+          className="bg-gradient-to-r from-[#1a3a6e] to-[#0f2340] hover:from-[#1f4580] hover:to-[#153050] text-white px-6 py-4 rounded-full shadow-xl shadow-black/40 border-2 border-[#f0b429]/50 flex items-center gap-2 font-semibold text-base"
+        >
+          <span>📲 Install LBPL Cricket App</span>
+        </Button>
       </div>
 
-      {/* Instructions Bottom Sheet - Works for both iOS and Android */}
+      {/* Instructions Bottom Sheet - for iOS or fallback */}
       {showInstructionsSheet && (
-        <div className="fixed inset-0 z-[100]" onClick={handleDismiss}>
+        <div className="fixed inset-0 z-[100]" onClick={closeInstructionsSheet}>
           <div className="absolute inset-0 bg-black/60" />
           <div 
             className="absolute bottom-0 left-0 right-0 bg-[#0f1b2e] rounded-t-3xl p-6 pb-10 animate-slide-up"
@@ -185,11 +144,11 @@ const PwaInstallPrompt = () => {
             </div>
 
             <Button
-              onClick={handleDismiss}
+              onClick={closeInstructionsSheet}
               variant="ghost"
               className="w-full text-gray-400 hover:text-white"
             >
-              Maybe Later
+              Close
             </Button>
           </div>
         </div>
