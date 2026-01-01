@@ -290,7 +290,11 @@ export const MatchDetailDialog = ({
 
           {/* Squad Tab Content */}
           <TabsContent value="squad" className="mt-6">
-            {loading ? (
+            {teamA === 'TBD' || teamB === 'TBD' ? (
+              <div className="text-center py-8 text-muted-foreground">
+                Squad information will be available once teams are finalized
+              </div>
+            ) : loading ? (
               <div className="text-center py-8 text-muted-foreground">Loading squads...</div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

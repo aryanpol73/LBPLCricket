@@ -290,54 +290,52 @@ export const MatchDetailsDialog = ({
                     </Button>
                   </div>
                 )}
-                {savedScorerLink ? (
-                  <div className="space-y-4">
-                    <div className="w-full h-[60vh] rounded-lg overflow-hidden border border-[#F9C846]/30">
-                      <iframe
-                        src={savedScorerLink}
-                        className="w-full h-full border-0"
-                        title="Match Details"
-                        allow="fullscreen"
-                      />
+                <div className="space-y-4">
+                  <div className="w-full h-[60vh] rounded-lg overflow-hidden border border-[#F9C846]/30">
+                    <iframe
+                      src={savedScorerLink || CRICHEROES_LIVE_EMBED}
+                      className="w-full h-full border-0"
+                      title="Match Details"
+                      allow="fullscreen"
+                    />
+                  </div>
+                  {cricHeroesMatchId && (
+                    <div className="text-center">
+                      <a 
+                        href={generateMatchScorecardLink(cricHeroesMatchId)} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Open Match {match.match_no} Scorecard in Browser
+                      </a>
                     </div>
-                    {cricHeroesMatchId && (
-                      <div className="text-center">
-                        <a 
-                          href={generateMatchScorecardLink(cricHeroesMatchId)} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                          Open Match {match.match_no} Scorecard in Browser
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="w-full h-40 rounded-lg border border-dashed flex items-center justify-center text-muted-foreground">
-                    {isAdmin 
-                      ? "Paste a CricHeroes match URL and save to display match details" 
-                      : "Match details will be available once the match starts on CricHeroes"}
-                  </div>
-                )}
+                  )}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="squad" className="space-y-6 mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardContent className="pt-6">
-                  <PlayerList players={teamASquad} teamName={teamAName} />
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <PlayerList players={teamBSquad} teamName={teamBName} />
-                </CardContent>
-              </Card>
-            </div>
+            {teamAName === 'TBD' || teamBName === 'TBD' ? (
+              <div className="text-center py-8 text-muted-foreground">
+                Squad information will be available once teams are finalized
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardContent className="pt-6">
+                    <PlayerList players={teamASquad} teamName={teamAName} />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <PlayerList players={teamBSquad} teamName={teamBName} />
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </DialogContent>
