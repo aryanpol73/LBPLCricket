@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { getMatchTime } from "@/lib/matchUtils";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Save, ExternalLink } from "lucide-react";
 
 interface Player {
   id: string;
@@ -26,21 +30,75 @@ export const MatchDetailDialog = ({
   teamA = "TBD",
   teamB = "TBD",
 }: MatchDetailDialogProps) => {
-  const [activeTab, setActiveTab] = useState("squad");
+  const [activeTab, setActiveTab] = useState("score");
   const [teamASquad, setTeamASquad] = useState<Player[]>([]);
   const [teamBSquad, setTeamBSquad] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
+  const [scorerLink, setScorerLink] = useState("");
+  const [savedScorerLink, setSavedScorerLink] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [matchId, setMatchId] = useState<string | null>(null);
   
   useEffect(() => {
-    if (open && matchNo && teamA !== 'TBD' && teamB !== 'TBD') {
-      loadSquads();
+    if (open && matchNo) {
+      loadMatchData();
+      checkAdminStatus();
+      if (teamA !== 'TBD' && teamB !== 'TBD') {
+        loadSquads();
+      }
     }
   }, [open, matchNo, teamA, teamB]);
+
+  const checkAdminStatus = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      setIsAdmin(!!data);
+    }
+  };
+
+  const loadMatchData = async () => {
+    const { data } = await supabase
+      .from('matches')
+      .select('id, scorer_link')
+      .eq('match_no', matchNo)
+      .maybeSingle();
+    
+    if (data) {
+      setMatchId(data.id);
+      setScorerLink(data.scorer_link || "");
+      setSavedScorerLink(data.scorer_link || "");
+    }
+  };
+
+  const saveScorerLink = async () => {
+    if (!matchId) return;
+    
+    setIsSaving(true);
+    const { error } = await supabase
+      .from('matches')
+      .update({ scorer_link: scorerLink })
+      .eq('id', matchId);
+    
+    setIsSaving(false);
+    
+    if (error) {
+      toast.error("Failed to save match link");
+    } else {
+      setSavedScorerLink(scorerLink);
+      toast.success("Match link saved successfully");
+    }
+  };
 
   const loadSquads = async () => {
     setLoading(true);
     
-    // Get team IDs from team names
     const { data: teamsData } = await supabase
       .from('teams')
       .select('id, name')
@@ -56,7 +114,6 @@ export const MatchDetailDialog = ({
           .select('id, name, role, team_id')
           .eq('team_id', teamAData.id)
           .order('role');
-        
         if (playersA) setTeamASquad(playersA);
       }
       
@@ -66,7 +123,6 @@ export const MatchDetailDialog = ({
           .select('id, name, role, team_id')
           .eq('team_id', teamBData.id)
           .order('role');
-        
         if (playersB) setTeamBSquad(playersB);
       }
     }
@@ -146,22 +202,76 @@ export const MatchDetailDialog = ({
           </p>
         </DialogHeader>
 
-        {/* Tabs for Squad and Score */}
+        {/* Tabs for Score and Squad */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-4">
           <TabsList className="grid w-full grid-cols-2 bg-[#1a2744]">
-            <TabsTrigger 
-              value="squad"
-              className="data-[state=active]:bg-[#2a3f5f] data-[state=active]:text-white"
-            >
-              Squad
-            </TabsTrigger>
             <TabsTrigger 
               value="score"
               className="data-[state=active]:bg-[#2a3f5f] data-[state=active]:text-white"
             >
               Score
             </TabsTrigger>
+            <TabsTrigger 
+              value="squad"
+              className="data-[state=active]:bg-[#2a3f5f] data-[state=active]:text-white"
+            >
+              Squad
+            </TabsTrigger>
           </TabsList>
+
+          {/* Score Tab Content */}
+          <TabsContent value="score" className="mt-6 space-y-4">
+            {isAdmin && (
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Paste CricHeroes match URL here..."
+                  value={scorerLink}
+                  onChange={(e) => setScorerLink(e.target.value)}
+                  className="flex-1 bg-[#1a2744] border-border/30"
+                />
+                <Button 
+                  onClick={saveScorerLink} 
+                  disabled={isSaving || scorerLink === savedScorerLink}
+                  className="bg-secondary hover:bg-secondary/80"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {isSaving ? "Saving..." : "Save"}
+                </Button>
+              </div>
+            )}
+            
+            {savedScorerLink ? (
+              <div className="space-y-4">
+                <div className="w-full h-[60vh] rounded-lg overflow-hidden border border-[#F9C846]/30">
+                  <iframe
+                    src={savedScorerLink}
+                    className="w-full h-full border-0"
+                    title={`Match ${matchNo} Details`}
+                    allow="fullscreen"
+                  />
+                </div>
+                <div className="text-center">
+                  <a 
+                    href={savedScorerLink.replace('tournament-embed/1/', 'tournament/')} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-[#F9C846] underline"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Open Match Details in Browser
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-[#1a2744] rounded-lg p-8 border border-border/30 text-center">
+                <p className="text-muted-foreground">
+                  {isAdmin 
+                    ? "Paste a CricHeroes match URL above and save to display match details" 
+                    : "Match details will be available once the match starts on CricHeroes"}
+                </p>
+              </div>
+            )}
+          </TabsContent>
 
           {/* Squad Tab Content */}
           <TabsContent value="squad" className="mt-6">
@@ -173,29 +283,6 @@ export const MatchDetailDialog = ({
                 {renderSquadSection(teamBSquad, teamB)}
               </div>
             )}
-          </TabsContent>
-
-          {/* Score Tab Content */}
-          <TabsContent value="score" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Team A Score */}
-              <div className="bg-[#1a2744] rounded-lg p-6 border border-border/30">
-                <h3 className="text-xl font-bold text-white mb-4">{teamA}</h3>
-                <div className="text-center py-8">
-                  <p className="text-4xl font-bold text-secondary">--</p>
-                  <p className="text-muted-foreground text-sm mt-2">Score will be updated</p>
-                </div>
-              </div>
-
-              {/* Team B Score */}
-              <div className="bg-[#1a2744] rounded-lg p-6 border border-border/30">
-                <h3 className="text-xl font-bold text-white mb-4">{teamB}</h3>
-                <div className="text-center py-8">
-                  <p className="text-4xl font-bold text-secondary">--</p>
-                  <p className="text-muted-foreground text-sm mt-2">Score will be updated</p>
-                </div>
-              </div>
-            </div>
           </TabsContent>
         </Tabs>
       </DialogContent>

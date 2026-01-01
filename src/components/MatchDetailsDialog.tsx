@@ -247,37 +247,22 @@ export const MatchDetailsDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="squad" className="w-full">
+        <Tabs defaultValue="score" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="squad">Squad</TabsTrigger>
             <TabsTrigger value="score">Score</TabsTrigger>
+            <TabsTrigger value="squad">Squad</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="squad" className="space-y-6 mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardContent className="pt-6">
-                  <PlayerList players={teamASquad} teamName={teamAName} />
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <PlayerList players={teamBSquad} teamName={teamBName} />
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
 
           <TabsContent value="score" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>Live Score</CardTitle>
+                <CardTitle>Match Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isAdmin && (
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Paste scorer link URL here..."
+                      placeholder="Paste CricHeroes match URL here..."
                       value={scorerLink}
                       onChange={(e) => setScorerLink(e.target.value)}
                       className="flex-1"
@@ -293,31 +278,50 @@ export const MatchDetailsDialog = ({
                 )}
                 {savedScorerLink ? (
                   <div className="space-y-4">
-                    <div className="w-full aspect-video rounded-lg overflow-hidden border">
+                    <div className="w-full h-[60vh] rounded-lg overflow-hidden border border-[#F9C846]/30">
                       <iframe
                         src={savedScorerLink}
-                        className="w-full h-full"
-                        title="Live Score"
-                        allowFullScreen
+                        className="w-full h-full border-0"
+                        title="Match Details"
+                        allow="fullscreen"
                       />
                     </div>
-                    <a 
-                      href={savedScorerLink} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      Open in new tab
-                    </a>
+                    <div className="text-center">
+                      <a 
+                        href={savedScorerLink.replace('tournament-embed/1/', 'tournament/')} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Open Match Details in Browser
+                      </a>
+                    </div>
                   </div>
                 ) : (
-                  <div className="w-full aspect-video rounded-lg border border-dashed flex items-center justify-center text-muted-foreground">
-                    {isAdmin ? "Paste a scorer link URL and save to display live scores" : "No live score available for this match"}
+                  <div className="w-full h-40 rounded-lg border border-dashed flex items-center justify-center text-muted-foreground">
+                    {isAdmin 
+                      ? "Paste a CricHeroes match URL and save to display match details" 
+                      : "Match details will be available once the match starts on CricHeroes"}
                   </div>
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="squad" className="space-y-6 mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardContent className="pt-6">
+                  <PlayerList players={teamASquad} teamName={teamAName} />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <PlayerList players={teamBSquad} teamName={teamBName} />
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </DialogContent>
