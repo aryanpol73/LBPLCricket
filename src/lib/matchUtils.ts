@@ -114,3 +114,9 @@ export const getMatchTextColors = (matchNo: number): { text: string; subtext: st
   }
   return { text: "text-white", subtext: "text-white/80" };
 };
+
+// Generate CricHeroes embed URL from match ID
+// Uses the tournament-embed format which allows iframe embedding
+export const generateCricHeroesUrl = (cricHeroesMatchId: string): string => {
+  return `https://cricheroes.com/tournament-embed/1/1735717/lbpl-season-3/match/${cricHeroesMatchId}`;
+};
