@@ -63,10 +63,15 @@ export const MatchDetailDialog = ({
     }
   };
 
-  // Import from matchUtils for consistent URL generation
-  const generateCricHeroesEmbedUrl = (matchId: string) => {
-    return `https://cricheroes.com/tournament-embed/1/1735717/lbpl-season-3/match/${matchId}`;
+  // CricHeroes embed URL - uses live-matches view as individual match embeds are not supported
+  const CRICHEROES_LIVE_EMBED = "https://cricheroes.com/tournament-embed/1/1735717/lbpl-season-3/matches/live-matches";
+  
+  // Generate direct link to specific match scorecard (opens in browser, not embed)
+  const generateMatchScorecardLink = (cricHeroesMatchId: string) => {
+    return `https://cricheroes.com/scorecard/${cricHeroesMatchId}/lbpl-season-3`;
   };
+  
+  const [cricHeroesMatchId, setCricHeroesMatchId] = useState<string | null>(null);
 
   const loadMatchData = async () => {
     const { data } = await supabase
@@ -77,9 +82,9 @@ export const MatchDetailDialog = ({
     
     if (data) {
       setMatchId(data.id);
-      // Prioritize manually set scorer_link, otherwise auto-generate from cricheroes_match_id
-      const effectiveLink = data.scorer_link || 
-        (data.cricheroes_match_id ? generateCricHeroesEmbedUrl(data.cricheroes_match_id) : "");
+      setCricHeroesMatchId(data.cricheroes_match_id);
+      // Use manually set scorer_link if available, otherwise use live-matches embed
+      const effectiveLink = data.scorer_link || CRICHEROES_LIVE_EMBED;
       setScorerLink(data.scorer_link || "");
       setSavedScorerLink(effectiveLink);
     }
@@ -258,17 +263,19 @@ export const MatchDetailDialog = ({
                     allow="fullscreen"
                   />
                 </div>
-                <div className="text-center">
-                  <a 
-                    href={savedScorerLink.replace('tournament-embed/1/', 'tournament/')} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-[#F9C846] underline"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    Open Match Details in Browser
-                  </a>
-                </div>
+                {cricHeroesMatchId && (
+                  <div className="text-center">
+                    <a 
+                      href={generateMatchScorecardLink(cricHeroesMatchId)} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-[#F9C846] underline"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Open Match {matchNo} Scorecard in Browser
+                    </a>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="bg-[#1a2744] rounded-lg p-8 border border-border/30 text-center">

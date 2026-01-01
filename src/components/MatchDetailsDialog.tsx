@@ -108,10 +108,15 @@ export const MatchDetailsDialog = ({
     checkAdminStatus();
   }, []);
 
-  // Use tournament-embed format for proper iframe embedding
-  const generateCricHeroesEmbedUrl = (matchId: string) => {
-    return `https://cricheroes.com/tournament-embed/1/1735717/lbpl-season-3/match/${matchId}`;
+  // CricHeroes embed URL - uses live-matches view as individual match embeds are not supported
+  const CRICHEROES_LIVE_EMBED = "https://cricheroes.com/tournament-embed/1/1735717/lbpl-season-3/matches/live-matches";
+  
+  // Generate direct link to specific match scorecard (opens in browser, not embed)
+  const generateMatchScorecardLink = (cricHeroesMatchId: string) => {
+    return `https://cricheroes.com/scorecard/${cricHeroesMatchId}/lbpl-season-3`;
   };
+
+  const [cricHeroesMatchId, setCricHeroesMatchId] = useState<string | null>(null);
 
   const loadScorerLink = async (matchId: string) => {
     const { data } = await supabase
@@ -121,12 +126,13 @@ export const MatchDetailsDialog = ({
       .maybeSingle();
     
     if (data) {
-      // Prioritize manually set scorer_link, otherwise auto-generate from cricheroes_match_id
-      const effectiveLink = data.scorer_link || 
-        (data.cricheroes_match_id ? generateCricHeroesEmbedUrl(data.cricheroes_match_id) : "");
+      setCricHeroesMatchId(data.cricheroes_match_id);
+      // Use manually set scorer_link if available, otherwise use live-matches embed
+      const effectiveLink = data.scorer_link || CRICHEROES_LIVE_EMBED;
       setScorerLink(data.scorer_link || "");
       setSavedScorerLink(effectiveLink);
     } else {
+      setCricHeroesMatchId(null);
       setScorerLink("");
       setSavedScorerLink("");
     }
@@ -294,17 +300,19 @@ export const MatchDetailsDialog = ({
                         allow="fullscreen"
                       />
                     </div>
-                    <div className="text-center">
-                      <a 
-                        href={savedScorerLink.replace('tournament-embed/1/', 'tournament/')} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                        Open Match Details in Browser
-                      </a>
-                    </div>
+                    {cricHeroesMatchId && (
+                      <div className="text-center">
+                        <a 
+                          href={generateMatchScorecardLink(cricHeroesMatchId)} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          Open Match {match.match_no} Scorecard in Browser
+                        </a>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="w-full h-40 rounded-lg border border-dashed flex items-center justify-center text-muted-foreground">
