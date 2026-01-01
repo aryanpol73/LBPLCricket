@@ -107,10 +107,10 @@ const SettingsHelp = () => {
         <div className="mt-8 p-4 bg-[#f0b429]/10 rounded-xl border border-[#f0b429]/20">
           <h3 className="text-white font-semibold mb-2">Still need help?</h3>
           <p className="text-gray-400 text-sm mb-3">
-            Contact us at aryanpol0305@gmail.com for support.
+            Contact us at aryan.pol737@gmail.com for support.
           </p>
           <button
-            onClick={() => window.open("mailto:aryanpol0305@gmail.com?subject=LBPL App Support", "_blank")}
+            onClick={() => window.open("mailto:aryan.pol737@gmail.com?subject=LBPL App Support", "_blank")}
             className="bg-[#f0b429] text-[#0b1c3d] font-semibold px-4 py-2 rounded-lg hover:bg-[#f0b429]/90 transition-colors"
           >
             Contact Support

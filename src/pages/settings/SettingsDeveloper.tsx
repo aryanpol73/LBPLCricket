@@ -87,7 +87,7 @@ const SettingsDeveloper = () => {
 
           {/* Contact */}
           <div className="mt-6 pt-6 border-t border-white/10 text-center space-y-3">
-            <p className="text-sm text-gray-300">📧 Contact: aryanpol0305@gmail.com</p>
+            <p className="text-sm text-gray-300">📧 Contact: aryan.pol737@gmail.com</p>
             <a
               href="https://www.linkedin.com/in/aryanpol0305"
               target="_blank"
