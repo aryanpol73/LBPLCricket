@@ -6,6 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
 import { getMatchTime, getMatchPhase, getMatchStyle, getMatchTextColors } from "@/lib/matchUtils";
 
+const CRICHEROES_LIVE_EMBED =
+  "https://cricheroes.com/tournament-embed/1/1735717/lbpl-season-3/matches/live-matches";
+
 interface Match {
   id: string;
   match_no: number | null;
@@ -206,22 +209,12 @@ const Matches = () => {
           </DialogHeader>
           
           <div className="flex-1 overflow-hidden">
-            {selectedMatch?.scorer_link ? (
-              <iframe
-                src={selectedMatch.scorer_link}
-                className="w-full h-full border-0 rounded-lg"
-                title="Live Score"
-                allow="fullscreen"
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-center">
-                <Trophy className="text-secondary mb-4" size={64} />
-                <p className="text-muted-foreground text-lg mb-2">Live score not available yet</p>
-                <p className="text-sm text-muted-foreground">
-                  Score link will be added once the match begins
-                </p>
-              </div>
-            )}
+            <iframe
+              src={selectedMatch?.scorer_link || CRICHEROES_LIVE_EMBED}
+              className="w-full h-full border-0 rounded-lg"
+              title="Live Score"
+              allow="fullscreen"
+            />
           </div>
         </DialogContent>
       </Dialog>
