@@ -85,7 +85,7 @@ const SettingsHome = () => {
   };
 
   const handleFeedback = () => {
-    window.open("mailto:aryanpol0305@gmail.com?subject=LBPL App Feedback", "_blank");
+    window.open("mailto:aryan.pol737@gmail.com?subject=LBPL App Feedback", "_blank");
     toast.success("Opening email client...");
   };
 
