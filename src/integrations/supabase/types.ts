@@ -92,6 +92,7 @@ export type Database = {
           created_at: string | null
           id: string
           image_url: string | null
+          image_urls: string[] | null
           is_pinned: boolean | null
           post_type: string | null
           updated_at: string | null
@@ -103,6 +104,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           is_pinned?: boolean | null
           post_type?: string | null
           updated_at?: string | null
@@ -114,6 +116,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           is_pinned?: boolean | null
           post_type?: string | null
           updated_at?: string | null

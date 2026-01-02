@@ -52,6 +52,7 @@ type Post = {
   user_name: string;
   content: string;
   image_url: string | null;
+  image_urls: string[] | null;
   post_type: string;
   is_pinned: boolean;
   created_at: string;
@@ -97,8 +98,8 @@ const Community = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -202,53 +203,78 @@ const Community = () => {
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    
+    // Limit to 5 images max
+    const totalImages = selectedImages.length + files.length;
+    if (totalImages > 5) {
+      toast({ title: "Maximum 5 images allowed", variant: "destructive" });
+      return;
+    }
+    
+    // Check each file size
+    for (const file of files) {
       if (file.size > 5 * 1024 * 1024) {
-        toast({ title: "Image must be less than 5MB", variant: "destructive" });
+        toast({ title: "Each image must be less than 5MB", variant: "destructive" });
         return;
       }
-      setSelectedImage(file);
+    }
+    
+    setSelectedImages(prev => [...prev, ...files]);
+    
+    // Generate previews for new files
+    files.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        setImagePreviews(prev => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
-    }
+    });
   };
 
-  const clearImage = () => {
-    setSelectedImage(null);
-    setImagePreview(null);
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const clearImages = () => {
+    setSelectedImages([]);
+    setImagePreviews([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
-  const uploadImage = async (): Promise<string | null> => {
-    if (!selectedImage || !user) return null;
+  const uploadImages = async (): Promise<string[]> => {
+    if (selectedImages.length === 0 || !user) return [];
     
     setIsUploading(true);
-    const fileExt = selectedImage.name.split('.').pop();
-    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+    const uploadedUrls: string[] = [];
     
-    const { error: uploadError } = await supabase.storage
-      .from('community-images')
-      .upload(fileName, selectedImage);
+    for (const image of selectedImages) {
+      const fileExt = image.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('community-images')
+        .upload(fileName, image);
 
-    if (uploadError) {
-      console.error('Upload error:', uploadError);
-      toast({ title: "Failed to upload image", variant: "destructive" });
-      setIsUploading(false);
-      return null;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        toast({ title: "Failed to upload an image", variant: "destructive" });
+        continue;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('community-images')
+        .getPublicUrl(fileName);
+
+      uploadedUrls.push(urlData.publicUrl);
     }
 
-    const { data: urlData } = supabase.storage
-      .from('community-images')
-      .getPublicUrl(fileName);
-
     setIsUploading(false);
-    return urlData.publicUrl;
+    return uploadedUrls;
   };
 
   const moderateContent = async (content: string): Promise<{ acceptable: boolean; reason: string | null; reply: string | null }> => {
@@ -279,7 +305,7 @@ const Community = () => {
       toast({ title: "Please login to post", variant: "destructive" });
       return;
     }
-    if (!newPostContent.trim() && !selectedImage) {
+    if (!newPostContent.trim() && selectedImages.length === 0) {
       toast({ title: "Please add some content or an image", variant: "destructive" });
       return;
     }
@@ -306,9 +332,9 @@ const Community = () => {
       }
     }
 
-    let imageUrl = null;
-    if (selectedImage) {
-      imageUrl = await uploadImage();
+    let imageUrls: string[] = [];
+    if (selectedImages.length > 0) {
+      imageUrls = await uploadImages();
     }
 
     const { error } = await supabase.from('community_posts').insert({
@@ -316,7 +342,8 @@ const Community = () => {
       user_name: user.email?.split('@')[0] || 'Anonymous',
       content: newPostContent,
       post_type: newPostType,
-      image_url: imageUrl,
+      image_url: imageUrls.length > 0 ? imageUrls[0] : null,
+      image_urls: imageUrls,
     });
 
     if (error) {
@@ -325,7 +352,7 @@ const Community = () => {
     }
 
     setNewPostContent("");
-    clearImage();
+    clearImages();
     toast({ title: "Post created!" });
   };
 
@@ -505,20 +532,24 @@ const Community = () => {
               className="mb-4 bg-background/50 border-secondary/30 min-h-[100px]"
             />
             
-            {/* Image Preview */}
-            {imagePreview && (
-              <div className="relative mb-4 inline-block">
-                <img 
-                  src={imagePreview} 
-                  alt="Preview" 
-                  className="max-h-48 rounded-lg border border-secondary/30"
-                />
-                <button
-                  onClick={clearImage}
-                  className="absolute -top-2 -right-2 p-1 bg-red-500 rounded-full hover:bg-red-600 transition-colors"
-                >
-                  <X size={14} className="text-white" />
-                </button>
+            {/* Image Previews */}
+            {imagePreviews.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {imagePreviews.map((preview, index) => (
+                  <div key={index} className="relative inline-block">
+                    <img 
+                      src={preview} 
+                      alt={`Preview ${index + 1}`} 
+                      className="h-24 w-24 object-cover rounded-lg border border-secondary/30"
+                    />
+                    <button
+                      onClick={() => removeImage(index)}
+                      className="absolute -top-2 -right-2 p-1 bg-red-500 rounded-full hover:bg-red-600 transition-colors"
+                    >
+                      <X size={14} className="text-white" />
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
             
@@ -542,6 +573,7 @@ const Community = () => {
                 ref={fileInputRef}
                 onChange={handleImageSelect}
                 accept="image/*"
+                multiple
                 className="hidden"
               />
               <Button 
@@ -655,15 +687,24 @@ const Community = () => {
                   <p className="text-white whitespace-pre-wrap mb-4">{post.content}</p>
                 )}
                 
-                {/* Post Image */}
-                {post.image_url && (
-                  <div className="mb-4">
-                    <img 
-                      src={post.image_url} 
-                      alt="Post image" 
-                      className="max-w-full max-h-[500px] rounded-lg border border-secondary/20 cursor-pointer hover:opacity-90 transition-opacity"
-                      onClick={() => window.open(post.image_url!, '_blank')}
-                    />
+                {/* Post Images */}
+                {(post.image_urls && post.image_urls.length > 0 ? post.image_urls : post.image_url ? [post.image_url] : []).length > 0 && (
+                  <div className={`mb-4 grid gap-2 ${
+                    (post.image_urls?.length || (post.image_url ? 1 : 0)) === 1 ? 'grid-cols-1' :
+                    (post.image_urls?.length || 0) === 2 ? 'grid-cols-2' :
+                    'grid-cols-2 md:grid-cols-3'
+                  }`}>
+                    {(post.image_urls && post.image_urls.length > 0 ? post.image_urls : post.image_url ? [post.image_url] : []).map((imgUrl, idx) => (
+                      <img 
+                        key={idx}
+                        src={imgUrl} 
+                        alt={`Post image ${idx + 1}`} 
+                        className={`w-full rounded-lg border border-secondary/20 cursor-pointer hover:opacity-90 transition-opacity object-cover ${
+                          (post.image_urls?.length || 1) === 1 ? 'max-h-[500px]' : 'h-48'
+                        }`}
+                        onClick={() => window.open(imgUrl, '_blank')}
+                      />
+                    ))}
                   </div>
                 )}
 
