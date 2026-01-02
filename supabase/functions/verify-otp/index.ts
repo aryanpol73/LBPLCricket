@@ -9,6 +9,9 @@ const corsHeaders = {
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes lockout
+
 serve(async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -25,12 +28,60 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const normalizedEmail = email.toLowerCase();
 
-    // Find valid OTP
+    // Check for existing OTP record for this email (most recent, unused)
+    const { data: latestOtp, error: latestOtpError } = await supabase
+      .from("email_otps")
+      .select("*")
+      .eq("email", normalizedEmail)
+      .eq("used", false)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (latestOtpError) {
+      console.error("Error checking OTP:", latestOtpError);
+      return new Response(
+        JSON.stringify({ error: "Failed to verify OTP" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Check if OTP is locked due to too many failed attempts
+    if (latestOtp) {
+      const failedAttempts = latestOtp.failed_attempts || 0;
+      const lockedUntil = latestOtp.locked_until ? new Date(latestOtp.locked_until) : null;
+      
+      // Check if currently locked
+      if (lockedUntil && lockedUntil > new Date()) {
+        const remainingMinutes = Math.ceil((lockedUntil.getTime() - Date.now()) / 60000);
+        console.log(`OTP locked for email ${normalizedEmail}. Remaining lockout: ${remainingMinutes} minutes`);
+        return new Response(
+          JSON.stringify({ 
+            error: `Too many failed attempts. Please try again in ${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''}, or request a new OTP.` 
+          }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      // Check if max attempts reached (lock the OTP)
+      if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
+        console.log(`Max attempts reached for email ${normalizedEmail}. Locking OTP.`);
+        return new Response(
+          JSON.stringify({ 
+            error: "This OTP has been locked due to too many failed attempts. Please request a new OTP." 
+          }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // Find valid OTP that matches the provided code
     const { data: otpRecord, error: otpError } = await supabase
       .from("email_otps")
       .select("*")
-      .eq("email", email.toLowerCase())
+      .eq("email", normalizedEmail)
       .eq("otp", otp)
       .eq("used", false)
       .gte("expires_at", new Date().toISOString())
@@ -47,11 +98,43 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     if (!otpRecord) {
+      // OTP doesn't match - increment failed attempts on the latest OTP
+      if (latestOtp) {
+        const newFailedAttempts = (latestOtp.failed_attempts || 0) + 1;
+        const updateData: { failed_attempts: number; locked_until?: string } = {
+          failed_attempts: newFailedAttempts
+        };
+        
+        // Lock the OTP if max attempts reached
+        if (newFailedAttempts >= MAX_FAILED_ATTEMPTS) {
+          updateData.locked_until = new Date(Date.now() + LOCKOUT_DURATION_MS).toISOString();
+          console.log(`Locking OTP for email ${normalizedEmail} after ${newFailedAttempts} failed attempts`);
+        }
+        
+        await supabase
+          .from("email_otps")
+          .update(updateData)
+          .eq("id", latestOtp.id);
+        
+        const remainingAttempts = MAX_FAILED_ATTEMPTS - newFailedAttempts;
+        
+        if (remainingAttempts <= 0) {
+          return new Response(
+            JSON.stringify({ 
+              error: "Too many failed attempts. This OTP has been locked. Please request a new OTP." 
+            }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        
+        console.log(`Failed OTP attempt for ${normalizedEmail}. Attempts: ${newFailedAttempts}/${MAX_FAILED_ATTEMPTS}`);
+      }
+
       // Check if OTP exists but expired
       const { data: expiredOtp } = await supabase
         .from("email_otps")
         .select("id")
-        .eq("email", email.toLowerCase())
+        .eq("email", normalizedEmail)
         .eq("otp", otp)
         .eq("used", false)
         .lt("expires_at", new Date().toISOString())
@@ -68,7 +151,7 @@ serve(async (req: Request): Promise<Response> => {
       const { data: usedOtp } = await supabase
         .from("email_otps")
         .select("id")
-        .eq("email", email.toLowerCase())
+        .eq("email", normalizedEmail)
         .eq("otp", otp)
         .eq("used", true)
         .limit(1);
@@ -78,7 +161,7 @@ serve(async (req: Request): Promise<Response> => {
         // Check if user exists
         const { data: existingUsers } = await supabase.auth.admin.listUsers();
         const existingUser = existingUsers?.users?.find(
-          (u) => u.email?.toLowerCase() === email.toLowerCase()
+          (u) => u.email?.toLowerCase() === normalizedEmail
         );
 
         if (existingUser) {
@@ -105,7 +188,7 @@ serve(async (req: Request): Promise<Response> => {
         } else {
           // Create new user with password
           const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
-            email: email.toLowerCase(),
+            email: normalizedEmail,
             password,
             email_confirm: true,
           });
@@ -129,22 +212,26 @@ serve(async (req: Request): Promise<Response> => {
         }
       }
 
+      // Return remaining attempts info
+      const remainingAttempts = latestOtp ? MAX_FAILED_ATTEMPTS - (latestOtp.failed_attempts || 0) - 1 : 0;
       return new Response(
-        JSON.stringify({ error: "Invalid OTP" }),
+        JSON.stringify({ 
+          error: `Invalid OTP. ${remainingAttempts > 0 ? `${remainingAttempts} attempt${remainingAttempts > 1 ? 's' : ''} remaining.` : 'Please request a new OTP.'}` 
+        }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Mark OTP as used
+    // OTP is valid - reset failed attempts and mark as used
     await supabase
       .from("email_otps")
-      .update({ used: true })
+      .update({ used: true, failed_attempts: 0, locked_until: null })
       .eq("id", otpRecord.id);
 
     // Check if user exists
     const { data: existingUsers } = await supabase.auth.admin.listUsers();
     const existingUser = existingUsers?.users?.find(
-      (u) => u.email?.toLowerCase() === email.toLowerCase()
+      (u) => u.email?.toLowerCase() === normalizedEmail
     );
 
     if (existingUser) {
