@@ -159,7 +159,9 @@ export type Database = {
           created_at: string | null
           email: string
           expires_at: string
+          failed_attempts: number | null
           id: string
+          locked_until: string | null
           otp: string
           used: boolean | null
         }
@@ -167,7 +169,9 @@ export type Database = {
           created_at?: string | null
           email: string
           expires_at: string
+          failed_attempts?: number | null
           id?: string
+          locked_until?: string | null
           otp: string
           used?: boolean | null
         }
@@ -175,7 +179,9 @@ export type Database = {
           created_at?: string | null
           email?: string
           expires_at?: string
+          failed_attempts?: number | null
           id?: string
+          locked_until?: string | null
           otp?: string
           used?: boolean | null
         }
