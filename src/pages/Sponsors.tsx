@@ -78,10 +78,10 @@ const Sponsors = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pt-16">
+    <div className="min-h-screen bg-background pt-16 overflow-x-hidden">
       <Navigation />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pb-32 overflow-y-auto">
         {/* Premium Header */}
         <div className="flex items-center justify-center gap-3 mb-8">
           <Heart className="text-[hsl(45,90%,55%)]" size={40} strokeWidth={2.5} fill="currentColor" />
@@ -110,13 +110,13 @@ const Sponsors = () => {
                 {tier} Sponsors
               </h2>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-1">
                 {tierSponsors.map((sponsor, index) => {
                   const style = tierStyles[sponsor.tier];
                   return (
                     <Card
                       key={`${sponsor.name}-${index}`}
-                      className="overflow-hidden transition-all duration-300 hover:scale-105 rounded-3xl animate-fade-in"
+                      className="overflow-hidden transition-all duration-300 hover:scale-[1.02] rounded-3xl"
                       style={{
                         background: style.gradient,
                         border: `6px solid ${style.borderColor}`,
@@ -126,8 +126,6 @@ const Sponsors = () => {
                           inset 0 2px 4px rgba(255, 255, 255, 0.4),
                           inset 0 -2px 4px rgba(0, 0, 0, 0.4)
                         `,
-                        animationDelay: `${index * 0.1}s`,
-                        animationFillMode: 'both',
                       }}
                     >
                       {/* Embossed Title Badge */}
