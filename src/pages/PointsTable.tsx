@@ -72,12 +72,11 @@ const PointsTable = () => {
       return acc;
     }, {} as Record<string, { name: string; p: number; w: number; l: number; nrr: number; pts: number }[]>);
 
-    // Sort each group by wins (desc), matches_played (desc), then NRR (desc)
+    // Sort each group by wins (desc), then NRR (desc), and assign ranks
     const result: Record<string, { rank: number; name: string; p: number; w: number; l: number; nrr: string; pts: number }[]> = {};
     Object.keys(grouped).forEach(groupName => {
       grouped[groupName].sort((a, b) => {
         if (b.w !== a.w) return b.w - a.w; // Sort by wins first
-        if (b.p !== a.p) return b.p - a.p; // Then by matches played
         return b.nrr - a.nrr; // Then by NRR
       });
       // Assign ranks after sorting
