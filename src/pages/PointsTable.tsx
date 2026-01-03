@@ -46,7 +46,7 @@ const PointsTable = () => {
       .select('*')
       .eq('round', 1)
       .order('group_name')
-      .order('points', { ascending: false })
+      .order('wins', { ascending: false })
       .order('net_run_rate', { ascending: false });
     
     if (data) {
@@ -54,23 +54,44 @@ const PointsTable = () => {
     }
   };
 
-  // Group points data by group_name
-  const groupedData = pointsData.reduce((acc, entry) => {
-    const groupName = `Group ${entry.group_name || 'A'}`;
-    if (!acc[groupName]) {
-      acc[groupName] = [];
-    }
-    acc[groupName].push({
-      rank: acc[groupName].length + 1,
-      name: entry.team_name || 'TBD',
-      p: entry.matches_played || 0,
-      w: entry.wins || 0,
-      l: entry.losses || 0,
-      nrr: (entry.net_run_rate || 0).toFixed(2),
-      pts: entry.points || 0,
+  // Group points data by group_name, then sort by wins and NRR within each group
+  const groupedData = (() => {
+    const grouped = pointsData.reduce((acc, entry) => {
+      const groupName = `Group ${entry.group_name || 'A'}`;
+      if (!acc[groupName]) {
+        acc[groupName] = [];
+      }
+      acc[groupName].push({
+        name: entry.team_name || 'TBD',
+        p: entry.matches_played || 0,
+        w: entry.wins || 0,
+        l: entry.losses || 0,
+        nrr: entry.net_run_rate || 0,
+        pts: entry.points || 0,
+      });
+      return acc;
+    }, {} as Record<string, { name: string; p: number; w: number; l: number; nrr: number; pts: number }[]>);
+
+    // Sort each group by wins (desc), then NRR (desc), and assign ranks
+    const result: Record<string, { rank: number; name: string; p: number; w: number; l: number; nrr: string; pts: number }[]> = {};
+    Object.keys(grouped).forEach(groupName => {
+      grouped[groupName].sort((a, b) => {
+        if (b.w !== a.w) return b.w - a.w; // Sort by wins first
+        return b.nrr - a.nrr; // Then by NRR
+      });
+      // Assign ranks after sorting
+      result[groupName] = grouped[groupName].map((team, index) => ({
+        rank: index + 1,
+        name: team.name,
+        p: team.p,
+        w: team.w,
+        l: team.l,
+        nrr: team.nrr.toFixed(2),
+        pts: team.pts,
+      }));
     });
-    return acc;
-  }, {} as Record<string, { rank: number; name: string; p: number; w: number; l: number; nrr: string; pts: number }[]>);
+    return result;
+  })();
 
   // Round 2: 12 teams in 4 groups
   const round2Groups = {
