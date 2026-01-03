@@ -65,11 +65,18 @@ const Index = () => {
       .from('points_table')
       .select('*')
       .in('group_name', ['A', 'B'])
-      .order('points', { ascending: false });
+      .order('wins', { ascending: false })
+      .order('net_run_rate', { ascending: false });
     
     if (data) {
-      setGroupATeams(data.filter(t => t.group_name === 'A'));
-      setGroupBTeams(data.filter(t => t.group_name === 'B'));
+      const sortTeams = (teams: PointsTableEntry[]) => 
+        [...teams].sort((a, b) => {
+          const winsDiff = (b.wins ?? 0) - (a.wins ?? 0);
+          if (winsDiff !== 0) return winsDiff;
+          return (b.net_run_rate ?? 0) - (a.net_run_rate ?? 0);
+        });
+      setGroupATeams(sortTeams(data.filter(t => t.group_name === 'A')));
+      setGroupBTeams(sortTeams(data.filter(t => t.group_name === 'B')));
     }
   };
 
