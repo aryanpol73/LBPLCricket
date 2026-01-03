@@ -6,6 +6,7 @@ import { LiveTicker } from "@/components/LiveTicker";
 import { CommunitySection } from "@/components/CommunitySection";
 import { MatchTimeline } from "@/components/MatchTimeline";
 import { MatchesSection } from "@/components/MatchesSection";
+import { MatchResultsTable } from "@/components/MatchResultsTable";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -296,7 +297,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Results Section - Coming Soon */}
+      {/* Results Section */}
       <section id="results" className="reveal-blur container mx-auto px-4 py-8">
         <div className="flex items-center justify-center gap-3 mb-8">
           <Trophy className="text-[hsl(45,90%,55%)]" size={40} strokeWidth={2.5} />
@@ -308,12 +309,11 @@ const Index = () => {
 
         <div className="relative bg-gradient-to-br from-[hsl(220,25%,12%)] via-[hsl(220,30%,15%)] to-[hsl(220,25%,10%)] rounded-3xl p-8 shadow-premium border-2 border-[hsl(45,90%,50%)]/30">
           <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[hsl(45,90%,50%)]/10 via-transparent to-[hsl(45,90%,50%)]/5 pointer-events-none" />
-          
-          <div className="relative text-center py-8">
-            <Trophy className="mx-auto mb-4 text-secondary" size={48} />
-            <p className="text-muted-foreground text-lg">Results will be available once matches are completed</p>
+
+          <div className="relative">
+            <MatchResultsTable limit={3} />
           </div>
-          
+
           <div className="text-center mt-4">
             <Button asChild size="lg" className="font-semibold bg-secondary hover:bg-secondary/90">
               <Link to="/results">View Results</Link>
