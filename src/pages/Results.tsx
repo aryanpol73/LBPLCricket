@@ -1,8 +1,6 @@
-
-import { Card } from "@/components/ui/card";
 import { Trophy, Crown } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
-
+import { MatchResultsTable } from "@/components/MatchResultsTable";
 const Results = () => {
   return (
     <div className="min-h-screen bg-background pt-16">
@@ -22,13 +20,8 @@ const Results = () => {
         <div className="relative bg-gradient-to-br from-[hsl(220,25%,12%)] via-[hsl(220,30%,15%)] to-[hsl(220,25%,10%)] rounded-3xl p-8 shadow-premium border-2 border-[hsl(45,90%,50%)]/30">
           {/* Subtle inner glow */}
           <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[hsl(45,90%,50%)]/10 via-transparent to-[hsl(45,90%,50%)]/5 pointer-events-none" />
-          
-          <div className="relative text-center py-12">
-            <Trophy className="mx-auto mb-4 text-secondary" size={64} />
-            <h2 className="text-2xl font-bold text-primary mb-2">Results Coming Soon</h2>
-            <p className="text-muted-foreground text-lg">
-              Results will be available once matches are completed
-            </p>
+          <div className="relative">
+            <MatchResultsTable grouped />
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
-const CACHE_NAME = "lbpl-cricket-cache-v12";
-const STATIC_CACHE = "lbpl-static-v12";
-const DYNAMIC_CACHE = "lbpl-dynamic-v12";
-const IMAGE_CACHE = "lbpl-images-v12";
+const CACHE_NAME = "lbpl-cricket-cache-v13";
+const STATIC_CACHE = "lbpl-static-v13";
+const DYNAMIC_CACHE = "lbpl-dynamic-v13";
+const IMAGE_CACHE = "lbpl-images-v13";
 
 // Critical assets to precache immediately
 const PRECACHE_ASSETS = [
