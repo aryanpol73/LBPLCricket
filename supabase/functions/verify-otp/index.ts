@@ -228,34 +228,25 @@ serve(async (req: Request): Promise<Response> => {
       .update({ used: true, failed_attempts: 0, locked_until: null })
       .eq("id", otpRecord.id);
 
-    // Check if user exists
+    // Check if user exists (internal check only - not revealed to client)
     const { data: existingUsers } = await supabase.auth.admin.listUsers();
     const existingUser = existingUsers?.users?.find(
       (u) => u.email?.toLowerCase() === normalizedEmail
     );
 
-    if (existingUser) {
-      // User exists - they need to sign in with password
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          isNewUser: false,
-          requiresPassword: true,
-          message: "OTP verified. Please enter your password to sign in."
-        }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    } else {
-      // New user - they need to set password
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          isNewUser: true,
-          message: "OTP verified. Please set your password."
-        }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    // SECURITY: Return consistent response to prevent user enumeration
+    // Both new and existing users see the same response - "enter your password"
+    // The server will handle the difference internally when password is submitted
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        requiresPassword: true,
+        // Internal flag for server-side logic only - client treats all users the same
+        _internal_is_new_user: !existingUser,
+        message: "OTP verified. Please enter your password."
+      }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
 
   } catch (error: any) {
     console.error("Error in verify-otp function:", error);

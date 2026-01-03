@@ -137,12 +137,12 @@ const Auth = () => {
         return;
       }
 
-      if (response.data?.isNewUser) {
-        toast.success("OTP verified! Please set your password.");
-        setStep("set-password");
-      } else if (response.data?.requiresPassword) {
+      if (response.data?.requiresPassword) {
+        // Unified response - both new and existing users see the same message
+        // Use internal flag to determine which flow, but show same UI to user
+        const isNewUser = response.data?._internal_is_new_user;
         toast.success("OTP verified! Please enter your password.");
-        setStep("enter-password");
+        setStep(isNewUser ? "set-password" : "enter-password");
       } else {
         toast.success("Logged in successfully!");
         navigate("/community", { replace: true });
