@@ -424,7 +424,7 @@ export type Database = {
           matches_played: number | null
           net_run_rate: number | null
           points: number | null
-          round: number | null
+          round: number
           team_id: string
           team_name: string | null
           updated_at: string | null
@@ -437,7 +437,7 @@ export type Database = {
           matches_played?: number | null
           net_run_rate?: number | null
           points?: number | null
-          round?: number | null
+          round?: number
           team_id: string
           team_name?: string | null
           updated_at?: string | null
@@ -450,7 +450,7 @@ export type Database = {
           matches_played?: number | null
           net_run_rate?: number | null
           points?: number | null
-          round?: number | null
+          round?: number
           team_id?: string
           team_name?: string | null
           updated_at?: string | null
@@ -460,7 +460,7 @@ export type Database = {
           {
             foreignKeyName: "points_table_team_id_fkey"
             columns: ["team_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
