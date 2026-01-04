@@ -20,8 +20,7 @@ interface PointsEntry {
 const PointsTable = () => {
   const [cricherosUrl, setCricherosUrl] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [round1Data, setRound1Data] = useState<PointsEntry[]>([]);
-  const [round2Data, setRound2Data] = useState<PointsEntry[]>([]);
+  const [pointsData, setPointsData] = useState<PointsEntry[]>([]);
 
   useEffect(() => {
     loadSettings();
@@ -42,8 +41,7 @@ const PointsTable = () => {
   };
 
   const loadPointsData = async () => {
-    // Fetch Round 1 data
-    const { data: r1Data } = await supabase
+    const { data } = await supabase
       .from('points_table')
       .select('*')
       .eq('round', 1)
@@ -51,27 +49,14 @@ const PointsTable = () => {
       .order('wins', { ascending: false })
       .order('net_run_rate', { ascending: false });
     
-    if (r1Data) {
-      setRound1Data(r1Data);
-    }
-
-    // Fetch Round 2 data
-    const { data: r2Data } = await supabase
-      .from('points_table')
-      .select('*')
-      .eq('round', 2)
-      .order('group_name')
-      .order('wins', { ascending: false })
-      .order('net_run_rate', { ascending: false });
-    
-    if (r2Data) {
-      setRound2Data(r2Data);
+    if (data) {
+      setPointsData(data);
     }
   };
 
-  // Helper function to group and sort points data
-  const groupPointsData = (data: PointsEntry[]) => {
-    const grouped = data.reduce((acc, entry) => {
+  // Group points data by group_name, then sort by wins and NRR within each group
+  const groupedData = (() => {
+    const grouped = pointsData.reduce((acc, entry) => {
       const groupName = `Group ${entry.group_name || 'A'}`;
       if (!acc[groupName]) {
         acc[groupName] = [];
@@ -91,9 +76,10 @@ const PointsTable = () => {
     const result: Record<string, { rank: number; name: string; p: number; w: number; l: number; nrr: string; pts: number }[]> = {};
     Object.keys(grouped).forEach(groupName => {
       grouped[groupName].sort((a, b) => {
-        if (b.w !== a.w) return b.w - a.w;
-        return b.nrr - a.nrr;
+        if (b.w !== a.w) return b.w - a.w; // Sort by wins first
+        return b.nrr - a.nrr; // Then by NRR
       });
+      // Assign ranks after sorting
       result[groupName] = grouped[groupName].map((team, index) => ({
         rank: index + 1,
         name: team.name,
@@ -105,10 +91,31 @@ const PointsTable = () => {
       }));
     });
     return result;
-  };
+  })();
 
-  const round1GroupedData = groupPointsData(round1Data);
-  const round2GroupedData = groupPointsData(round2Data);
+  // Round 2: 12 teams in 4 groups
+  const round2Groups = {
+    'Group A': [
+      { rank: 1, name: 'TBD', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
+      { rank: 2, name: 'TBD', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
+      { rank: 3, name: 'TBD', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
+    ],
+    'Group B': [
+      { rank: 1, name: 'TBD', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
+      { rank: 2, name: 'TBD', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
+      { rank: 3, name: 'TBD', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
+    ],
+    'Group C': [
+      { rank: 1, name: 'TBD', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
+      { rank: 2, name: 'TBD', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
+      { rank: 3, name: 'TBD', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
+    ],
+    'Group D': [
+      { rank: 1, name: 'TBD', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
+      { rank: 2, name: 'TBD', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
+      { rank: 3, name: 'TBD', p: 0, w: 0, l: 0, nrr: '0.00', pts: 0 },
+    ],
+  };
 
   // Better table design with Pts column
   const GroupTableV2 = ({ groupName, teams }: { groupName: string; teams: any[] }) => (
@@ -252,7 +259,7 @@ const PointsTable = () => {
 
             <TabsContent value="round1" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {Object.entries(round1GroupedData).sort().map(([groupName, teams]) => (
+                {Object.entries(groupedData).sort().map(([groupName, teams]) => (
                   <GroupTableV2 key={groupName} groupName={groupName} teams={teams} />
                 ))}
               </div>
@@ -260,7 +267,7 @@ const PointsTable = () => {
 
             <TabsContent value="round2" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {Object.entries(round2GroupedData).sort().map(([groupName, teams]) => (
+                {Object.entries(round2Groups).map(([groupName, teams]) => (
                   <GroupTableV2 key={groupName} groupName={groupName} teams={teams} />
                 ))}
               </div>
