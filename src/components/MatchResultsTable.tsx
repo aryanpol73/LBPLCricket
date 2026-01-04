@@ -233,7 +233,17 @@ export function MatchResultsTable({ limit, grouped = false, className }: Props) 
 
                     <TableCell>
                       {r.phase ? (
-                        <Badge className="whitespace-nowrap">{r.phase}</Badge>
+                        <Badge 
+                          className={cn(
+                            "whitespace-nowrap",
+                            r.phase === "League Phase" && "bg-[hsl(174,100%,40%)] hover:bg-[hsl(174,100%,35%)] text-white",
+                            r.phase === "Knockouts" && "bg-[hsl(270,70%,50%)] hover:bg-[hsl(270,70%,45%)] text-white",
+                            r.phase === "Semi-Finals" && "bg-[hsl(30,90%,50%)] hover:bg-[hsl(30,90%,45%)] text-white",
+                            r.phase === "Grand Final" && "bg-[hsl(45,90%,50%)] hover:bg-[hsl(45,90%,45%)] text-black"
+                          )}
+                        >
+                          {r.phase}
+                        </Badge>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
