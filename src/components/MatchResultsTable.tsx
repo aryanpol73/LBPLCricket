@@ -154,10 +154,53 @@ export function MatchResultsTable({ limit, grouped = false, className }: Props) 
     );
   }
 
+  // Phase navigation config
+  const phaseNav = [
+    { key: "League Phase", label: "League Phase", color: "bg-teal-600 hover:bg-teal-500" },
+    { key: "Knockouts", label: "Knockouts", color: "bg-purple-600 hover:bg-purple-500" },
+    { key: "Semi-Finals", label: "Semi-Finals", color: "bg-orange-500 hover:bg-orange-400" },
+    { key: "Grand Final", label: "Grand Final", color: "bg-yellow-500 hover:bg-yellow-400 text-black" },
+  ];
+
+  const scrollToPhase = (phaseKey: string) => {
+    const element = document.getElementById(`phase-${phaseKey.replace(/\s+/g, "-").toLowerCase()}`);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  // Check which phases have data
+  const availablePhases = new Set(groupedRows.map(g => g.key));
+
   return (
-    <div className={cn("space-y-8", className)}>
+    <div className={cn("space-y-6", className)}>
+      {/* Phase Quick Navigation Bar */}
+      {grouped && (
+        <div className="flex flex-wrap justify-center gap-2 p-4 bg-card/30 rounded-xl border border-border/30 sticky top-16 z-10 backdrop-blur-sm">
+          {phaseNav.map((phase) => (
+            <button
+              key={phase.key}
+              onClick={() => scrollToPhase(phase.key)}
+              disabled={!availablePhases.has(phase.key)}
+              className={cn(
+                "px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200",
+                "disabled:opacity-40 disabled:cursor-not-allowed",
+                availablePhases.has(phase.key) ? phase.color : "bg-gray-600",
+                "text-white shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
+              )}
+            >
+              {phase.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {groupedRows.map((group) => (
-        <div key={group.key} className="space-y-3">
+        <div 
+          key={group.key} 
+          id={`phase-${group.key.replace(/\s+/g, "-").toLowerCase()}`}
+          className="space-y-3 scroll-mt-32"
+        >
           {group.title && (
             <div className="flex items-center gap-2">
               <Trophy className="text-secondary" size={18} />
