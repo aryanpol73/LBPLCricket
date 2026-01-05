@@ -427,6 +427,7 @@ export type Database = {
           round: number
           team_id: string
           team_name: string | null
+          ties: number | null
           updated_at: string | null
           wins: number | null
         }
@@ -440,6 +441,7 @@ export type Database = {
           round?: number
           team_id: string
           team_name?: string | null
+          ties?: number | null
           updated_at?: string | null
           wins?: number | null
         }
@@ -453,6 +455,7 @@ export type Database = {
           round?: number
           team_id?: string
           team_name?: string | null
+          ties?: number | null
           updated_at?: string | null
           wins?: number | null
         }
