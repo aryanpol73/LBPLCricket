@@ -13,6 +13,7 @@ interface PointsEntry {
   matches_played: number | null;
   wins: number | null;
   losses: number | null;
+  ties: number | null;
   points: number | null;
   net_run_rate: number | null;
 }
@@ -68,14 +69,15 @@ const PointsTable = () => {
         p: entry.matches_played || 0,
         w: entry.wins || 0,
         l: entry.losses || 0,
+        t: entry.ties || 0,
         nrr: entry.net_run_rate || 0,
         pts: entry.points || 0,
       });
       return acc;
-    }, {} as Record<string, { name: string; p: number; w: number; l: number; nrr: number; pts: number }[]>);
+    }, {} as Record<string, { name: string; p: number; w: number; l: number; t: number; nrr: number; pts: number }[]>);
 
     // Sort each group by wins (desc), then NRR (desc), and assign ranks
-    const result: Record<string, { rank: number; name: string; p: number; w: number; l: number; nrr: string; pts: number }[]> = {};
+    const result: Record<string, { rank: number; name: string; p: number; w: number; l: number; t: number; nrr: string; pts: number }[]> = {};
     Object.keys(grouped).forEach(groupName => {
       grouped[groupName].sort((a, b) => {
         if (b.w !== a.w) return b.w - a.w; // Sort by wins first
@@ -88,6 +90,7 @@ const PointsTable = () => {
         p: team.p,
         w: team.w,
         l: team.l,
+        t: team.t,
         nrr: team.nrr.toFixed(2),
         pts: team.pts,
       }));
@@ -98,7 +101,7 @@ const PointsTable = () => {
   const round1Groups = groupData(round1Data);
   const round2Groups = groupData(round2Data);
 
-  // Better table design with Pts column
+  // Better table design with Pts column and Tie column
   const GroupTableV2 = ({ groupName, teams }: { groupName: string; teams: any[] }) => (
     <Card className="bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-primary/50 overflow-hidden">
       {/* Group Header */}
@@ -107,12 +110,13 @@ const PointsTable = () => {
       </div>
       
       {/* Table Header */}
-      <div className="grid grid-cols-8 gap-1 px-4 py-2 text-xs text-gray-400 border-b border-primary/20">
+      <div className="grid grid-cols-9 gap-1 px-4 py-2 text-xs text-gray-400 border-b border-primary/20">
         <div>Rank</div>
         <div className="col-span-2">Team</div>
         <div className="text-center">P</div>
         <div className="text-center">W</div>
         <div className="text-center">L</div>
+        <div className="text-center">Tie</div>
         <div className="text-center">NRR</div>
         <div className="text-center">Pts</div>
       </div>
@@ -121,13 +125,14 @@ const PointsTable = () => {
       {teams.map((team, index) => (
         <div 
           key={index}
-          className="grid grid-cols-8 gap-1 px-4 py-3 text-sm border-b border-primary/10 last:border-b-0 hover:bg-primary/10 transition-colors"
+          className="grid grid-cols-9 gap-1 px-4 py-3 text-sm border-b border-primary/10 last:border-b-0 hover:bg-primary/10 transition-colors"
         >
           <div className="text-white font-semibold">{team.rank}</div>
           <div className="col-span-2 text-white font-medium truncate">{team.name}</div>
           <div className="text-center text-white">{team.p}</div>
           <div className="text-center text-green-400 font-semibold">{team.w}</div>
           <div className="text-center text-red-400 font-semibold">{team.l}</div>
+          <div className="text-center text-yellow-400 font-semibold">{team.t}</div>
           <div className="text-center text-white">{team.nrr}</div>
           <div className="text-center">
             <span className="inline-flex items-center justify-center w-7 h-7 bg-primary text-white text-xs font-bold rounded-full">

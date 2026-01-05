@@ -64,6 +64,7 @@ const Index = () => {
     const { data } = await supabase
       .from('points_table')
       .select('*')
+      .eq('round', 1)
       .in('group_name', ['A', 'B'])
       .order('wins', { ascending: false })
       .order('net_run_rate', { ascending: false });
@@ -74,7 +75,7 @@ const Index = () => {
           const winsDiff = (b.wins ?? 0) - (a.wins ?? 0);
           if (winsDiff !== 0) return winsDiff;
           return (b.net_run_rate ?? 0) - (a.net_run_rate ?? 0);
-        });
+        }).slice(0, 3); // Limit to 3 teams per group
       setGroupATeams(sortTeams(data.filter(t => t.group_name === 'A')));
       setGroupBTeams(sortTeams(data.filter(t => t.group_name === 'B')));
     }
