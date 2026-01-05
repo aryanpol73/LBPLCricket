@@ -186,60 +186,90 @@ export function MatchResultsTable({ limit, grouped = false, className }: Props) 
               </TableHeader>
 
               <TableBody>
-                {group.rows.map((r) => (
-                  <TableRow key={r.id} className="hover:bg-muted/30">
-                    <TableCell className="font-semibold text-foreground">
-                      {r.roundNo ?? "-"}
-                    </TableCell>
-                    <TableCell className="font-semibold text-foreground">
-                      {r.matchNo ?? "-"}
-                    </TableCell>
+                {group.rows.map((r) => {
+                  // Phase-specific row colors
+                  const getRowColorClass = (phase: string) => {
+                    switch (phase) {
+                      case "Knockouts":
+                        return "bg-purple-500/20 hover:bg-purple-500/30";
+                      case "Semi-Finals":
+                        return "bg-orange-500/25 hover:bg-orange-500/35";
+                      case "Grand Final":
+                        return "bg-yellow-500/25 hover:bg-yellow-500/35";
+                      default:
+                        return "bg-teal-500/15 hover:bg-teal-500/25"; // League Phase
+                    }
+                  };
 
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-foreground">{r.teamA}</span>
-                        <span className="text-muted-foreground">{r.teamB}</span>
-                      </div>
-                    </TableCell>
+                  // Phase-specific badge colors
+                  const getPhaseBadgeClass = (phase: string) => {
+                    switch (phase) {
+                      case "Knockouts":
+                        return "bg-purple-600 text-white border-purple-500";
+                      case "Semi-Finals":
+                        return "bg-orange-500 text-white border-orange-400";
+                      case "Grand Final":
+                        return "bg-yellow-500 text-black border-yellow-400";
+                      default:
+                        return "bg-teal-600 text-white border-teal-500"; // League Phase
+                    }
+                  };
 
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-foreground">{r.teamAScore || "-"}</span>
-                        <span className="text-muted-foreground">{r.teamBScore || "-"}</span>
-                      </div>
-                    </TableCell>
+                  return (
+                    <TableRow key={r.id} className={getRowColorClass(r.phase)}>
+                      <TableCell className="font-semibold text-foreground">
+                        {r.roundNo ?? "-"}
+                      </TableCell>
+                      <TableCell className="font-semibold text-foreground">
+                        {r.matchNo ?? "-"}
+                      </TableCell>
 
-                    <TableCell>
-                      {r.winner ? (
-                        <Badge variant="secondary" className="gap-1">
-                          <Trophy size={14} />
-                          <span>{r.winner}</span>
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-foreground">{r.teamA}</span>
+                          <span className="text-muted-foreground">{r.teamB}</span>
+                        </div>
+                      </TableCell>
 
-                    <TableCell>
-                      {r.playerOfMatch ? (
-                        <Badge variant="outline" className="gap-1">
-                          <Star size={14} />
-                          <span>{r.playerOfMatch}</span>
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-foreground">{r.teamAScore || "-"}</span>
+                          <span className="text-muted-foreground">{r.teamBScore || "-"}</span>
+                        </div>
+                      </TableCell>
 
-                    <TableCell>
-                      {r.phase ? (
-                        <Badge className="whitespace-nowrap">{r.phase}</Badge>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      <TableCell>
+                        {r.winner ? (
+                          <Badge variant="secondary" className="gap-1">
+                            <Trophy size={14} />
+                            <span>{r.winner}</span>
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+
+                      <TableCell>
+                        {r.playerOfMatch ? (
+                          <Badge variant="outline" className="gap-1">
+                            <Star size={14} />
+                            <span>{r.playerOfMatch}</span>
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+
+                      <TableCell>
+                        {r.phase ? (
+                          <Badge className={cn("whitespace-nowrap", getPhaseBadgeClass(r.phase))}>{r.phase}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>
