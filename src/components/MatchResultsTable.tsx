@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Star } from "lucide-react";
-import { getMatchPhase } from "@/lib/matchUtils";
+
 import { cn } from "@/lib/utils";
 
 type ResultRow = {
@@ -34,17 +34,11 @@ type Props = {
 
 const toDisplayPhase = (matchNo: number | null): string => {
   if (!matchNo) return "";
-  const base = getMatchPhase(matchNo);
-  switch (base) {
-    case "League Stage":
-      return "League Phase";
-    case "Round 2":
-      return "Knockouts";
-    case "Semi Final":
-      return "Semi-Finals";
-    default:
-      return base;
-  }
+  if (matchNo >= 1 && matchNo <= 18) return "League Phase";
+  if (matchNo >= 19 && matchNo <= 30) return "Knockouts";
+  if (matchNo >= 31 && matchNo <= 32) return "Semi-Finals";
+  if (matchNo === 33) return "Grand Final";
+  return "";
 };
 
 export function MatchResultsTable({ limit, grouped = false, className }: Props) {
