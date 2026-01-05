@@ -12,7 +12,7 @@ import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trophy, Users, Calendar, Crown } from "lucide-react";
+import { Trophy, Users, Calendar, Crown, Sparkles, Star } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 import { TeamDetailDialog } from "@/components/TeamDetailDialog";
 import { Link } from "react-router-dom";
@@ -154,6 +154,29 @@ const Index = () => {
       {/* Navigation */}
       <Navigation />
       
+      {/* Champion Celebration Banner */}
+      <div className="relative z-20 bg-gradient-to-r from-[#F9C846] via-[#FFD700] to-[#F9C846] py-4 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMiIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjMpIi8+PC9zdmc+')] opacity-50" />
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            <Sparkles className="text-[#0A1325] animate-pulse" size={24} />
+            <Trophy className="text-[#0A1325]" size={28} />
+            <div className="text-center">
+              <p className="text-[#0A1325] font-bold text-lg md:text-xl">
+                🏆 LBPL SEASON 3 CHAMPIONS 🏆
+              </p>
+              <p className="text-[#0A1325] font-extrabold text-xl md:text-2xl flex items-center justify-center gap-2">
+                <Star className="text-[#0A1325] fill-[#0A1325]" size={20} />
+                MALKAPUR RISERS
+                <Star className="text-[#0A1325] fill-[#0A1325]" size={20} />
+              </p>
+            </div>
+            <Trophy className="text-[#0A1325]" size={28} />
+            <Sparkles className="text-[#0A1325] animate-pulse" size={24} />
+          </div>
+        </div>
+      </div>
+
       {/* Live Ticker Banner */}
       <LiveTicker />
 
