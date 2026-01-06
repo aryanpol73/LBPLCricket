@@ -7,6 +7,7 @@ import { CommunitySection } from "@/components/CommunitySection";
 import { MatchTimeline } from "@/components/MatchTimeline";
 import { MatchesSection } from "@/components/MatchesSection";
 import { MatchResultsTable } from "@/components/MatchResultsTable";
+import { StatsPreview } from "@/components/StatsPreview";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -339,28 +340,7 @@ const Index = () => {
           <h2 className="text-4xl font-bold text-white">Player Statistics</h2>
         </div>
 
-        {cricherosStatsUrl ? (
-          <div className="w-full h-[50vh] rounded-lg overflow-hidden border border-[#F9C846]/30 mb-8">
-            <iframe
-              src={cricherosStatsUrl}
-              className="w-full h-full border-0"
-              title="Tournament Stats"
-              allow="fullscreen"
-            />
-          </div>
-        ) : (
-          <Card className="p-8 bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-[#F9C846]/30 text-center">
-            <Trophy className="mx-auto mb-4 text-[#F9C846]" size={48} />
-            <p className="text-muted-foreground text-lg">Statistics will be available once the tournament starts</p>
-          </Card>
-        )}
-        
-        {/* View More Button for Stats - Always visible */}
-        <div className="text-center mt-8">
-          <Button asChild size="lg" className="font-semibold">
-            <Link to="/stats">View Full Statistics</Link>
-          </Button>
-        </div>
+        <StatsPreview />
       </section>
 
       {/* Matches Section */}
