@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Trophy, Target, Shield, Star, TrendingUp, Award, User } from "lucide-react";
+import { Trophy, Target, Shield, Star, TrendingUp, Award, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { PlayerProfileDialog } from "@/components/PlayerProfileDialog";
 
 interface Player {
   id: string;
@@ -33,14 +35,16 @@ interface StatCardProps {
   rank: number;
   player: Player;
   statType: 'batting' | 'bowling' | 'mvp';
+  onPlayerClick: (player: Player) => void;
 }
 
 interface FieldingCardProps {
   rank: number;
   stats: FieldingStats;
+  onPlayerClick: (name: string) => void;
 }
 
-const StatCard = ({ rank, player, statType }: StatCardProps) => {
+const StatCard = ({ rank, player, statType, onPlayerClick }: StatCardProps) => {
   const getRankBadge = () => {
     if (rank === 1) return "bg-gradient-to-br from-yellow-400 to-amber-600 text-black";
     if (rank === 2) return "bg-gradient-to-br from-gray-300 to-gray-500 text-black";
@@ -141,10 +145,13 @@ const StatCard = ({ rank, player, statType }: StatCardProps) => {
   };
 
   return (
-    <Card className={cn(
-      "p-4 bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-[#F9C846]/20 hover:border-[#F9C846]/50 transition-all duration-300",
-      rank <= 3 && "ring-1 ring-[#F9C846]/30"
-    )}>
+    <Card 
+      className={cn(
+        "p-4 bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-[#F9C846]/20 hover:border-[#F9C846]/50 transition-all duration-300 cursor-pointer",
+        rank <= 3 && "ring-1 ring-[#F9C846]/30"
+      )}
+      onClick={() => onPlayerClick(player)}
+    >
       <div className="flex items-start gap-3">
         {/* Rank Badge */}
         <div className={cn(
@@ -160,7 +167,7 @@ const StatCard = ({ rank, player, statType }: StatCardProps) => {
 
         {/* Player Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-white truncate">{player.name}</h3>
+          <h3 className="font-semibold text-white truncate hover:text-[#F9C846] transition-colors">{player.name}</h3>
           <p className="text-xs text-muted-foreground truncate">{player.team_name ?? 'Unknown Team'}</p>
         </div>
 
@@ -175,7 +182,7 @@ const StatCard = ({ rank, player, statType }: StatCardProps) => {
   );
 };
 
-const FieldingCard = ({ rank, stats }: FieldingCardProps) => {
+const FieldingCard = ({ rank, stats, onPlayerClick }: FieldingCardProps) => {
   const getRankBadge = () => {
     if (rank === 1) return "bg-gradient-to-br from-yellow-400 to-amber-600 text-black";
     if (rank === 2) return "bg-gradient-to-br from-gray-300 to-gray-500 text-black";
@@ -184,10 +191,13 @@ const FieldingCard = ({ rank, stats }: FieldingCardProps) => {
   };
 
   return (
-    <Card className={cn(
-      "p-4 bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-[#F9C846]/20 hover:border-[#F9C846]/50 transition-all duration-300",
-      rank <= 3 && "ring-1 ring-[#F9C846]/30"
-    )}>
+    <Card 
+      className={cn(
+        "p-4 bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-[#F9C846]/20 hover:border-[#F9C846]/50 transition-all duration-300 cursor-pointer",
+        rank <= 3 && "ring-1 ring-[#F9C846]/30"
+      )}
+      onClick={() => onPlayerClick(stats.name)}
+    >
       <div className="flex items-start gap-3">
         {/* Rank Badge */}
         <div className={cn(
@@ -203,7 +213,7 @@ const FieldingCard = ({ rank, stats }: FieldingCardProps) => {
 
         {/* Player Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-white truncate">{stats.name}</h3>
+          <h3 className="font-semibold text-white truncate hover:text-[#F9C846] transition-colors">{stats.name}</h3>
           <p className="text-xs text-muted-foreground">Fielder</p>
         </div>
 
@@ -399,6 +409,9 @@ const Stats = () => {
   const [mvpLeaders, setMvpLeaders] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("batting");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedPlayer, setSelectedPlayer] = useState<any | null>(null);
+  const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
 
   useEffect(() => {
     loadStats();
@@ -529,7 +542,14 @@ const Stats = () => {
       };
 
       const batting = mapPlayerData(battingData || []);
-      const bowling = mapPlayerData(bowlingData || []);
+      // Sort bowling: primary by wickets DESC, secondary by bowling_average ASC (lower is better)
+      const bowling = mapPlayerData(bowlingData || []).sort((a, b) => {
+        if ((b.wickets_taken ?? 0) !== (a.wickets_taken ?? 0)) {
+          return (b.wickets_taken ?? 0) - (a.wickets_taken ?? 0);
+        }
+        // For same wickets, lower bowling average is better
+        return (a.bowling_average ?? 999) - (b.bowling_average ?? 999);
+      });
       
       // Parse fielding from scorecards
       const fielding = parseFieldingFromScorecards(scorecards || []);
@@ -572,6 +592,57 @@ const Stats = () => {
 
   const hasData = battingLeaders.length > 0 || bowlingLeaders.length > 0;
 
+  const handlePlayerClick = async (player: Player) => {
+    const { data } = await supabase
+      .from('players')
+      .select(`*, teams(name, logo_url)`)
+      .eq('id', player.id)
+      .maybeSingle();
+    
+    if (data) {
+      setSelectedPlayer(data);
+      setPlayerDialogOpen(true);
+    }
+  };
+
+  const handleFieldingPlayerClick = async (playerName: string) => {
+    const { data } = await supabase
+      .from('players')
+      .select(`*, teams(name, logo_url)`)
+      .ilike('name', `%${playerName}%`)
+      .maybeSingle();
+    
+    if (data) {
+      setSelectedPlayer(data);
+      setPlayerDialogOpen(true);
+    }
+  };
+
+  // Filter functions for search
+  const filterPlayers = (players: Player[]) => {
+    if (!searchQuery.trim()) return players;
+    return players.filter(p => 
+      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.team_name?.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  };
+
+  const filterFielding = (stats: FieldingStats[]) => {
+    if (!searchQuery.trim()) return stats;
+    return stats.filter(s => 
+      s.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
+
+  // Get original rank for a player even after filtering
+  const getOriginalRank = (player: Player, allPlayers: Player[]) => {
+    return allPlayers.findIndex(p => p.id === player.id) + 1;
+  };
+
+  const getOriginalFieldingRank = (name: string, allStats: FieldingStats[]) => {
+    return allStats.findIndex(s => s.name === name) + 1;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A1325] via-[#0F1B35] to-[#0A1325]">
       <div className="container mx-auto px-4 py-6 md:py-8">
@@ -584,6 +655,17 @@ const Stats = () => {
             <h1 className="text-2xl md:text-4xl font-bold text-white">Player Statistics</h1>
             <p className="text-sm text-muted-foreground">LBPL Season 3 Leaderboard</p>
           </div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
+          <Input
+            placeholder="Search players..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 bg-[#0F1B35] border-[#F9C846]/20 text-white placeholder:text-muted-foreground focus:border-[#F9C846]/50"
+          />
         </div>
 
         {!hasData ? (
@@ -630,18 +712,24 @@ const Stats = () => {
 
             {/* Batting Tab */}
             <TabsContent value="batting" className="mt-0">
-              <TopThreeSection players={battingLeaders} statType="batting" />
+              {!searchQuery && <TopThreeSection players={battingLeaders} statType="batting" />}
               <div className="space-y-3">
-                {battingLeaders.slice(3).map((player, index) => (
+                {(searchQuery ? filterPlayers(battingLeaders) : battingLeaders.slice(3)).map((player) => (
                   <StatCard 
                     key={player.id} 
-                    rank={index + 4} 
+                    rank={getOriginalRank(player, battingLeaders)} 
                     player={player} 
-                    statType="batting" 
+                    statType="batting"
+                    onPlayerClick={handlePlayerClick}
                   />
                 ))}
               </div>
-              {battingLeaders.length === 0 && (
+              {filterPlayers(battingLeaders).length === 0 && searchQuery && (
+                <Card className="p-6 bg-[#0F1B35] border-[#F9C846]/20 text-center">
+                  <p className="text-muted-foreground">No players found matching "{searchQuery}"</p>
+                </Card>
+              )}
+              {battingLeaders.length === 0 && !searchQuery && (
                 <Card className="p-6 bg-[#0F1B35] border-[#F9C846]/20 text-center">
                   <p className="text-muted-foreground">No batting stats available yet</p>
                 </Card>
@@ -650,18 +738,24 @@ const Stats = () => {
 
             {/* Bowling Tab */}
             <TabsContent value="bowling" className="mt-0">
-              <TopThreeSection players={bowlingLeaders} statType="bowling" />
+              {!searchQuery && <TopThreeSection players={bowlingLeaders} statType="bowling" />}
               <div className="space-y-3">
-                {bowlingLeaders.slice(3).map((player, index) => (
+                {(searchQuery ? filterPlayers(bowlingLeaders) : bowlingLeaders.slice(3)).map((player) => (
                   <StatCard 
                     key={player.id} 
-                    rank={index + 4} 
+                    rank={getOriginalRank(player, bowlingLeaders)} 
                     player={player} 
-                    statType="bowling" 
+                    statType="bowling"
+                    onPlayerClick={handlePlayerClick}
                   />
                 ))}
               </div>
-              {bowlingLeaders.length === 0 && (
+              {filterPlayers(bowlingLeaders).length === 0 && searchQuery && (
+                <Card className="p-6 bg-[#0F1B35] border-[#F9C846]/20 text-center">
+                  <p className="text-muted-foreground">No players found matching "{searchQuery}"</p>
+                </Card>
+              )}
+              {bowlingLeaders.length === 0 && !searchQuery && (
                 <Card className="p-6 bg-[#0F1B35] border-[#F9C846]/20 text-center">
                   <p className="text-muted-foreground">No bowling stats available yet</p>
                 </Card>
@@ -670,17 +764,23 @@ const Stats = () => {
 
             {/* Fielding Tab */}
             <TabsContent value="fielding" className="mt-0">
-              <FieldingTopThree stats={fieldingStats} />
+              {!searchQuery && <FieldingTopThree stats={fieldingStats} />}
               <div className="space-y-3">
-                {fieldingStats.slice(3).map((stats, index) => (
+                {(searchQuery ? filterFielding(fieldingStats) : fieldingStats.slice(3)).map((stats) => (
                   <FieldingCard 
                     key={stats.name} 
-                    rank={index + 4} 
-                    stats={stats} 
+                    rank={getOriginalFieldingRank(stats.name, fieldingStats)} 
+                    stats={stats}
+                    onPlayerClick={handleFieldingPlayerClick}
                   />
                 ))}
               </div>
-              {fieldingStats.length === 0 && (
+              {filterFielding(fieldingStats).length === 0 && searchQuery && (
+                <Card className="p-6 bg-[#0F1B35] border-[#F9C846]/20 text-center">
+                  <p className="text-muted-foreground">No players found matching "{searchQuery}"</p>
+                </Card>
+              )}
+              {fieldingStats.length === 0 && !searchQuery && (
                 <Card className="p-6 bg-[#0F1B35] border-[#F9C846]/20 text-center">
                   <p className="text-muted-foreground">No fielding stats available yet</p>
                 </Card>
@@ -698,18 +798,24 @@ const Stats = () => {
                   1 point per run + 25 points per wicket + 10 points per catch/stumping
                 </p>
               </div>
-              <TopThreeSection players={mvpLeaders} statType="mvp" />
+              {!searchQuery && <TopThreeSection players={mvpLeaders} statType="mvp" />}
               <div className="space-y-3">
-                {mvpLeaders.slice(3).map((player, index) => (
+                {(searchQuery ? filterPlayers(mvpLeaders) : mvpLeaders.slice(3)).map((player) => (
                   <StatCard 
                     key={player.id} 
-                    rank={index + 4} 
+                    rank={getOriginalRank(player, mvpLeaders)} 
                     player={player} 
-                    statType="mvp" 
+                    statType="mvp"
+                    onPlayerClick={handlePlayerClick}
                   />
                 ))}
               </div>
-              {mvpLeaders.length === 0 && (
+              {filterPlayers(mvpLeaders).length === 0 && searchQuery && (
+                <Card className="p-6 bg-[#0F1B35] border-[#F9C846]/20 text-center">
+                  <p className="text-muted-foreground">No players found matching "{searchQuery}"</p>
+                </Card>
+              )}
+              {mvpLeaders.length === 0 && !searchQuery && (
                 <Card className="p-6 bg-[#0F1B35] border-[#F9C846]/20 text-center">
                   <p className="text-muted-foreground">No MVP stats available yet</p>
                 </Card>
@@ -718,6 +824,12 @@ const Stats = () => {
           </Tabs>
         )}
       </div>
+
+      <PlayerProfileDialog
+        player={selectedPlayer}
+        open={playerDialogOpen}
+        onOpenChange={setPlayerDialogOpen}
+      />
     </div>
   );
 };
