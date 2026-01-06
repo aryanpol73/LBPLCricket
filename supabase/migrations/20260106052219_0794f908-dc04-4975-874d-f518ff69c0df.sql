@@ -1,0 +1,77 @@
+-- Insert Match 1 scorecard data (without foreign key constraint on match_id)
+INSERT INTO public.match_scorecards (
+  match_id,
+  match_no,
+  team_a_id,
+  team_a_name,
+  team_a_runs,
+  team_a_wickets,
+  team_a_overs,
+  team_a_extras,
+  team_b_id,
+  team_b_name,
+  team_b_runs,
+  team_b_wickets,
+  team_b_overs,
+  team_b_extras,
+  winner_name,
+  result_text,
+  toss_text,
+  team_a_batting,
+  team_a_bowling,
+  team_b_batting,
+  team_b_bowling
+) VALUES (
+  '7876bb29-a8a0-4dd4-904d-dbdc023f460a',
+  1,
+  '8cdea9ab-bd5b-4c99-a4d3-77d0f04b78b6',
+  'Dhamakedar Mumbai',
+  90,
+  10,
+  '12.4',
+  'Extras: 8 (WD: 6, NB: 2)',
+  'eadb9f08-3611-4571-beca-0d8551d1cadc',
+  'Akot Avengers',
+  92,
+  5,
+  '10.1',
+  'Extras: 7 (WD: 5, NB: 2)',
+  'Akot Avengers',
+  'Akot Avengers won by 5 wickets',
+  'Akot Avengers won the toss and elected to bowl first',
+  '[
+    {"player_name": "Siddharth Patil", "runs": 12, "balls": 14, "fours": 2, "sixes": 0, "strike_rate": 85.71, "dismissal": "c Bhavesh Gudewar b Ravindra Tapade"},
+    {"player_name": "Akshay Khonde", "runs": 2, "balls": 8, "fours": 0, "sixes": 0, "strike_rate": 25.00, "dismissal": "c Rusabh Rathi b Ravindra Tapade"},
+    {"player_name": "Gaurav Khonde", "runs": 18, "balls": 16, "fours": 2, "sixes": 1, "strike_rate": 112.50, "dismissal": "c Atish Rathi b Aayush Karale"},
+    {"player_name": "Swarup Sanap", "runs": 1, "balls": 2, "fours": 0, "sixes": 0, "strike_rate": 50.00, "dismissal": "b Aayush Karale"},
+    {"player_name": "Sagar Bobde", "runs": 16, "balls": 11, "fours": 2, "sixes": 1, "strike_rate": 145.45, "dismissal": "c Bhavesh Gudewar b Atish Rathi"},
+    {"player_name": "Rahul Yadav", "runs": 9, "balls": 5, "fours": 0, "sixes": 1, "strike_rate": 180.00, "dismissal": "c Rusabh Rathi b Vaibhav Rathi"},
+    {"player_name": "Prathamesh Sangole", "runs": 1, "balls": 5, "fours": 0, "sixes": 0, "strike_rate": 20.00, "dismissal": "c Rusabh Rathi b Aayush Karale"},
+    {"player_name": "Vikas Narole", "runs": 8, "balls": 8, "fours": 0, "sixes": 1, "strike_rate": 100.00, "dismissal": "c Atish Rathi b Ravindra Tapade"},
+    {"player_name": "Bhavesh Jaiswal", "runs": 5, "balls": 3, "fours": 1, "sixes": 0, "strike_rate": 166.67, "dismissal": "b Mayur Uke"},
+    {"player_name": "Jayesh Yenorkar", "runs": 3, "balls": 4, "fours": 0, "sixes": 0, "strike_rate": 75.00, "dismissal": "not out"},
+    {"player_name": "Rohit Murchude", "runs": 0, "balls": 0, "fours": 0, "sixes": 0, "strike_rate": 0.00, "dismissal": "b Mayur Uke"}
+  ]'::jsonb,
+  '[
+    {"player_name": "Ravindra Tapade", "overs": "3.0", "maidens": 0, "runs": 26, "wickets": 3, "economy": 8.67},
+    {"player_name": "Aayush Karale", "overs": "3.0", "maidens": 0, "runs": 18, "wickets": 3, "economy": 6.00},
+    {"player_name": "Atish Rathi", "overs": "2.0", "maidens": 0, "runs": 16, "wickets": 1, "economy": 8.00},
+    {"player_name": "Vaibhav Rathi", "overs": "2.0", "maidens": 0, "runs": 12, "wickets": 1, "economy": 6.00},
+    {"player_name": "Mayur Uke", "overs": "2.4", "maidens": 0, "runs": 10, "wickets": 2, "economy": 3.75}
+  ]'::jsonb,
+  '[
+    {"player_name": "Rusabh Rathi", "runs": 25, "balls": 20, "fours": 3, "sixes": 1, "strike_rate": 125.00, "dismissal": "c Gaurav Khonde b Siddharth Patil"},
+    {"player_name": "Ritesh Bhoyar", "runs": 4, "balls": 7, "fours": 0, "sixes": 0, "strike_rate": 57.14, "dismissal": "c Sagar Bobde b Jayesh Yenorkar"},
+    {"player_name": "Bhavesh Gudewar", "runs": 30, "balls": 18, "fours": 3, "sixes": 2, "strike_rate": 166.67, "dismissal": "c Swarup Sanap b Prathamesh Sangole"},
+    {"player_name": "Atish Rathi", "runs": 12, "balls": 8, "fours": 2, "sixes": 0, "strike_rate": 150.00, "dismissal": "b Jayesh Yenorkar"},
+    {"player_name": "Vaibhav Rathi", "runs": 8, "balls": 5, "fours": 1, "sixes": 0, "strike_rate": 160.00, "dismissal": "c Siddharth Patil b Prathamesh Sangole"},
+    {"player_name": "Aayush Karale", "runs": 8, "balls": 3, "fours": 1, "sixes": 0, "strike_rate": 266.67, "dismissal": "not out"}
+  ]'::jsonb,
+  '[
+    {"player_name": "Siddharth Patil", "overs": "2.0", "maidens": 0, "runs": 18, "wickets": 1, "economy": 9.00},
+    {"player_name": "Jayesh Yenorkar", "overs": "2.0", "maidens": 0, "runs": 15, "wickets": 2, "economy": 7.50},
+    {"player_name": "Prathamesh Sangole", "overs": "2.1", "maidens": 0, "runs": 22, "wickets": 2, "economy": 10.15},
+    {"player_name": "Vikas Narole", "overs": "2.0", "maidens": 0, "runs": 18, "wickets": 0, "economy": 9.00},
+    {"player_name": "Rohit Murchude", "overs": "2.0", "maidens": 0, "runs": 12, "wickets": 0, "economy": 6.00}
+  ]'::jsonb
+);

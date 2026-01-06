@@ -5,27 +5,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 interface BattingEntry {
-  name: string;
+  player_name: string;
   player_id?: string;
   runs: number;
   balls: number;
   fours: number;
   sixes: number;
-  strikeRate: number;
+  strike_rate: number;
   dismissal: string;
 }
 
 interface BowlingEntry {
-  name: string;
+  player_name: string;
   player_id?: string;
   overs: string;
   maidens: number;
   runs: number;
   wickets: number;
   economy: number;
-  dots?: number;
-  wides?: number;
-  noBalls?: number;
 }
 
 interface ScorecardData {
@@ -152,10 +149,10 @@ export const ScorecardView = ({ scorecard }: ScorecardViewProps) => {
               <tr key={idx} className="border-b border-border/20 hover:bg-[#1a2744]/50">
                 <td className="py-2 px-2">
                   <button
-                    onClick={() => handlePlayerClick(batter.name, batter.player_id)}
+                    onClick={() => handlePlayerClick(batter.player_name, batter.player_id)}
                     className="text-left hover:text-[#F9C846] transition-colors"
                   >
-                    <span className="font-medium text-white">{batter.name}</span>
+                    <span className="font-medium text-white">{batter.player_name}</span>
                     <p className="text-xs text-muted-foreground truncate max-w-[180px]">
                       {batter.dismissal}
                     </p>
@@ -165,7 +162,7 @@ export const ScorecardView = ({ scorecard }: ScorecardViewProps) => {
                 <td className="text-center py-2 px-1 text-muted-foreground">{batter.balls}</td>
                 <td className="text-center py-2 px-1 text-muted-foreground">{batter.fours}</td>
                 <td className="text-center py-2 px-1 text-muted-foreground">{batter.sixes}</td>
-                <td className="text-center py-2 px-1 text-muted-foreground">{batter.strikeRate.toFixed(2)}</td>
+                <td className="text-center py-2 px-1 text-muted-foreground">{batter.strike_rate.toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
@@ -199,10 +196,10 @@ export const ScorecardView = ({ scorecard }: ScorecardViewProps) => {
               <tr key={idx} className="border-b border-border/20 hover:bg-[#1a2744]/50">
                 <td className="py-2 px-2">
                   <button
-                    onClick={() => handlePlayerClick(bowler.name, bowler.player_id)}
+                    onClick={() => handlePlayerClick(bowler.player_name, bowler.player_id)}
                     className="text-left font-medium text-white hover:text-[#2E73FF] transition-colors"
                   >
-                    {bowler.name}
+                    {bowler.player_name}
                   </button>
                 </td>
                 <td className="text-center py-2 px-1 text-muted-foreground">{bowler.overs}</td>
