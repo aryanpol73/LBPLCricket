@@ -4,10 +4,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { User, Trophy, Target, Activity } from "lucide-react";
-import { useEffect, useState } from "react";
+import { User, Trophy, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface PlayerProfile {
@@ -116,24 +114,10 @@ export const PlayerProfileDialog = ({ player, open, onOpenChange }: PlayerProfil
               <Target className="text-secondary w-5 h-5" />
               <h3 className="text-lg font-bold text-foreground">Bowling Stats</h3>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               <StatItem label="Wickets" value={player.wickets_taken || 0} />
               <StatItem label="Average" value={player.bowling_average?.toFixed(2) || '0.00'} />
               <StatItem label="Economy" value={player.economy_rate?.toFixed(2) || '0.00'} />
-              <StatItem label="Overs" value={player.matches_played ? (player.matches_played * 4).toFixed(0) : 0} />
-            </div>
-          </div>
-
-          {/* Fielding Stats */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Activity className="text-secondary w-5 h-5" />
-              <h3 className="text-lg font-bold text-foreground">Fielding Stats</h3>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <StatItem label="Catches" value={player.catches || 0} />
-              <StatItem label="Stumpings" value={player.stumpings || 0} />
-              <StatItem label="Total" value={(player.catches || 0) + (player.stumpings || 0)} />
             </div>
           </div>
         </div>
