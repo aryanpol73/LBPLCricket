@@ -259,6 +259,106 @@ export type Database = {
           },
         ]
       }
+      match_scorecards: {
+        Row: {
+          created_at: string | null
+          id: string
+          match_id: string | null
+          match_no: number
+          result_text: string
+          team_a_batting: Json
+          team_a_bowling: Json
+          team_a_extras: string | null
+          team_a_id: string | null
+          team_a_name: string
+          team_a_overs: string
+          team_a_runs: number
+          team_a_wickets: number
+          team_b_batting: Json
+          team_b_bowling: Json
+          team_b_extras: string | null
+          team_b_id: string | null
+          team_b_name: string
+          team_b_overs: string
+          team_b_runs: number
+          team_b_wickets: number
+          toss_text: string | null
+          winner_name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          match_id?: string | null
+          match_no: number
+          result_text: string
+          team_a_batting?: Json
+          team_a_bowling?: Json
+          team_a_extras?: string | null
+          team_a_id?: string | null
+          team_a_name: string
+          team_a_overs: string
+          team_a_runs: number
+          team_a_wickets: number
+          team_b_batting?: Json
+          team_b_bowling?: Json
+          team_b_extras?: string | null
+          team_b_id?: string | null
+          team_b_name: string
+          team_b_overs: string
+          team_b_runs: number
+          team_b_wickets: number
+          toss_text?: string | null
+          winner_name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          match_id?: string | null
+          match_no?: number
+          result_text?: string
+          team_a_batting?: Json
+          team_a_bowling?: Json
+          team_a_extras?: string | null
+          team_a_id?: string | null
+          team_a_name?: string
+          team_a_overs?: string
+          team_a_runs?: number
+          team_a_wickets?: number
+          team_b_batting?: Json
+          team_b_bowling?: Json
+          team_b_extras?: string | null
+          team_b_id?: string | null
+          team_b_name?: string
+          team_b_overs?: string
+          team_b_runs?: number
+          team_b_wickets?: number
+          toss_text?: string | null
+          winner_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_scorecards_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_scorecards_team_a_id_fkey"
+            columns: ["team_a_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_scorecards_team_b_id_fkey"
+            columns: ["team_b_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           created_at: string | null
