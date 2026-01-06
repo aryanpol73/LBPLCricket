@@ -246,7 +246,7 @@ export const ScorecardView = ({ scorecard }: ScorecardViewProps) => {
         {expandedTeam === 'a' && (
           <div className="bg-[#0F1B35]/80 border border-t-0 border-border/30 rounded-b-lg p-4 -mt-1">
             <BattingTable batting={scorecard.team_a_batting} extras={scorecard.team_a_extras} />
-            <BowlingTable bowling={scorecard.team_b_bowling} />
+            <BowlingTable bowling={scorecard.team_a_bowling} />
           </div>
         )}
       </div>
@@ -265,7 +265,7 @@ export const ScorecardView = ({ scorecard }: ScorecardViewProps) => {
         {expandedTeam === 'b' && (
           <div className="bg-[#0F1B35]/80 border border-t-0 border-border/30 rounded-b-lg p-4 -mt-1">
             <BattingTable batting={scorecard.team_b_batting} extras={scorecard.team_b_extras} />
-            <BowlingTable bowling={scorecard.team_a_bowling} />
+            <BowlingTable bowling={scorecard.team_b_bowling} />
           </div>
         )}
       </div>
