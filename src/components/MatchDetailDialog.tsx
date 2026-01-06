@@ -7,6 +7,7 @@ import { getMatchTime } from "@/lib/matchUtils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Save, ExternalLink } from "lucide-react";
+import { ScorecardView } from "./ScorecardView";
 
 interface Player {
   id: string;
@@ -39,7 +40,7 @@ export const MatchDetailDialog = ({
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [matchId, setMatchId] = useState<string | null>(null);
-  
+  const [scorecardData, setScorecardData] = useState<any | null>(null);
   useEffect(() => {
     if (open && matchNo) {
       loadMatchData();
@@ -74,6 +75,19 @@ export const MatchDetailDialog = ({
   const [cricHeroesMatchId, setCricHeroesMatchId] = useState<string | null>(null);
 
   const loadMatchData = async () => {
+    // First check for scorecard data
+    const { data: scorecardResult } = await supabase
+      .from('match_scorecards')
+      .select('*')
+      .eq('match_no', matchNo)
+      .maybeSingle();
+    
+    if (scorecardResult) {
+      setScorecardData(scorecardResult);
+    } else {
+      setScorecardData(null);
+    }
+
     const { data } = await supabase
       .from('matches')
       .select('id, scorer_link, cricheroes_match_id')
@@ -234,7 +248,7 @@ export const MatchDetailDialog = ({
 
           {/* Score Tab Content */}
           <TabsContent value="score" className="mt-6 space-y-4">
-            {isAdmin && (
+            {isAdmin && !scorecardData && (
               <div className="flex gap-2">
                 <Input
                   placeholder="Paste CricHeroes match URL here..."
@@ -253,7 +267,9 @@ export const MatchDetailDialog = ({
               </div>
             )}
             
-            {savedScorerLink ? (
+            {scorecardData ? (
+              <ScorecardView scorecard={scorecardData} />
+            ) : savedScorerLink ? (
               <div className="space-y-4">
                 <div className="w-full h-[60vh] rounded-lg overflow-hidden border border-[#F9C846]/30">
                   <iframe

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { PlayerProfileDialog } from "./PlayerProfileDialog";
+import { ScorecardView } from "./ScorecardView";
 import { toast } from "sonner";
 import { Save, ExternalLink } from "lucide-react";
 
@@ -66,6 +67,7 @@ export const MatchDetailsDialog = ({
   const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [scorecardData, setScorecardData] = useState<any | null>(null);
 
   const handlePlayerClick = async (playerId: string) => {
     const { data } = await supabase
@@ -87,8 +89,23 @@ export const MatchDetailsDialog = ({
     if (match && open) {
       loadSquads(match.team_a?.id, match.team_b?.id);
       loadScorerLink(match.id);
+      loadScorecardData(match.match_no);
     }
   }, [match, open]);
+
+  const loadScorecardData = async (matchNo?: number) => {
+    if (!matchNo) {
+      setScorecardData(null);
+      return;
+    }
+    const { data } = await supabase
+      .from('match_scorecards')
+      .select('*')
+      .eq('match_no', matchNo)
+      .maybeSingle();
+    
+    setScorecardData(data);
+  };
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -273,7 +290,7 @@ export const MatchDetailsDialog = ({
                 <CardTitle>Match Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {isAdmin && (
+                {isAdmin && !scorecardData && (
                   <div className="flex gap-2">
                     <Input
                       placeholder="Paste CricHeroes match URL here..."
@@ -290,29 +307,33 @@ export const MatchDetailsDialog = ({
                     </Button>
                   </div>
                 )}
-                <div className="space-y-4">
-                  <div className="w-full h-[60vh] rounded-lg overflow-hidden border border-[#F9C846]/30">
-                    <iframe
-                      src={savedScorerLink || CRICHEROES_LIVE_EMBED}
-                      className="w-full h-full border-0"
-                      title="Match Details"
-                      allow="fullscreen"
-                    />
-                  </div>
-                  {cricHeroesMatchId && (
-                    <div className="text-center">
-                      <a 
-                        href={generateMatchScorecardLink(cricHeroesMatchId)} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                        Open Match {match.match_no} Scorecard in Browser
-                      </a>
+                {scorecardData ? (
+                  <ScorecardView scorecard={scorecardData} />
+                ) : (
+                  <div className="space-y-4">
+                    <div className="w-full h-[60vh] rounded-lg overflow-hidden border border-[#F9C846]/30">
+                      <iframe
+                        src={savedScorerLink || CRICHEROES_LIVE_EMBED}
+                        className="w-full h-full border-0"
+                        title="Match Details"
+                        allow="fullscreen"
+                      />
                     </div>
-                  )}
-                </div>
+                    {cricHeroesMatchId && (
+                      <div className="text-center">
+                        <a 
+                          href={generateMatchScorecardLink(cricHeroesMatchId)} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          Open Match {match.match_no} Scorecard in Browser
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
