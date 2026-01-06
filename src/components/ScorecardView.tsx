@@ -11,8 +11,11 @@ interface BattingEntry {
   balls: number;
   fours: number;
   sixes: number;
-  strike_rate: number;
-  dismissal: string;
+  strike_rate?: number | null;
+  /** Legacy key used in earlier scorecards */
+  dismissal?: string | null;
+  /** Current key used in newer scorecards */
+  how_out?: string | null;
 }
 
 interface BowlingEntry {
@@ -145,26 +148,30 @@ export const ScorecardView = ({ scorecard }: ScorecardViewProps) => {
             </tr>
           </thead>
           <tbody>
-            {batting.map((batter, idx) => (
-              <tr key={idx} className="border-b border-border/20 hover:bg-[#1a2744]/50">
-                <td className="py-2 px-2">
-                  <button
-                    onClick={() => handlePlayerClick(batter.player_name, batter.player_id)}
-                    className="text-left hover:text-[#F9C846] transition-colors"
-                  >
-                    <span className="font-medium text-white">{batter.player_name}</span>
-                    <p className="text-xs text-muted-foreground truncate max-w-[180px]">
-                      {batter.dismissal}
-                    </p>
-                  </button>
-                </td>
-                <td className="text-center py-2 px-1 font-semibold text-white">{batter.runs}</td>
-                <td className="text-center py-2 px-1 text-muted-foreground">{batter.balls}</td>
-                <td className="text-center py-2 px-1 text-muted-foreground">{batter.fours}</td>
-                <td className="text-center py-2 px-1 text-muted-foreground">{batter.sixes}</td>
-                <td className="text-center py-2 px-1 text-muted-foreground">{(batter.strike_rate ?? 0).toFixed(2)}</td>
-              </tr>
-            ))}
+            {batting.map((batter, idx) => {
+              const dismissalText = (batter.how_out ?? batter.dismissal ?? "").trim();
+
+              return (
+                <tr key={idx} className="border-b border-border/20 hover:bg-[#1a2744]/50">
+                  <td className="py-2 px-2">
+                    <button
+                      onClick={() => handlePlayerClick(batter.player_name, batter.player_id)}
+                      className="text-left hover:text-[#F9C846] transition-colors"
+                    >
+                      <span className="font-medium text-white">{batter.player_name}</span>
+                      <p className="text-xs text-muted-foreground whitespace-normal break-words max-w-[220px]">
+                        {dismissalText || "—"}
+                      </p>
+                    </button>
+                  </td>
+                  <td className="text-center py-2 px-1 font-semibold text-white">{batter.runs}</td>
+                  <td className="text-center py-2 px-1 text-muted-foreground">{batter.balls}</td>
+                  <td className="text-center py-2 px-1 text-muted-foreground">{batter.fours}</td>
+                  <td className="text-center py-2 px-1 text-muted-foreground">{batter.sixes}</td>
+                  <td className="text-center py-2 px-1 text-muted-foreground">{(batter.strike_rate ?? 0).toFixed(2)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
