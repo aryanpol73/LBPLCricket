@@ -1,73 +1,523 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Trophy } from "lucide-react";
+import { Trophy, Target, Shield, Star, TrendingUp, Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
+
+interface Player {
+  id: string;
+  name: string;
+  role: string | null;
+  runs_scored: number | null;
+  batting_average: number | null;
+  strike_rate: number | null;
+  wickets_taken: number | null;
+  bowling_average: number | null;
+  economy_rate: number | null;
+  catches: number | null;
+  stumpings: number | null;
+  matches_played: number | null;
+  team_name: string | null;
+}
+
+interface StatCardProps {
+  rank: number;
+  player: Player;
+  statType: 'batting' | 'bowling' | 'fielding' | 'mvp';
+}
+
+const StatCard = ({ rank, player, statType }: StatCardProps) => {
+  const getRankBadge = () => {
+    if (rank === 1) return "bg-gradient-to-br from-yellow-400 to-amber-600 text-black";
+    if (rank === 2) return "bg-gradient-to-br from-gray-300 to-gray-500 text-black";
+    if (rank === 3) return "bg-gradient-to-br from-orange-400 to-orange-700 text-white";
+    return "bg-[#1a2744] text-muted-foreground";
+  };
+
+  const getPrimaryValue = () => {
+    switch (statType) {
+      case 'batting':
+        return player.runs_scored ?? 0;
+      case 'bowling':
+        return player.wickets_taken ?? 0;
+      case 'fielding':
+        return (player.catches ?? 0) + (player.stumpings ?? 0);
+      case 'mvp':
+        return calculateMVPScore(player);
+      default:
+        return 0;
+    }
+  };
+
+  const getPrimaryLabel = () => {
+    switch (statType) {
+      case 'batting':
+        return 'Runs';
+      case 'bowling':
+        return 'Wickets';
+      case 'fielding':
+        return 'Dismissals';
+      case 'mvp':
+        return 'MVP Score';
+      default:
+        return '';
+    }
+  };
+
+  const calculateMVPScore = (p: Player) => {
+    const runs = (p.runs_scored ?? 0) * 1;
+    const wickets = (p.wickets_taken ?? 0) * 25;
+    const catches = (p.catches ?? 0) * 10;
+    const stumpings = (p.stumpings ?? 0) * 10;
+    return Math.round(runs + wickets + catches + stumpings);
+  };
+
+  const renderSecondaryStats = () => {
+    switch (statType) {
+      case 'batting':
+        return (
+          <div className="flex flex-wrap gap-2 mt-2">
+            <span className="text-xs px-2 py-0.5 rounded bg-[#F9C846]/10 text-[#F9C846]">
+              Avg: {player.batting_average?.toFixed(1) ?? '0'}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary">
+              SR: {player.strike_rate?.toFixed(1) ?? '0'}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
+              Mat: {player.matches_played ?? 0}
+            </span>
+          </div>
+        );
+      case 'bowling':
+        return (
+          <div className="flex flex-wrap gap-2 mt-2">
+            <span className="text-xs px-2 py-0.5 rounded bg-[#F9C846]/10 text-[#F9C846]">
+              Avg: {player.bowling_average?.toFixed(1) ?? '0'}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary">
+              Econ: {player.economy_rate?.toFixed(2) ?? '0'}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
+              Mat: {player.matches_played ?? 0}
+            </span>
+          </div>
+        );
+      case 'fielding':
+        return (
+          <div className="flex flex-wrap gap-2 mt-2">
+            <span className="text-xs px-2 py-0.5 rounded bg-[#F9C846]/10 text-[#F9C846]">
+              Catches: {player.catches ?? 0}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary">
+              Stumpings: {player.stumpings ?? 0}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
+              Mat: {player.matches_played ?? 0}
+            </span>
+          </div>
+        );
+      case 'mvp':
+        return (
+          <div className="flex flex-wrap gap-2 mt-2">
+            <span className="text-xs px-2 py-0.5 rounded bg-[#F9C846]/10 text-[#F9C846]">
+              Runs: {player.runs_scored ?? 0}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary">
+              Wkts: {player.wickets_taken ?? 0}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
+              Mat: {player.matches_played ?? 0}
+            </span>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Card className={cn(
+      "p-4 bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-[#F9C846]/20 hover:border-[#F9C846]/50 transition-all duration-300",
+      rank <= 3 && "ring-1 ring-[#F9C846]/30"
+    )}>
+      <div className="flex items-start gap-3">
+        {/* Rank Badge */}
+        <div className={cn(
+          "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-lg",
+          getRankBadge()
+        )}>
+          {rank <= 3 ? (
+            <Trophy className="w-5 h-5" />
+          ) : (
+            rank
+          )}
+        </div>
+
+        {/* Player Info */}
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-white truncate">{player.name}</h3>
+          <p className="text-xs text-muted-foreground truncate">{player.team_name ?? 'Unknown Team'}</p>
+          {renderSecondaryStats()}
+        </div>
+
+        {/* Primary Stat */}
+        <div className="flex-shrink-0 text-right">
+          <div className="text-2xl font-bold text-[#F9C846]">{getPrimaryValue()}</div>
+          <div className="text-xs text-muted-foreground">{getPrimaryLabel()}</div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+const TopThreeSection = ({ players, statType }: { players: Player[]; statType: 'batting' | 'bowling' | 'fielding' | 'mvp' }) => {
+  const topThree = players.slice(0, 3);
+  
+  if (topThree.length === 0) return null;
+
+  const getStatValue = (player: Player) => {
+    switch (statType) {
+      case 'batting':
+        return player.runs_scored ?? 0;
+      case 'bowling':
+        return player.wickets_taken ?? 0;
+      case 'fielding':
+        return (player.catches ?? 0) + (player.stumpings ?? 0);
+      case 'mvp':
+        const runs = (player.runs_scored ?? 0) * 1;
+        const wickets = (player.wickets_taken ?? 0) * 25;
+        const catches = (player.catches ?? 0) * 10;
+        const stumpings = (player.stumpings ?? 0) * 10;
+        return Math.round(runs + wickets + catches + stumpings);
+      default:
+        return 0;
+    }
+  };
+
+  const getStatLabel = () => {
+    switch (statType) {
+      case 'batting': return 'Runs';
+      case 'bowling': return 'Wickets';
+      case 'fielding': return 'Dismissals';
+      case 'mvp': return 'MVP Score';
+      default: return '';
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-3 gap-3 mb-6">
+      {/* 2nd Place */}
+      <div className="order-1 md:order-1">
+        {topThree[1] && (
+          <Card className="p-3 bg-gradient-to-br from-[#1a2744] to-[#0F1B35] border-gray-400/30 text-center h-full">
+            <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center">
+              <span className="text-xl font-bold text-black">2</span>
+            </div>
+            <h4 className="font-semibold text-white text-sm truncate">{topThree[1].name}</h4>
+            <p className="text-xs text-muted-foreground truncate mb-1">{topThree[1].team_name}</p>
+            <div className="text-xl font-bold text-gray-300">{getStatValue(topThree[1])}</div>
+            <div className="text-xs text-muted-foreground">{getStatLabel()}</div>
+          </Card>
+        )}
+      </div>
+      
+      {/* 1st Place */}
+      <div className="order-2 md:order-2">
+        {topThree[0] && (
+          <Card className="p-4 bg-gradient-to-br from-[#2a3654] to-[#0F1B35] border-[#F9C846]/50 text-center h-full ring-2 ring-[#F9C846]/30 shadow-lg shadow-[#F9C846]/10">
+            <div className="w-14 h-14 mx-auto mb-2 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 flex items-center justify-center">
+              <Trophy className="w-7 h-7 text-black" />
+            </div>
+            <h4 className="font-bold text-white text-sm truncate">{topThree[0].name}</h4>
+            <p className="text-xs text-muted-foreground truncate mb-1">{topThree[0].team_name}</p>
+            <div className="text-2xl font-bold text-[#F9C846]">{getStatValue(topThree[0])}</div>
+            <div className="text-xs text-[#F9C846]/70">{getStatLabel()}</div>
+          </Card>
+        )}
+      </div>
+      
+      {/* 3rd Place */}
+      <div className="order-3 md:order-3">
+        {topThree[2] && (
+          <Card className="p-3 bg-gradient-to-br from-[#1a2744] to-[#0F1B35] border-orange-500/30 text-center h-full">
+            <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-gradient-to-br from-orange-400 to-orange-700 flex items-center justify-center">
+              <span className="text-xl font-bold text-white">3</span>
+            </div>
+            <h4 className="font-semibold text-white text-sm truncate">{topThree[2].name}</h4>
+            <p className="text-xs text-muted-foreground truncate mb-1">{topThree[2].team_name}</p>
+            <div className="text-xl font-bold text-orange-400">{getStatValue(topThree[2])}</div>
+            <div className="text-xs text-muted-foreground">{getStatLabel()}</div>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const Stats = () => {
-  const [cricherosUrl, setCricherosUrl] = useState<string>('');
+  const [battingLeaders, setBattingLeaders] = useState<Player[]>([]);
+  const [bowlingLeaders, setBowlingLeaders] = useState<Player[]>([]);
+  const [fieldingLeaders, setFieldingLeaders] = useState<Player[]>([]);
+  const [mvpLeaders, setMvpLeaders] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("batting");
 
   useEffect(() => {
-    loadSettings();
+    loadStats();
   }, []);
 
-  const loadSettings = async () => {
-    const { data } = await supabase
-      .from('tournament_settings')
-      .select('setting_value')
-      .eq('setting_key', 'cricheroes_stats_url')
-      .maybeSingle();
-    
-    if (data?.setting_value) {
-      setCricherosUrl(data.setting_value);
+  const loadStats = async () => {
+    try {
+      // Fetch batting leaders
+      const { data: battingData } = await supabase
+        .from('players')
+        .select(`
+          id, name, role, runs_scored, batting_average, strike_rate,
+          wickets_taken, bowling_average, economy_rate,
+          catches, stumpings, matches_played,
+          teams!inner(name)
+        `)
+        .gt('runs_scored', 0)
+        .order('runs_scored', { ascending: false })
+        .limit(20);
+
+      // Fetch bowling leaders
+      const { data: bowlingData } = await supabase
+        .from('players')
+        .select(`
+          id, name, role, runs_scored, batting_average, strike_rate,
+          wickets_taken, bowling_average, economy_rate,
+          catches, stumpings, matches_played,
+          teams!inner(name)
+        `)
+        .gt('wickets_taken', 0)
+        .order('wickets_taken', { ascending: false })
+        .limit(20);
+
+      // Fetch all players for fielding (filter client-side for dismissals)
+      const { data: fieldingData } = await supabase
+        .from('players')
+        .select(`
+          id, name, role, runs_scored, batting_average, strike_rate,
+          wickets_taken, bowling_average, economy_rate,
+          catches, stumpings, matches_played,
+          teams!inner(name)
+        `)
+        .limit(100);
+
+      // Process data
+      const mapPlayerData = (data: any[]): Player[] => {
+        return (data || []).map(p => ({
+          id: p.id,
+          name: p.name,
+          role: p.role,
+          runs_scored: p.runs_scored,
+          batting_average: p.batting_average,
+          strike_rate: p.strike_rate,
+          wickets_taken: p.wickets_taken,
+          bowling_average: p.bowling_average,
+          economy_rate: p.economy_rate,
+          catches: p.catches,
+          stumpings: p.stumpings,
+          matches_played: p.matches_played,
+          team_name: p.teams?.name || null
+        }));
+      };
+
+      const batting = mapPlayerData(battingData || []);
+      const bowling = mapPlayerData(bowlingData || []);
+      const fielding = mapPlayerData(fieldingData || [])
+        .filter(p => (p.catches ?? 0) + (p.stumpings ?? 0) > 0)
+        .sort((a, b) => {
+          const aTotal = (a.catches ?? 0) + (a.stumpings ?? 0);
+          const bTotal = (b.catches ?? 0) + (b.stumpings ?? 0);
+          return bTotal - aTotal;
+        })
+        .slice(0, 20);
+
+      // Calculate MVP scores
+      const mvp = mapPlayerData(fieldingData || [])
+        .map(p => ({
+          ...p,
+          mvpScore: 
+            (p.runs_scored ?? 0) * 1 + 
+            (p.wickets_taken ?? 0) * 25 + 
+            (p.catches ?? 0) * 10 + 
+            (p.stumpings ?? 0) * 10
+        }))
+        .sort((a, b) => b.mvpScore - a.mvpScore)
+        .slice(0, 20);
+
+      setBattingLeaders(batting);
+      setBowlingLeaders(bowling);
+      setFieldingLeaders(fielding);
+      setMvpLeaders(mvp);
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0A1325] via-[#0F1B35] to-[#0A1325] flex items-center justify-center">
-        <div className="text-muted-foreground">Loading...</div>
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-[#F9C846]/30 border-t-[#F9C846] rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading statistics...</p>
+        </div>
       </div>
     );
   }
 
+  const hasData = battingLeaders.length > 0 || bowlingLeaders.length > 0;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A1325] via-[#0F1B35] to-[#0A1325]">
       <div className="container mx-auto px-4 py-6 md:py-8">
+        {/* Header */}
         <div className="flex items-center gap-3 mb-6 md:mb-8">
           <div className="p-2 rounded-lg bg-[#F9C846]/10 border border-[#F9C846]/30">
             <Trophy className="text-[#F9C846]" size={28} />
           </div>
-          <h1 className="text-2xl md:text-4xl font-bold text-white">Player Statistics</h1>
+          <div>
+            <h1 className="text-2xl md:text-4xl font-bold text-white">Player Statistics</h1>
+            <p className="text-sm text-muted-foreground">LBPL Season 3 Leaderboard</p>
+          </div>
         </div>
 
-        {cricherosUrl ? (
-          <>
-            <div className="w-full h-[75vh] rounded-lg overflow-hidden border border-[#F9C846]/30">
-              <iframe
-                src={cricherosUrl}
-                className="w-full h-full border-0"
-                title="Tournament Stats"
-                allow="fullscreen"
-              />
-            </div>
-            <div className="text-center mt-4">
-              <a 
-                href={cricherosUrl.replace('tournament-embed/1/', 'tournament/')} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-sm text-muted-foreground hover:text-[#F9C846] underline"
-              >
-                Open Stats in Browser ↗
-              </a>
-            </div>
-          </>
-        ) : (
+        {!hasData ? (
           <Card className="p-8 bg-gradient-to-br from-[#0F1B35] to-[#0A1325] border-[#F9C846]/30 text-center">
             <Trophy className="mx-auto mb-4 text-[#F9C846]" size={48} />
             <p className="text-muted-foreground text-lg">Statistics will be available once the tournament starts</p>
           </Card>
+        ) : (
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full grid grid-cols-4 bg-[#0F1B35] border border-[#F9C846]/20 mb-6">
+              <TabsTrigger 
+                value="batting" 
+                className="data-[state=active]:bg-[#F9C846] data-[state=active]:text-black flex gap-1.5 items-center"
+              >
+                <TrendingUp className="w-4 h-4" />
+                <span className="hidden sm:inline">Batting</span>
+                <span className="sm:hidden">BAT</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="bowling"
+                className="data-[state=active]:bg-[#F9C846] data-[state=active]:text-black flex gap-1.5 items-center"
+              >
+                <Target className="w-4 h-4" />
+                <span className="hidden sm:inline">Bowling</span>
+                <span className="sm:hidden">BOWL</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="fielding"
+                className="data-[state=active]:bg-[#F9C846] data-[state=active]:text-black flex gap-1.5 items-center"
+              >
+                <Shield className="w-4 h-4" />
+                <span className="hidden sm:inline">Fielding</span>
+                <span className="sm:hidden">FIELD</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="mvp"
+                className="data-[state=active]:bg-[#F9C846] data-[state=active]:text-black flex gap-1.5 items-center"
+              >
+                <Star className="w-4 h-4" />
+                <span className="hidden sm:inline">MVP</span>
+                <span className="sm:hidden">MVP</span>
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Batting Tab */}
+            <TabsContent value="batting" className="mt-0">
+              <TopThreeSection players={battingLeaders} statType="batting" />
+              <div className="space-y-3">
+                {battingLeaders.slice(3).map((player, index) => (
+                  <StatCard 
+                    key={player.id} 
+                    rank={index + 4} 
+                    player={player} 
+                    statType="batting" 
+                  />
+                ))}
+              </div>
+              {battingLeaders.length === 0 && (
+                <Card className="p-6 bg-[#0F1B35] border-[#F9C846]/20 text-center">
+                  <p className="text-muted-foreground">No batting stats available yet</p>
+                </Card>
+              )}
+            </TabsContent>
+
+            {/* Bowling Tab */}
+            <TabsContent value="bowling" className="mt-0">
+              <TopThreeSection players={bowlingLeaders} statType="bowling" />
+              <div className="space-y-3">
+                {bowlingLeaders.slice(3).map((player, index) => (
+                  <StatCard 
+                    key={player.id} 
+                    rank={index + 4} 
+                    player={player} 
+                    statType="bowling" 
+                  />
+                ))}
+              </div>
+              {bowlingLeaders.length === 0 && (
+                <Card className="p-6 bg-[#0F1B35] border-[#F9C846]/20 text-center">
+                  <p className="text-muted-foreground">No bowling stats available yet</p>
+                </Card>
+              )}
+            </TabsContent>
+
+            {/* Fielding Tab */}
+            <TabsContent value="fielding" className="mt-0">
+              <TopThreeSection players={fieldingLeaders} statType="fielding" />
+              <div className="space-y-3">
+                {fieldingLeaders.slice(3).map((player, index) => (
+                  <StatCard 
+                    key={player.id} 
+                    rank={index + 4} 
+                    player={player} 
+                    statType="fielding" 
+                  />
+                ))}
+              </div>
+              {fieldingLeaders.length === 0 && (
+                <Card className="p-6 bg-[#0F1B35] border-[#F9C846]/20 text-center">
+                  <p className="text-muted-foreground">No fielding stats available yet</p>
+                </Card>
+              )}
+            </TabsContent>
+
+            {/* MVP Tab */}
+            <TabsContent value="mvp" className="mt-0">
+              <div className="mb-4 p-3 bg-[#F9C846]/10 border border-[#F9C846]/30 rounded-lg">
+                <div className="flex items-center gap-2 text-sm text-[#F9C846]">
+                  <Award className="w-4 h-4" />
+                  <span className="font-medium">MVP Score Calculation:</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  1 point per run + 25 points per wicket + 10 points per catch/stumping
+                </p>
+              </div>
+              <TopThreeSection players={mvpLeaders} statType="mvp" />
+              <div className="space-y-3">
+                {mvpLeaders.slice(3).map((player, index) => (
+                  <StatCard 
+                    key={player.id} 
+                    rank={index + 4} 
+                    player={player} 
+                    statType="mvp" 
+                  />
+                ))}
+              </div>
+              {mvpLeaders.length === 0 && (
+                <Card className="p-6 bg-[#0F1B35] border-[#F9C846]/20 text-center">
+                  <p className="text-muted-foreground">No MVP stats available yet</p>
+                </Card>
+              )}
+            </TabsContent>
+          </Tabs>
         )}
       </div>
     </div>
