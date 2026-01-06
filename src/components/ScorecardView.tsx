@@ -162,7 +162,7 @@ export const ScorecardView = ({ scorecard }: ScorecardViewProps) => {
                 <td className="text-center py-2 px-1 text-muted-foreground">{batter.balls}</td>
                 <td className="text-center py-2 px-1 text-muted-foreground">{batter.fours}</td>
                 <td className="text-center py-2 px-1 text-muted-foreground">{batter.sixes}</td>
-                <td className="text-center py-2 px-1 text-muted-foreground">{batter.strike_rate.toFixed(2)}</td>
+                <td className="text-center py-2 px-1 text-muted-foreground">{(batter.strike_rate ?? 0).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
@@ -206,7 +206,7 @@ export const ScorecardView = ({ scorecard }: ScorecardViewProps) => {
                 <td className="text-center py-2 px-1 text-muted-foreground">{bowler.maidens}</td>
                 <td className="text-center py-2 px-1 text-muted-foreground">{bowler.runs}</td>
                 <td className="text-center py-2 px-1 font-semibold text-white">{bowler.wickets}</td>
-                <td className="text-center py-2 px-1 text-muted-foreground">{bowler.economy.toFixed(2)}</td>
+                <td className="text-center py-2 px-1 text-muted-foreground">{(bowler.economy ?? 0).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
