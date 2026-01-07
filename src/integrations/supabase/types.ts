@@ -377,6 +377,7 @@ export type Database = {
           team_b_id: string
           team_b_score: string | null
           venue: string | null
+          video_highlight_url: string | null
           winner_id: string | null
           youtube_stream_url: string | null
         }
@@ -397,6 +398,7 @@ export type Database = {
           team_b_id: string
           team_b_score?: string | null
           venue?: string | null
+          video_highlight_url?: string | null
           winner_id?: string | null
           youtube_stream_url?: string | null
         }
@@ -417,6 +419,7 @@ export type Database = {
           team_b_id?: string
           team_b_score?: string | null
           venue?: string | null
+          video_highlight_url?: string | null
           winner_id?: string | null
           youtube_stream_url?: string | null
         }
@@ -607,6 +610,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pwa_installs: {
+        Row: {
+          created_at: string
+          id: string
+          installed_at: string
+          platform: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          installed_at?: string
+          platform?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          installed_at?: string
+          platform?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
       }
       site_stats: {
         Row: {

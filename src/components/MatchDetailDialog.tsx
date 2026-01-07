@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { getMatchTime } from "@/lib/matchUtils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Save, ExternalLink } from "lucide-react";
+import { Save, ExternalLink, Play } from "lucide-react";
 import { ScorecardView } from "./ScorecardView";
 
 interface Player {
@@ -41,6 +41,8 @@ export const MatchDetailDialog = ({
   const [isSaving, setIsSaving] = useState(false);
   const [matchId, setMatchId] = useState<string | null>(null);
   const [scorecardData, setScorecardData] = useState<any | null>(null);
+  const [videoHighlightUrl, setVideoHighlightUrl] = useState<string | null>(null);
+
   useEffect(() => {
     if (open && matchNo) {
       loadMatchData();
@@ -90,18 +92,28 @@ export const MatchDetailDialog = ({
 
     const { data } = await supabase
       .from('matches')
-      .select('id, scorer_link, cricheroes_match_id')
+      .select('id, scorer_link, cricheroes_match_id, video_highlight_url')
       .eq('match_no', matchNo)
       .maybeSingle();
     
     if (data) {
       setMatchId(data.id);
       setCricHeroesMatchId(data.cricheroes_match_id);
+      setVideoHighlightUrl(data.video_highlight_url);
       // Use manually set scorer_link if available, otherwise use live-matches embed
       const effectiveLink = data.scorer_link || CRICHEROES_LIVE_EMBED;
       setScorerLink(data.scorer_link || "");
       setSavedScorerLink(effectiveLink);
     }
+  };
+
+  // Convert YouTube URL to embed URL
+  const getYouTubeEmbedUrl = (url: string) => {
+    const videoIdMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/);
+    if (videoIdMatch && videoIdMatch[1]) {
+      return `https://www.youtube.com/embed/${videoIdMatch[1]}`;
+    }
+    return url;
   };
 
   const saveScorerLink = async () => {
@@ -229,9 +241,9 @@ export const MatchDetailDialog = ({
           </p>
         </DialogHeader>
 
-        {/* Tabs for Score and Squad */}
+        {/* Tabs for Score, Squad, and Highlights */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-4">
-          <TabsList className="grid w-full grid-cols-2 bg-[#1a2744]">
+          <TabsList className="grid w-full grid-cols-3 bg-[#1a2744]">
             <TabsTrigger 
               value="score"
               className="data-[state=active]:bg-[#2a3f5f] data-[state=active]:text-white"
@@ -243,6 +255,12 @@ export const MatchDetailDialog = ({
               className="data-[state=active]:bg-[#2a3f5f] data-[state=active]:text-white"
             >
               Squad
+            </TabsTrigger>
+            <TabsTrigger 
+              value="highlights"
+              className="data-[state=active]:bg-[#2a3f5f] data-[state=active]:text-white"
+            >
+              Highlights
             </TabsTrigger>
           </TabsList>
 
@@ -316,6 +334,30 @@ export const MatchDetailDialog = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {renderSquadSection(teamASquad, teamA)}
                 {renderSquadSection(teamBSquad, teamB)}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Highlights Tab Content */}
+          <TabsContent value="highlights" className="mt-6">
+            {videoHighlightUrl ? (
+              <div className="space-y-4">
+                <div className="w-full aspect-video rounded-lg overflow-hidden border border-[#F9C846]/30">
+                  <iframe
+                    src={getYouTubeEmbedUrl(videoHighlightUrl)}
+                    className="w-full h-full border-0"
+                    title={`Match ${matchNo} Highlights`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="bg-[#1a2744] rounded-lg p-8 border border-border/30 text-center">
+                <Play className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">
+                  Highlights will be available after the match is completed
+                </p>
               </div>
             )}
           </TabsContent>

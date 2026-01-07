@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PlayerProfileDialog } from "./PlayerProfileDialog";
 import { ScorecardView } from "./ScorecardView";
 import { toast } from "sonner";
-import { Save, ExternalLink } from "lucide-react";
+import { Save, ExternalLink, Play } from "lucide-react";
 
 interface Player {
   id: string;
@@ -68,6 +68,7 @@ export const MatchDetailsDialog = ({
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [scorecardData, setScorecardData] = useState<any | null>(null);
+  const [videoHighlightUrl, setVideoHighlightUrl] = useState<string | null>(null);
 
   const handlePlayerClick = async (playerId: string) => {
     const { data } = await supabase
@@ -138,21 +139,32 @@ export const MatchDetailsDialog = ({
   const loadScorerLink = async (matchId: string) => {
     const { data } = await supabase
       .from('matches')
-      .select('scorer_link, cricheroes_match_id')
+      .select('scorer_link, cricheroes_match_id, video_highlight_url')
       .eq('id', matchId)
       .maybeSingle();
     
     if (data) {
       setCricHeroesMatchId(data.cricheroes_match_id);
+      setVideoHighlightUrl(data.video_highlight_url);
       // Use manually set scorer_link if available, otherwise use live-matches embed
       const effectiveLink = data.scorer_link || CRICHEROES_LIVE_EMBED;
       setScorerLink(data.scorer_link || "");
       setSavedScorerLink(effectiveLink);
     } else {
       setCricHeroesMatchId(null);
+      setVideoHighlightUrl(null);
       setScorerLink("");
       setSavedScorerLink("");
     }
+  };
+
+  // Convert YouTube URL to embed URL
+  const getYouTubeEmbedUrl = (url: string) => {
+    const videoIdMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/);
+    if (videoIdMatch && videoIdMatch[1]) {
+      return `https://www.youtube.com/embed/${videoIdMatch[1]}`;
+    }
+    return url;
   };
 
   const saveScorerLink = async () => {
@@ -279,9 +291,10 @@ export const MatchDetailsDialog = ({
         </DialogHeader>
 
         <Tabs defaultValue="score" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="score">Score</TabsTrigger>
             <TabsTrigger value="squad">Squad</TabsTrigger>
+            <TabsTrigger value="highlights">Highlights</TabsTrigger>
           </TabsList>
 
           <TabsContent value="score" className="mt-6">
@@ -357,6 +370,31 @@ export const MatchDetailsDialog = ({
                 </Card>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="highlights" className="mt-6">
+            <Card>
+              <CardContent className="pt-6">
+                {videoHighlightUrl ? (
+                  <div className="w-full aspect-video rounded-lg overflow-hidden">
+                    <iframe
+                      src={getYouTubeEmbedUrl(videoHighlightUrl)}
+                      className="w-full h-full border-0"
+                      title={`Match ${match.match_no} Highlights`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Play className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">
+                      Highlights will be available after the match is completed
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </DialogContent>
