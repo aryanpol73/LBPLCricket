@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -42,10 +43,22 @@ const PwaInstallPrompt = () => {
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
 
     // Listen for app installed
-    const handleAppInstalled = () => {
+    const handleAppInstalled = async () => {
       console.log('PWA: App installed successfully');
       setShowPrompt(false);
       globalDeferredPrompt = null;
+      
+      // Track PWA installation
+      try {
+        const platform = isIOS ? 'iOS' : /Android/i.test(navigator.userAgent) ? 'Android' : 'Desktop';
+        await supabase.from('pwa_installs').insert({
+          user_agent: navigator.userAgent,
+          platform: platform
+        });
+        console.log('PWA: Installation tracked');
+      } catch (err) {
+        console.log('PWA: Failed to track installation', err);
+      }
     };
 
     window.addEventListener('appinstalled', handleAppInstalled);

@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Shield, Plus, Edit, Trash2, Save, Upload, Image as ImageIcon } from "lucide-react";
+import { PwaStatsCard } from "@/components/admin/PwaStatsCard";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,7 +48,8 @@ const matchSchema = z.object({
   player_of_match_id: z.string().uuid("Invalid player").nullable().optional(),
   match_phase: z.string().trim().max(50, "Phase name too long").nullable().optional(),
   group_name: z.string().trim().max(50, "Group name too long").nullable().optional(),
-  youtube_stream_url: z.string().url("Invalid YouTube URL").max(500, "URL too long").nullable().optional()
+  youtube_stream_url: z.string().url("Invalid YouTube URL").max(500, "URL too long").nullable().optional(),
+  video_highlight_url: z.string().url("Invalid YouTube URL").max(500, "URL too long").nullable().optional()
 });
 
 const Admin = () => {
@@ -220,7 +222,8 @@ const Admin = () => {
         player_of_match_id: match.player_of_match_id || null,
         match_phase: match.match_phase || null,
         group_name: match.group_name || null,
-        youtube_stream_url: match.youtube_stream_url || null
+        youtube_stream_url: match.youtube_stream_url || null,
+        video_highlight_url: match.video_highlight_url || null
       }) as any;
 
       if (match.id) {
@@ -344,6 +347,11 @@ const Admin = () => {
         <div className="flex items-center gap-3">
           <Shield className="text-secondary" size={32} />
           <h1 className="text-4xl font-bold text-primary">Admin Panel</h1>
+        </div>
+
+        {/* PWA Stats Card at the top */}
+        <div className="mb-8">
+          <PwaStatsCard />
         </div>
 
         <Tabs defaultValue="teams" className="w-full">
@@ -942,6 +950,14 @@ const MatchForm = ({ match, teams, players, onSave, onCancel }: any) => {
           value={formData.youtube_stream_url || ''}
           onChange={(e) => setFormData({ ...formData, youtube_stream_url: e.target.value })}
           placeholder="https://youtube.com/..."
+        />
+      </div>
+      <div>
+        <Label>Video Highlight URL (optional)</Label>
+        <Input
+          value={formData.video_highlight_url || ''}
+          onChange={(e) => setFormData({ ...formData, video_highlight_url: e.target.value })}
+          placeholder="https://youtube.com/watch?v=..."
         />
       </div>
       <div className="flex gap-2 justify-end">
