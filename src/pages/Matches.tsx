@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Trophy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
 import { getMatchTime, getMatchPhase, getMatchStyle, getMatchTextColors } from "@/lib/matchUtils";
-
-const CRICHEROES_LIVE_EMBED =
-  "https://cricheroes.com/tournament-embed/1/1735717/lbpl-season-3/matches/live-matches";
+import { MatchDetailDialog } from "@/components/MatchDetailDialog";
 
 interface Match {
   id: string;
@@ -36,27 +33,20 @@ interface MatchCardProps {
   teamA?: string;
   teamB?: string;
   group?: string;
-  match?: Match | null;
-  onMatchClick?: (match: Match) => void;
+  onClick?: () => void;
 }
 
-const MatchCard = ({ matchNo, teamA = "TBD", teamB = "TBD", group, match, onMatchClick }: MatchCardProps) => {
+const MatchCard = ({ matchNo, teamA = "TBD", teamB = "TBD", group, onClick }: MatchCardProps) => {
   const phase = getMatchPhase(matchNo);
   const time = getMatchTime(matchNo);
   const style = getMatchStyle(matchNo);
   const colors = getMatchTextColors(matchNo);
 
-  const handleClick = () => {
-    if (match && onMatchClick) {
-      onMatchClick(match);
-    }
-  };
-
   return (
     <div 
       className="rounded-xl p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl cursor-pointer"
       style={style}
-      onClick={handleClick}
+      onClick={onClick}
     >
       <div className="flex justify-between items-start">
         <div className="flex-1">
@@ -76,7 +66,9 @@ const MatchCard = ({ matchNo, teamA = "TBD", teamB = "TBD", group, match, onMatc
 const Matches = () => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
-  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const [selectedMatchNo, setSelectedMatchNo] = useState<number | null>(null);
+  const [selectedTeamA, setSelectedTeamA] = useState<string>('TBD');
+  const [selectedTeamB, setSelectedTeamB] = useState<string>('TBD');
   const [matchDialogOpen, setMatchDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -109,12 +101,13 @@ const Matches = () => {
 
   const getTeamName = (teamId: string) => {
     const team = teams.find(t => t.id === teamId);
-    // Always prefer the official full team name (short_name is legacy like Pune1/Nagpur1)
     return team?.name || team?.short_name || 'TBD';
   };
 
-  const handleMatchClick = (match: Match) => {
-    setSelectedMatch(match);
+  const handleMatchClick = (matchNo: number, teamA: string, teamB: string) => {
+    setSelectedMatchNo(matchNo);
+    setSelectedTeamA(teamA);
+    setSelectedTeamB(teamB);
     setMatchDialogOpen(true);
   };
 
@@ -161,7 +154,7 @@ const Matches = () => {
           <TabsContent value="day1">
             <div className="space-y-4 max-w-4xl mx-auto">
               {day1Matches.map((matchNo) => {
-                const { match, teamA, teamB, group } = getMatchData(matchNo);
+                const { teamA, teamB, group } = getMatchData(matchNo);
                 return (
                   <MatchCard 
                     key={matchNo} 
@@ -169,8 +162,7 @@ const Matches = () => {
                     teamA={teamA}
                     teamB={teamB}
                     group={group}
-                    match={match}
-                    onMatchClick={handleMatchClick}
+                    onClick={() => handleMatchClick(matchNo, teamA, teamB)}
                   />
                 );
               })}
@@ -180,7 +172,7 @@ const Matches = () => {
           <TabsContent value="day2">
             <div className="space-y-4 max-w-4xl mx-auto">
               {day2Matches.map((matchNo) => {
-                const { match, teamA, teamB, group } = getMatchData(matchNo);
+                const { teamA, teamB, group } = getMatchData(matchNo);
                 return (
                   <MatchCard 
                     key={matchNo} 
@@ -188,8 +180,7 @@ const Matches = () => {
                     teamA={teamA}
                     teamB={teamB}
                     group={group}
-                    match={match}
-                    onMatchClick={handleMatchClick}
+                    onClick={() => handleMatchClick(matchNo, teamA, teamB)}
                   />
                 );
               })}
@@ -198,26 +189,14 @@ const Matches = () => {
         </Tabs>
       </div>
 
-      {/* Match Details Dialog with CricHeroes Iframe */}
-      <Dialog open={matchDialogOpen} onOpenChange={setMatchDialogOpen}>
-        <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Trophy className="text-secondary" />
-              Match {selectedMatch?.match_no}: {selectedMatch && getTeamName(selectedMatch.team_a_id)} vs {selectedMatch && getTeamName(selectedMatch.team_b_id)}
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="flex-1 overflow-hidden">
-            <iframe
-              src={selectedMatch?.scorer_link || CRICHEROES_LIVE_EMBED}
-              className="w-full h-full border-0 rounded-lg"
-              title="Live Score"
-              allow="fullscreen"
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Match Detail Dialog - now uses ScorecardView with proper scorecard data */}
+      <MatchDetailDialog
+        matchNo={selectedMatchNo}
+        open={matchDialogOpen}
+        onOpenChange={setMatchDialogOpen}
+        teamA={selectedTeamA}
+        teamB={selectedTeamB}
+      />
     </div>
   );
 };
