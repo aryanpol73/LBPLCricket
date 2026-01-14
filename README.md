@@ -21,8 +21,8 @@ It displays match schedules, scorecards, highlights and standings for local box 
 - **TypeScript** for static typing  
 - **Vite** (fast build tool)  
 - **Tailwind CSS** for styling  
-- **Supabase** backend (if used)  
-- **PWA support** (optional)
+- **Supabase** backend  
+- **PWA support** 
 
 ---
 
