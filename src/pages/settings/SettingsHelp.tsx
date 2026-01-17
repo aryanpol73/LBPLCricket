@@ -7,6 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { isSmartTV } from "@/hooks/useTVMode";
 
 const SettingsHelp = () => {
   const navigate = useNavigate();
@@ -17,7 +18,8 @@ const SettingsHelp = () => {
       (navigator as any).standalone === true ||
       new URLSearchParams(window.location.search).get("pwa") === "1";
 
-    if (!isPwa) {
+    // Allow access in PWA mode OR on Smart TV
+    if (!isPwa && !isSmartTV()) {
       navigate("/", { replace: true });
     }
   }, [navigate]);
