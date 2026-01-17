@@ -28,13 +28,12 @@ export default function MoreSheet({
   isPwa,
 }: MoreSheetProps) {
   const onTV = isSmartTV();
-  const isActualPwa = isPwa && !onTV; // True PWA mode (not just TV showing bottom nav)
   
-  // Add Settings item only in actual PWA mode (not TV)
+  // Show Settings in both actual PWA mode AND on Smart TV
   // Add Exit TV Mode option for Smart TVs
   const allItems = [
     ...items,
-    ...(isActualPwa ? [{ label: "Settings", icon: Settings, path: "/settings" }] : []),
+    ...((isPwa || onTV) ? [{ label: "Settings", icon: Settings, path: "/settings" }] : []),
     ...(onTV ? [{ label: "Exit TV Mode", icon: MonitorOff, path: "__exit_tv__" }] : []),
   ];
   const sheetRef = useRef<HTMLDivElement>(null);
