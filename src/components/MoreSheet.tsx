@@ -1,5 +1,6 @@
 import { useRef, useCallback, useEffect } from "react";
-import { Settings } from "lucide-react";
+import { Settings, Monitor, MonitorOff } from "lucide-react";
+import { isSmartTV } from "@/hooks/useTVMode";
 
 interface NavItem {
   label: string;
@@ -26,10 +27,16 @@ export default function MoreSheet({
   triggerHaptic,
   isPwa,
 }: MoreSheetProps) {
-  // Add Settings item only in PWA mode
-  const allItems = isPwa
-    ? [...items, { label: "Settings", icon: Settings, path: "/settings" }]
-    : items;
+  const onTV = isSmartTV();
+  const isActualPwa = isPwa && !onTV; // True PWA mode (not just TV showing bottom nav)
+  
+  // Add Settings item only in actual PWA mode (not TV)
+  // Add Exit TV Mode option for Smart TVs
+  const allItems = [
+    ...items,
+    ...(isActualPwa ? [{ label: "Settings", icon: Settings, path: "/settings" }] : []),
+    ...(onTV ? [{ label: "Exit TV Mode", icon: MonitorOff, path: "__exit_tv__" }] : []),
+  ];
   const sheetRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef(0);
   const currentTranslateY = useRef(0);
@@ -125,13 +132,28 @@ export default function MoreSheet({
           {allItems.map((item) => {
             const active = isActive(item.path);
             const Icon = item.icon;
+            const isExitTV = item.path === "__exit_tv__";
+
+            const handleClick = () => {
+              if (isExitTV) {
+                // Clear TV-related URL params and reload as normal website
+                const url = new URL(window.location.href);
+                url.searchParams.delete('tv');
+                localStorage.removeItem('lbpl_tv_mode');
+                window.location.href = url.origin + url.pathname;
+              } else {
+                onItemClick(item.path);
+              }
+            };
 
             return (
               <button
                 key={item.path}
-                onClick={() => onItemClick(item.path)}
+                onClick={handleClick}
                 className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-200 active:scale-95 ${
-                  active
+                  isExitTV
+                    ? "bg-red-500/10 hover:bg-red-500/20"
+                    : active
                     ? "bg-[#f0b429]/10 scale-105"
                     : "bg-white/5 hover:bg-white/10"
                 }`}
@@ -139,13 +161,13 @@ export default function MoreSheet({
                 <Icon
                   size={24}
                   className={`transition-colors duration-200 ${
-                    active ? "text-[#f0b429]" : "text-gray-300"
+                    isExitTV ? "text-red-400" : active ? "text-[#f0b429]" : "text-gray-300"
                   }`}
                   strokeWidth={active ? 2.5 : 2}
                 />
                 <span
                   className={`text-xs mt-2 font-medium transition-colors duration-200 ${
-                    active ? "text-[#f0b429]" : "text-gray-300"
+                    isExitTV ? "text-red-400" : active ? "text-[#f0b429]" : "text-gray-300"
                   }`}
                 >
                   {item.label}
