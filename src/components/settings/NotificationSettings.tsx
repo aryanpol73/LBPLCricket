@@ -3,20 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Bell, MessageCircle, Megaphone, AlertTriangle } from "lucide-react";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
 import { Switch } from "@/components/ui/switch";
+import { isSmartTV } from "@/hooks/useTVMode";
 
 const NotificationSettings = () => {
   const navigate = useNavigate();
   const { settings, updateSetting, permission, isPermissionDenied } = useNotificationSettings();
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("dark");
 
-  // Check if PWA mode and get theme
+  // Check if PWA mode or Smart TV and get theme
   useEffect(() => {
     const isPwa =
       window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as any).standalone === true ||
       new URLSearchParams(window.location.search).get("pwa") === "1";
 
-    if (!isPwa) {
+    // Allow access in PWA mode OR on Smart TV
+    if (!isPwa && !isSmartTV()) {
       navigate("/", { replace: true });
     }
 
