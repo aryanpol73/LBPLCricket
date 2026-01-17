@@ -3,20 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Palette, Bell, Info, Code, ChevronRight, Pin, ExternalLink, Share2, Trash2, RefreshCw, HelpCircle, Star, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import AppRatingDialog from "@/components/AppRatingDialog";
+import { isSmartTV } from "@/hooks/useTVMode";
 
 const SettingsHome = () => {
   const navigate = useNavigate();
   const [showPinInstructions, setShowPinInstructions] = useState(false);
   const [showRatingDialog, setShowRatingDialog] = useState(false);
 
-  // Check if PWA mode
+  // Check if PWA mode or Smart TV
   useEffect(() => {
     const isPwa =
       window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as any).standalone === true ||
       new URLSearchParams(window.location.search).get("pwa") === "1";
 
-    if (!isPwa) {
+    // Allow access in PWA mode OR on Smart TV
+    if (!isPwa && !isSmartTV()) {
       navigate("/", { replace: true });
     }
   }, [navigate]);
