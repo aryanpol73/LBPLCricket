@@ -12,6 +12,8 @@ import Footer from "@/components/Footer";
 import PwaBottomNav from "@/components/PwaBottomNav";
 import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 import AppRatingDialog from "@/components/AppRatingDialog";
+import TVModeProvider from "@/contexts/TVModeContext";
+import TVNavHelper from "@/components/TVNavHelper";
 import Index from "./pages/Index";
 import Matches from "./pages/Matches";
 import Results from "./pages/Results";
@@ -123,8 +125,11 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <ScrollToTop />
-            <AppContent />
+            <TVModeProvider>
+              <ScrollToTop />
+              <AppContent />
+              <TVNavHelper />
+            </TVModeProvider>
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>
