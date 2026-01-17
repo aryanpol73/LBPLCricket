@@ -9,15 +9,20 @@ export const useTVMode = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const tvParam = urlParams.get('tv') === '1';
     
-    // Common Smart TV user agent patterns
+    // Check if on /tv route
+    const isTVRoute = window.location.pathname.startsWith('/tv');
+    
+    // Common Smart TV user agent patterns (expanded for LG webOS)
     const userAgent = navigator.userAgent.toLowerCase();
     const isTVUserAgent = 
       userAgent.includes('smart-tv') ||
       userAgent.includes('smarttv') ||
       userAgent.includes('webos') ||
+      userAgent.includes('web0s') ||
+      userAgent.includes('lg') ||
+      userAgent.includes('netcast') ||
       userAgent.includes('tizen') ||
       userAgent.includes('hbbtv') ||
-      userAgent.includes('netcast') ||
       userAgent.includes('viera') ||
       userAgent.includes('nettv') ||
       userAgent.includes('roku') ||
@@ -26,7 +31,10 @@ export const useTVMode = () => {
       userAgent.includes('googletv') ||
       userAgent.includes('androidtv') ||
       userAgent.includes('playstation') ||
-      userAgent.includes('xbox');
+      userAgent.includes('xbox') ||
+      userAgent.includes('bravia') ||
+      userAgent.includes('philipstv') ||
+      userAgent.includes('samsungtv');
 
     // Large screen without touch support suggests TV
     const isLargeScreenNoTouch = 
@@ -36,7 +44,7 @@ export const useTVMode = () => {
 
     const savedTVMode = localStorage.getItem('lbpl_tv_mode') === 'true';
 
-    setIsTVMode(tvParam || isTVUserAgent || savedTVMode);
+    setIsTVMode(tvParam || isTVRoute || isTVUserAgent || savedTVMode);
   }, []);
 
   const enableTVMode = useCallback(() => {

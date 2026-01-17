@@ -9,14 +9,13 @@ import { MatchesSection } from "@/components/MatchesSection";
 import { MatchResultsTable } from "@/components/MatchResultsTable";
 import { StatsPreview } from "@/components/StatsPreview";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Users, Calendar, Crown } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 import { TeamDetailDialog } from "@/components/TeamDetailDialog";
-import { Link } from "react-router-dom";
 
 interface PointsTableEntry {
   id: string;
@@ -149,11 +148,14 @@ const Index = () => {
     setDialogOpen(true);
   };
 
-  return <div className="min-h-screen bg-background relative pt-16">
+  // Check if we're in TV route (nested under /tv)
+  const isTVRoute = location.pathname.startsWith('/tv');
+
+  return <div className={`min-h-screen bg-background relative ${isTVRoute ? '' : 'pt-16'}`}>
       <AnimatedBackground />
       
-      {/* Navigation */}
-      <Navigation />
+      {/* Navigation - Hidden in TV mode */}
+      {!isTVRoute && <Navigation />}
       
       {/* Live Ticker Banner */}
       <LiveTicker />

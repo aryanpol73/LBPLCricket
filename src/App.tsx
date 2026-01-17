@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ThemeProvider } from "next-themes";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -35,6 +35,7 @@ import SettingsHelp from "./pages/settings/SettingsHelp";
 import AppearanceSettings from "./components/settings/AppearanceSettings";
 import NotificationSettings from "./components/settings/NotificationSettings";
 import LiveScoreWidget from "./pages/widget/LiveScoreWidget";
+import TVApp from "./pages/TVApp";
 
 const queryClient = new QueryClient();
 
@@ -79,12 +80,27 @@ const useAutoRatingPrompt = () => {
 
 const AppContent = () => {
   const { showRating, handleClose } = useAutoRatingPrompt();
+  const location = useLocation();
+  const isTVRoute = location.pathname.startsWith('/tv');
 
   return (
     <>
       <div className="min-h-screen flex flex-col">
         <div className="flex-1">
           <Routes>
+            {/* TV App Routes - dedicated TV interface */}
+            <Route path="/tv" element={<TVApp />}>
+              <Route index element={<Index />} />
+              <Route path="matches" element={<Matches />} />
+              <Route path="results" element={<Results />} />
+              <Route path="points-table" element={<PointsTable />} />
+              <Route path="teams" element={<Teams />} />
+              <Route path="stats" element={<Stats />} />
+              <Route path="gallery" element={<Gallery />} />
+              <Route path="community" element={<Community />} />
+            </Route>
+            
+            {/* Regular App Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/matches" element={<Matches />} />
             <Route path="/results" element={<Results />} />
@@ -108,11 +124,16 @@ const AppContent = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
-        <Footer />
-        <PwaInstallPrompt />
-        <PwaBottomNav />
+        {/* Hide Footer, PWA elements on TV routes */}
+        {!isTVRoute && (
+          <>
+            <Footer />
+            <PwaInstallPrompt />
+            <PwaBottomNav />
+          </>
+        )}
       </div>
-      <AppRatingDialog open={showRating} onClose={handleClose} />
+      {!isTVRoute && <AppRatingDialog open={showRating} onClose={handleClose} />}
     </>
   );
 };
