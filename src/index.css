@@ -573,7 +573,7 @@ html.tv-mode .hero-section {
   padding: 60px 80px;
 }
 
-/* TV Navigation Helper Overlay */
+/* TV Navigation Helper Overlay - Hidden when TVBottomNav is visible */
 .tv-nav-helper {
   position: fixed;
   bottom: 40px;
@@ -604,4 +604,50 @@ html.tv-mode .hero-section {
   border-radius: 6px;
   font-weight: 600;
   color: hsl(var(--foreground));
+}
+
+/* TV Bottom Navigation Styles */
+html.tv-mode .tv-bottom-nav {
+  background: linear-gradient(to top, hsl(220 60% 8% / 0.98), hsl(220 60% 8% / 0.95));
+}
+
+html.tv-mode .tv-bottom-nav button {
+  font-size: 1.25rem;
+  padding: 1rem 2rem;
+  min-width: 140px;
+}
+
+html.tv-mode .tv-bottom-nav button svg {
+  width: 40px;
+  height: 40px;
+}
+
+/* Hide default TV mode badge and nav helper when using TV App layout */
+html.tv-mode [data-tv-app="true"] .tv-mode-badge,
+html.tv-mode [data-tv-app="true"] .tv-nav-helper {
+  display: none;
+}
+
+/* TV App specific padding adjustments */
+html.tv-mode main {
+  padding-bottom: 140px;
+}
+
+/* Larger touch targets for TV remote */
+html.tv-mode .tv-focusable {
+  min-height: 60px;
+  min-width: 60px;
+}
+
+/* Enhanced focus ring for TV */
+html.tv-mode .tv-focusable:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px hsl(45 90% 55%);
+  transform: scale(1.05);
+  transition: all 0.2s ease-out;
+}
+
+html.tv-mode .tv-focusable:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px hsl(45 90% 55%);
 }
