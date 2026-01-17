@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Home, Calendar, Users, Menu, Trophy, Image, BarChart3, Award } from "lucide-react";
 import MoreSheet from "./MoreSheet";
+import { isSmartTV } from "@/hooks/useTVMode";
 
 interface NavItem {
   label: string;
@@ -43,7 +44,11 @@ export default function PwaBottomNav() {
       const isStandalone =
         window.matchMedia("(display-mode: standalone)").matches ||
         (window.navigator as any).standalone === true;
-      setIsPwa(pwaOverride || isStandalone);
+      
+      // Also show bottom nav on Smart TVs for easy navigation
+      const onTV = isSmartTV();
+      
+      setIsPwa(pwaOverride || isStandalone || onTV);
     };
 
     checkPwaMode();

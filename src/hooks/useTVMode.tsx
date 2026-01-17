@@ -1,50 +1,48 @@
 import { useState, useEffect, useCallback } from 'react';
 
+// Helper to detect if running on a Smart TV
+export const isSmartTV = () => {
+  const userAgent = navigator.userAgent.toLowerCase();
+  return (
+    userAgent.includes('smart-tv') ||
+    userAgent.includes('smarttv') ||
+    userAgent.includes('webos') ||
+    userAgent.includes('web0s') ||
+    userAgent.includes('netcast') ||
+    userAgent.includes('tizen') ||
+    userAgent.includes('hbbtv') ||
+    userAgent.includes('viera') ||
+    userAgent.includes('nettv') ||
+    userAgent.includes('roku') ||
+    userAgent.includes('firetv') ||
+    userAgent.includes('appletv') ||
+    userAgent.includes('googletv') ||
+    userAgent.includes('androidtv') ||
+    userAgent.includes('playstation') ||
+    userAgent.includes('xbox') ||
+    userAgent.includes('bravia') ||
+    userAgent.includes('philipstv') ||
+    userAgent.includes('samsungtv')
+  );
+};
+
 export const useTVMode = () => {
   const [isTVMode, setIsTVMode] = useState(false);
   const [focusedElement, setFocusedElement] = useState<string | null>(null);
 
   useEffect(() => {
-    // Detect TV mode via URL parameter, user agent, or large screen with no touch
+    // Only enable TV mode via explicit URL parameter or /tv route
+    // Do NOT auto-enable based on user agent - user wants normal website on TV
     const urlParams = new URLSearchParams(window.location.search);
     const tvParam = urlParams.get('tv') === '1';
     
-    // Check if on /tv route
+    // Check if on /tv route (explicit TV interface)
     const isTVRoute = window.location.pathname.startsWith('/tv');
-    
-    // Common Smart TV user agent patterns (expanded for LG webOS)
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isTVUserAgent = 
-      userAgent.includes('smart-tv') ||
-      userAgent.includes('smarttv') ||
-      userAgent.includes('webos') ||
-      userAgent.includes('web0s') ||
-      userAgent.includes('lg') ||
-      userAgent.includes('netcast') ||
-      userAgent.includes('tizen') ||
-      userAgent.includes('hbbtv') ||
-      userAgent.includes('viera') ||
-      userAgent.includes('nettv') ||
-      userAgent.includes('roku') ||
-      userAgent.includes('firetv') ||
-      userAgent.includes('appletv') ||
-      userAgent.includes('googletv') ||
-      userAgent.includes('androidtv') ||
-      userAgent.includes('playstation') ||
-      userAgent.includes('xbox') ||
-      userAgent.includes('bravia') ||
-      userAgent.includes('philipstv') ||
-      userAgent.includes('samsungtv');
-
-    // Large screen without touch support suggests TV
-    const isLargeScreenNoTouch = 
-      window.innerWidth >= 1280 && 
-      !('ontouchstart' in window) &&
-      !navigator.maxTouchPoints;
 
     const savedTVMode = localStorage.getItem('lbpl_tv_mode') === 'true';
 
-    setIsTVMode(tvParam || isTVRoute || isTVUserAgent || savedTVMode);
+    // Only use explicit triggers, not auto-detection
+    setIsTVMode(tvParam || isTVRoute || savedTVMode);
   }, []);
 
   const enableTVMode = useCallback(() => {
