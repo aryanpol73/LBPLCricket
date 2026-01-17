@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Moon, Sun } from "lucide-react";
+import { Menu, X, Moon, Sun, Tv, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import lbplLogo from "@/assets/lbpl-logo-new.jpg";
+import { useTVModeContext } from "@/contexts/TVModeContext";
 
 const navLinks = [
   { href: "#home", label: "Home" },
@@ -24,6 +25,7 @@ export const Navigation = () => {
   const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { isTVMode, toggleTVMode } = useTVModeContext();
 
   useEffect(() => {
     setMounted(true);
@@ -78,7 +80,7 @@ export const Navigation = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-white hover:bg-white/10 rounded-full"
+                  className="text-white hover:bg-white/10 rounded-full tv-focusable"
                   aria-label="Open menu"
                 >
                   {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -94,7 +96,7 @@ export const Navigation = () => {
                       <button
                         key={link.href}
                         onClick={() => handleNavClick(link.href)}
-                        className="px-4 py-3 rounded-lg font-medium text-white hover:bg-secondary/20 hover:text-secondary transition-all duration-300 text-left"
+                        className="px-4 py-3 rounded-lg font-medium text-white hover:bg-secondary/20 hover:text-secondary transition-all duration-300 text-left tv-focusable"
                       >
                         {link.label}
                       </button>
@@ -112,7 +114,7 @@ export const Navigation = () => {
 
             <button 
               onClick={handleLogoClick}
-              className="flex items-center gap-2 group"
+              className="flex items-center gap-2 group tv-focusable"
             >
               <img 
                 src={lbplLogo} 
@@ -132,22 +134,41 @@ export const Navigation = () => {
             </button>
           </div>
 
-          {/* Right Side - Dark Mode Toggle */}
-          <div className="flex items-center">
+          {/* Right Side - TV Mode Toggle + Dark Mode Toggle */}
+          <div className="flex items-center gap-2">
             {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="text-white hover:bg-white/10 rounded-full w-10 h-10"
-                aria-label="Toggle theme"
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
-              </Button>
+              <>
+                {/* TV Mode Toggle */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleTVMode}
+                  className="text-white hover:bg-white/10 rounded-full w-10 h-10 tv-focusable"
+                  aria-label={isTVMode ? "Exit TV Mode" : "Enter TV Mode"}
+                  title={isTVMode ? "Exit TV Mode" : "Enter TV Mode"}
+                >
+                  {isTVMode ? (
+                    <Monitor className="h-5 w-5" />
+                  ) : (
+                    <Tv className="h-5 w-5" />
+                  )}
+                </Button>
+
+                {/* Theme Toggle */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="text-white hover:bg-white/10 rounded-full w-10 h-10 tv-focusable"
+                  aria-label="Toggle theme"
+                >
+                  {theme === "dark" ? (
+                    <Sun className="h-5 w-5" />
+                  ) : (
+                    <Moon className="h-5 w-5" />
+                  )}
+                </Button>
+              </>
             )}
           </div>
         </div>

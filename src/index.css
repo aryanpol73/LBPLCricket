@@ -365,3 +365,243 @@ All colors MUST be HSL.
     content-visibility: auto;
   }
 }
+
+/* ============================================
+   SMART TV MODE STYLES
+   Full-screen UI, large elements, remote navigation
+   ============================================ */
+
+/* TV Mode Base Styles */
+html.tv-mode {
+  font-size: 24px; /* Base font size for TV viewing distance */
+  cursor: none;
+}
+
+html.tv-mode body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* TV Focus Ring - visible highlight for remote navigation */
+html.tv-mode .tv-focused,
+html.tv-mode *:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 4px hsl(var(--secondary)) !important;
+  transform: scale(1.02);
+  transition: all 0.15s ease-out;
+  z-index: 100;
+  position: relative;
+}
+
+/* Make all interactive elements larger on TV */
+html.tv-mode button,
+html.tv-mode a,
+html.tv-mode [role="button"],
+html.tv-mode .tv-focusable {
+  min-height: 56px;
+  min-width: 56px;
+  padding: 16px 24px;
+  font-size: 1.25rem;
+  transition: all 0.15s ease-out;
+}
+
+/* TV Mode Navigation Buttons */
+html.tv-mode nav button,
+html.tv-mode nav a {
+  padding: 20px 32px;
+  font-size: 1.5rem;
+  border-radius: 12px;
+}
+
+/* TV Cards - larger and more spaced */
+html.tv-mode .card,
+html.tv-mode [class*="Card"] {
+  padding: 24px;
+  margin: 16px;
+  border-radius: 16px;
+}
+
+/* TV Mode Text Scaling */
+html.tv-mode h1 {
+  font-size: 4rem;
+  line-height: 1.1;
+}
+
+html.tv-mode h2 {
+  font-size: 3rem;
+  line-height: 1.2;
+}
+
+html.tv-mode h3 {
+  font-size: 2rem;
+  line-height: 1.3;
+}
+
+html.tv-mode p,
+html.tv-mode span,
+html.tv-mode div {
+  font-size: 1.25rem;
+  line-height: 1.6;
+}
+
+/* TV Mode Tables - larger cells */
+html.tv-mode table {
+  font-size: 1.25rem;
+}
+
+html.tv-mode th,
+html.tv-mode td {
+  padding: 16px 24px;
+}
+
+/* TV Mode Grid Layout - fewer columns for larger items */
+html.tv-mode .grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+html.tv-mode .grid-cols-3 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+html.tv-mode .grid-cols-4 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+html.tv-mode .grid-cols-6 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* TV Mode Spacing */
+html.tv-mode .gap-4 {
+  gap: 24px;
+}
+
+html.tv-mode .gap-6 {
+  gap: 32px;
+}
+
+html.tv-mode .p-4 {
+  padding: 24px;
+}
+
+html.tv-mode .p-6 {
+  padding: 32px;
+}
+
+/* TV Mode Images - larger */
+html.tv-mode img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* TV Mode Dialog/Modal - larger and centered */
+html.tv-mode [role="dialog"] {
+  max-width: 80vw;
+  max-height: 80vh;
+  padding: 32px;
+  font-size: 1.25rem;
+}
+
+/* Hide mobile-only elements on TV */
+html.tv-mode .pwa-bottom-nav,
+html.tv-mode .pwa-install-prompt {
+  display: none !important;
+}
+
+/* TV Mode Footer - simplified */
+html.tv-mode footer {
+  padding: 32px;
+  font-size: 1.25rem;
+}
+
+/* TV Mode Scroll Indicators */
+html.tv-mode::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html.tv-mode::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 6px;
+}
+
+html.tv-mode::-webkit-scrollbar-thumb {
+  background: hsl(var(--secondary));
+  border-radius: 6px;
+}
+
+/* TV Mode Badge for current mode indicator */
+.tv-mode-badge {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* TV Mode Animation for focus */
+@keyframes tv-focus-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 4px hsl(var(--secondary));
+  }
+  50% {
+    box-shadow: 0 0 0 6px hsl(var(--secondary) / 0.7);
+  }
+}
+
+html.tv-mode .tv-focused {
+  animation: tv-focus-pulse 1.5s ease-in-out infinite;
+}
+
+/* TV Mode - Ensure full screen sections */
+html.tv-mode section {
+  min-height: auto;
+  padding: 40px 60px;
+}
+
+/* TV Mode Hero Section */
+html.tv-mode .hero-section {
+  min-height: 60vh;
+  padding: 60px 80px;
+}
+
+/* TV Navigation Helper Overlay */
+.tv-nav-helper {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: hsl(var(--background) / 0.95);
+  border: 2px solid hsl(var(--border));
+  border-radius: 16px;
+  padding: 16px 32px;
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  z-index: 9998;
+  backdrop-filter: blur(10px);
+}
+
+.tv-nav-helper-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.tv-nav-helper-key {
+  background: hsl(var(--muted));
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
