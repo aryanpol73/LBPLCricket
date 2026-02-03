@@ -1,13 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { isSmartTV } from "@/hooks/useTVMode";
 
 const SettingsHelp = () => {
   const navigate = useNavigate();
@@ -18,8 +17,7 @@ const SettingsHelp = () => {
       (navigator as any).standalone === true ||
       new URLSearchParams(window.location.search).get("pwa") === "1";
 
-    // Allow access in PWA mode OR on Smart TV
-    if (!isPwa && !isSmartTV()) {
+    if (!isPwa) {
       navigate("/", { replace: true });
     }
   }, [navigate]);

@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Trophy, Users, Target, Award, Circle } from "lucide-react";
-import { isSmartTV } from "@/hooks/useTVMode";
 
 const SettingsRules = () => {
   const navigate = useNavigate();
@@ -12,8 +11,7 @@ const SettingsRules = () => {
       (navigator as any).standalone === true ||
       new URLSearchParams(window.location.search).get("pwa") === "1";
 
-    // Allow access in PWA mode OR on Smart TV
-    if (!isPwa && !isSmartTV()) {
+    if (!isPwa) {
       navigate("/", { replace: true });
     }
   }, [navigate]);
