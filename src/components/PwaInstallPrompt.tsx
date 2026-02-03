@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { isSmartTV } from '@/hooks/useTVMode';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -28,8 +27,8 @@ const PwaInstallPrompt = () => {
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(iOS);
 
-    // Hide if already installed OR on Smart TV (install prompt not relevant for TV)
-    if (isInstalled() || isSmartTV()) {
+    // Hide if already installed
+    if (isInstalled()) {
       setShowPrompt(false);
       return;
     }
