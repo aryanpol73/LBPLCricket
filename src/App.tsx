@@ -123,10 +123,12 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <ScrollToTop />
-            <AppContent />
-          </BrowserRouter>
+          <ErrorBoundary>
+            <BrowserRouter>
+              <ScrollToTop />
+              <AppContent />
+            </BrowserRouter>
+          </ErrorBoundary>
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
