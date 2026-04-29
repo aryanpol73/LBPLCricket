@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Bell, MessageCircle, Megaphone, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Bell, MessageCircle, Megaphone, AlertTriangle, Play, Target, Trophy } from "lucide-react";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
 import { Switch } from "@/components/ui/switch";
 
@@ -154,6 +154,63 @@ const NotificationSettings = () => {
             })}
           </div>
         </div>
+
+        {/* Match reminder sub-toggles — only visible when match reminders are on */}
+        {settings.matchReminders && (
+          <div style={{ animation: "slideInRight 0.25s ease-out forwards" }}>
+            <h2
+              className="text-sm font-semibold uppercase tracking-wider mb-3 px-1"
+              style={{ color: "#f0b429" }}
+            >
+              Match Reminder Details
+            </h2>
+            <div
+              className="rounded-xl overflow-hidden border"
+              style={{
+                backgroundColor: resolvedTheme === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.02)",
+                borderColor: resolvedTheme === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              {[
+                { key: "matchStartReminder" as const, icon: Play, label: "Match Start", description: "Notify 15 mins before kickoff" },
+                { key: "wicketAlerts" as const, icon: Target, label: "Wicket Alerts", description: "Get pinged for every wicket" },
+                { key: "resultAlerts" as const, icon: Trophy, label: "Result Alerts", description: "Final score when match ends" },
+              ].map((item, index, arr) => {
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={item.key}
+                    className={`flex items-center gap-4 px-4 py-4 ${index !== arr.length - 1 ? "border-b" : ""}`}
+                    style={{
+                      borderColor: resolvedTheme === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+                      opacity: isPermissionDenied ? 0.5 : 1,
+                    }}
+                  >
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: "rgba(240, 180, 41, 0.1)" }}
+                    >
+                      <Icon size={20} style={{ color: "#f0b429" }} />
+                    </div>
+                    <div className="flex-1">
+                      <p className={`font-medium ${resolvedTheme === "dark" ? "text-white" : "text-gray-900"}`}>
+                        {item.label}
+                      </p>
+                      <p className={resolvedTheme === "dark" ? "text-gray-400" : "text-gray-600"} style={{ fontSize: "0.875rem" }}>
+                        {item.description}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings[item.key]}
+                      onCheckedChange={() => handleToggle(item.key)}
+                      disabled={isPermissionDenied}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Status Info */}
         <div 

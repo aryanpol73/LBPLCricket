@@ -31,6 +31,7 @@ import SettingsAbout from "./pages/settings/SettingsAbout";
 import SettingsRules from "./pages/settings/SettingsRules";
 import SettingsDeveloper from "./pages/settings/SettingsDeveloper";
 import SettingsHelp from "./pages/settings/SettingsHelp";
+import SettingsFavoriteTeam from "./pages/settings/SettingsFavoriteTeam";
 import AppearanceSettings from "./components/settings/AppearanceSettings";
 import NotificationSettings from "./components/settings/NotificationSettings";
 import LiveScoreWidget from "./pages/widget/LiveScoreWidget";
@@ -103,6 +104,7 @@ const AppContent = () => {
             <Route path="/settings/appearance" element={<AppearanceSettings />} />
             <Route path="/settings/notifications" element={<NotificationSettings />} />
             <Route path="/settings/help" element={<SettingsHelp />} />
+            <Route path="/settings/favorite-team" element={<SettingsFavoriteTeam />} />
             <Route path="/widget/live" element={<LiveScoreWidget />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

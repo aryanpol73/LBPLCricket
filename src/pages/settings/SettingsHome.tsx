@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Palette, Bell, Info, Code, ChevronRight, Pin, ExternalLink, Share2, Trash2, RefreshCw, HelpCircle, Star, MessageSquare } from "lucide-react";
+import { ArrowLeft, Palette, Bell, Info, Code, ChevronRight, Pin, ExternalLink, Share2, Trash2, RefreshCw, HelpCircle, Star, MessageSquare, Heart } from "lucide-react";
 import { toast } from "sonner";
 import AppRatingDialog from "@/components/AppRatingDialog";
 
@@ -100,6 +100,7 @@ const SettingsHome = () => {
       items: [
         { icon: Palette, label: "Appearance", description: "Theme, colors, display", path: "/settings/appearance", action: null },
         { icon: Bell, label: "Notifications", description: "Alerts and updates", path: "/settings/notifications", action: null },
+        { icon: Heart, label: "Favorite Team", description: "Just for fun — pick your team", path: "/settings/favorite-team", action: null },
       ],
     },
     {
