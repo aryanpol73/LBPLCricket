@@ -43,17 +43,25 @@ export default function PwaBottomNav() {
       const isStandalone =
         window.matchMedia("(display-mode: standalone)").matches ||
         (window.navigator as any).standalone === true;
-      
-      setIsPwa(pwaOverride || isStandalone);
+      // Also show on any mobile-sized viewport so Android/iOS web visitors
+      // get the same bottom navigation as installed PWA users.
+      const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
+
+      setIsPwa(pwaOverride || isStandalone || isMobileViewport);
     };
 
     checkPwaMode();
 
-    const mediaQuery = window.matchMedia("(display-mode: standalone)");
+    const standaloneMq = window.matchMedia("(display-mode: standalone)");
+    const mobileMq = window.matchMedia("(max-width: 767px)");
     const handleChange = () => checkPwaMode();
-    mediaQuery.addEventListener("change", handleChange);
+    standaloneMq.addEventListener("change", handleChange);
+    mobileMq.addEventListener("change", handleChange);
 
-    return () => mediaQuery.removeEventListener("change", handleChange);
+    return () => {
+      standaloneMq.removeEventListener("change", handleChange);
+      mobileMq.removeEventListener("change", handleChange);
+    };
   }, []);
 
   useEffect(() => {
