@@ -100,6 +100,7 @@ const SettingsHome = () => {
       items: [
         { icon: Palette, label: "Appearance", description: "Theme, colors, display", path: "/settings/appearance", action: null },
         { icon: Bell, label: "Notifications", description: "Alerts and updates", path: "/settings/notifications", action: null },
+        { icon: Heart, label: "Favorite Team", description: "Just for fun — pick your team", path: "/settings/favorite-team", action: null },
       ],
     },
     {
