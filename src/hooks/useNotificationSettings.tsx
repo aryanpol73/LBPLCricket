@@ -4,6 +4,10 @@ interface NotificationSettings {
   matchReminders: boolean;
   communityAlerts: boolean;
   generalAlerts: boolean;
+  // Per-event match reminders (only relevant when matchReminders is true)
+  matchStartReminder: boolean;
+  wicketAlerts: boolean;
+  resultAlerts: boolean;
 }
 
 const STORAGE_KEY = "lbpl_notification_settings";
@@ -12,13 +16,22 @@ const defaultSettings: NotificationSettings = {
   matchReminders: false,
   communityAlerts: false,
   generalAlerts: false,
+  matchStartReminder: true,
+  wicketAlerts: false,
+  resultAlerts: true,
 };
 
 export function useNotificationSettings() {
   const [settings, setSettingsState] = useState<NotificationSettings>(() => {
     if (typeof window === "undefined") return defaultSettings;
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : defaultSettings;
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) return defaultSettings;
+      // Merge with defaults so newly added keys get sensible defaults
+      return { ...defaultSettings, ...JSON.parse(stored) };
+    } catch {
+      return defaultSettings;
+    }
   });
 
   const [permission, setPermission] = useState<NotificationPermission>("default");
