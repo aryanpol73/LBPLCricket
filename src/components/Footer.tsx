@@ -1,3 +1,5 @@
+const APP_VERSION = "1.1.2";
+
 const Footer = () => {
   return (
     <>
@@ -8,6 +10,7 @@ const Footer = () => {
           <p className="text-center text-sm text-muted-foreground font-medium tracking-wide">
             Designed & Developed by{" "}
             <span className="text-[#F9C846] font-semibold">Aryan Pol</span>
+            <span className="ml-2 text-xs text-muted-foreground/70">v{APP_VERSION}</span>
           </p>
         </div>
       </footer>
@@ -16,3 +19,4 @@ const Footer = () => {
 };
 
 export default Footer;
+
