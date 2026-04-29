@@ -12,6 +12,7 @@ import Footer from "@/components/Footer";
 import PwaBottomNav from "@/components/PwaBottomNav";
 import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 import AppRatingDialog from "@/components/AppRatingDialog";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Matches from "./pages/Matches";
 import Results from "./pages/Results";
