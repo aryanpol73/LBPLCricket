@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Bell, MessageCircle, Megaphone, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Bell, MessageCircle, Megaphone, AlertTriangle, Play, Target, Trophy } from "lucide-react";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
 import { Switch } from "@/components/ui/switch";
 
