@@ -104,6 +104,7 @@ const AppContent = () => {
             <Route path="/settings/appearance" element={<AppearanceSettings />} />
             <Route path="/settings/notifications" element={<NotificationSettings />} />
             <Route path="/settings/help" element={<SettingsHelp />} />
+            <Route path="/settings/favorite-team" element={<SettingsFavoriteTeam />} />
             <Route path="/widget/live" element={<LiveScoreWidget />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
