@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Palette, Bell, Info, Code, ChevronRight, Pin, ExternalLink, Share2, Trash2, RefreshCw, HelpCircle, Star, MessageSquare } from "lucide-react";
+import { ArrowLeft, Palette, Bell, Info, Code, ChevronRight, Pin, ExternalLink, Share2, Trash2, RefreshCw, HelpCircle, Star, MessageSquare, Heart } from "lucide-react";
 import { toast } from "sonner";
 import AppRatingDialog from "@/components/AppRatingDialog";
 
