@@ -200,6 +200,9 @@ const SettingsHome = () => {
             </div>
           </div>
         ))}
+        <p className="text-center text-xs text-gray-500 pt-4">
+          LBPL Cricket · v1.1.2
+        </p>
       </div>
 
       {/* Pin Widget Instructions Modal */}
