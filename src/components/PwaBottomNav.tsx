@@ -141,14 +141,17 @@ export default function PwaBottomNav() {
         className="fixed bottom-0 left-0 right-0 z-50"
       >
         {/* Upper shadow gradient */}
-        <div className="absolute inset-x-0 -top-4 h-4 bg-gradient-to-t from-[#081428]/80 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 -top-6 h-6 bg-gradient-to-t from-[#050d18]/80 to-transparent pointer-events-none" />
 
-        {/* Main nav bar */}
+        {/* Main nav bar — modern glass + subtle gold top border */}
         <div
-          className="flex items-center justify-around px-2 py-2"
+          className="relative flex items-stretch justify-around px-2 pt-2 pb-1.5 border-t border-[#f0b429]/15"
           style={{
-            background: "linear-gradient(to bottom, #0b1c3d, #081428)",
-            boxShadow: "0 -4px 20px rgba(0, 0, 0, 0.4)",
+            background:
+              "linear-gradient(180deg, rgba(11,28,61,0.92) 0%, rgba(8,20,40,0.96) 100%)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            boxShadow: "0 -8px 32px rgba(0, 0, 0, 0.5)",
           }}
         >
           {navItems.map((item) => {
@@ -159,30 +162,43 @@ export default function PwaBottomNav() {
               <button
                 key={item.path}
                 onClick={() => handleNavClick(item.path)}
-                className={`relative flex flex-col items-center justify-center flex-1 py-2 transition-all duration-200 ${
-                  active ? "scale-110" : "scale-100"
-                }`}
+                aria-label={item.label}
+                aria-current={active ? "page" : undefined}
+                className="group relative flex flex-col items-center justify-center flex-1 min-h-[52px] py-1.5 transition-transform duration-200 active:scale-90"
               >
-                <div className="relative">
+                {/* Active pill background */}
+                <span
+                  className={`absolute top-1 h-9 w-12 rounded-full transition-all duration-300 ${
+                    active
+                      ? "bg-[#f0b429]/15 scale-100 opacity-100"
+                      : "bg-transparent scale-75 opacity-0"
+                  }`}
+                />
+                <div className="relative z-10">
                   <Icon
                     size={22}
                     className={`transition-colors duration-200 ${
-                      active ? "text-[#f0b429]" : "text-gray-400"
+                      active ? "text-[#f0b429]" : "text-gray-400 group-hover:text-gray-200"
                     }`}
                     strokeWidth={active ? 2.5 : 2}
                   />
-                  {/* Notification dot */}
                   {item.hasNotification && (
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                    <span className="absolute -top-1 -right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-[#0b1c3d] animate-pulse" />
                   )}
                 </div>
                 <span
-                  className={`text-[10px] mt-1 font-medium transition-colors duration-200 ${
-                    active ? "text-[#f0b429]" : "text-gray-400"
+                  className={`relative z-10 text-[10px] mt-0.5 font-medium transition-colors duration-200 ${
+                    active ? "text-[#f0b429]" : "text-gray-400 group-hover:text-gray-200"
                   }`}
                 >
                   {item.label}
                 </span>
+                {/* Active indicator dot */}
+                <span
+                  className={`absolute -bottom-0.5 h-1 w-1 rounded-full bg-[#f0b429] transition-all duration-300 ${
+                    active ? "opacity-100 scale-100" : "opacity-0 scale-0"
+                  }`}
+                />
               </button>
             );
           })}
@@ -190,28 +206,39 @@ export default function PwaBottomNav() {
           {/* More button */}
           <button
             onClick={handleMoreClick}
-            className={`flex flex-col items-center justify-center flex-1 py-2 transition-all duration-200 ${
-              isMoreActive ? "scale-110" : "scale-100"
-            }`}
+            aria-label="More"
+            className="group relative flex flex-col items-center justify-center flex-1 min-h-[52px] py-1.5 transition-transform duration-200 active:scale-90"
           >
+            <span
+              className={`absolute top-1 h-9 w-12 rounded-full transition-all duration-300 ${
+                isMoreActive || moreOpen
+                  ? "bg-[#f0b429]/15 scale-100 opacity-100"
+                  : "bg-transparent scale-75 opacity-0"
+              }`}
+            />
             <Menu
               size={22}
-              className={`transition-colors duration-200 ${
-                isMoreActive ? "text-[#f0b429]" : "text-gray-400"
+              className={`relative z-10 transition-colors duration-200 ${
+                isMoreActive || moreOpen ? "text-[#f0b429]" : "text-gray-400 group-hover:text-gray-200"
               }`}
-              strokeWidth={isMoreActive ? 2.5 : 2}
+              strokeWidth={isMoreActive || moreOpen ? 2.5 : 2}
             />
             <span
-              className={`text-[10px] mt-1 font-medium transition-colors duration-200 ${
-                isMoreActive ? "text-[#f0b429]" : "text-gray-400"
+              className={`relative z-10 text-[10px] mt-0.5 font-medium transition-colors duration-200 ${
+                isMoreActive || moreOpen ? "text-[#f0b429]" : "text-gray-400 group-hover:text-gray-200"
               }`}
             >
               More
             </span>
+            <span
+              className={`absolute -bottom-0.5 h-1 w-1 rounded-full bg-[#f0b429] transition-all duration-300 ${
+                isMoreActive || moreOpen ? "opacity-100 scale-100" : "opacity-0 scale-0"
+              }`}
+            />
           </button>
         </div>
 
-        {/* Developer Credit Bar - below nav */}
+        {/* Developer Credit Bar */}
         <div
           className="py-1.5 border-t border-border/20"
           style={{
