@@ -1,5 +1,6 @@
 import { useRef, useCallback, useEffect } from "react";
 import { Settings } from "lucide-react";
+import SeasonSwitcher from "@/components/SeasonSwitcher";
 
 interface NavItem {
   label: string;
