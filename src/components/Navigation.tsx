@@ -4,10 +4,13 @@ import { useTheme } from "next-themes";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import SeasonSwitcher from "@/components/SeasonSwitcher";
 import lbplLogo from "@/assets/lbpl-logo-new.jpg";
 
 const navLinks = [
-  { href: "#home", label: "Home" },
+  { href: "/", label: "Season Hub", route: true },
+  { href: "/archive", label: "Tournament Archive", route: true },
+  { href: "/hall-of-fame", label: "Hall of Fame", route: true },
   { href: "#pointsTable", label: "Points Table" },
   { href: "#results", label: "Match Results" },
   { href: "#playerStats", label: "Player Statistics" },
