@@ -139,7 +139,9 @@ const App = () => {
           <ErrorBoundary>
             <BrowserRouter>
               <ScrollToTop />
-              <AppContent />
+              <SeasonProvider>
+                <AppContent />
+              </SeasonProvider>
             </BrowserRouter>
           </ErrorBoundary>
         </TooltipProvider>
