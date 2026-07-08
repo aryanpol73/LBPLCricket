@@ -26,12 +26,18 @@ const AppRatingDialog = ({ open, onClose }: AppRatingDialogProps) => {
     }
 
     setLoading(true);
-    const userIdentifier = getUserIdentifier();
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Please sign in to rate the app");
+        setLoading(false);
+        return;
+      }
+
       // Always insert new rating (database is write-only for privacy)
       const { error } = await supabase.from("app_ratings").insert({
-        user_identifier: userIdentifier,
+        user_identifier: user.id,
         rating,
         feedback: feedback.trim() || null,
       });
