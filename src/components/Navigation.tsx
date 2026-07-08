@@ -141,8 +141,9 @@ export const Navigation = () => {
             </button>
           </div>
 
-          {/* Right Side - Dark Mode Toggle */}
+          {/* Right Side - Season switcher + Dark Mode Toggle */}
           <div className="flex items-center gap-2">
+            <SeasonSwitcher />
             {mounted && (
               <Button
                 variant="ghost"
