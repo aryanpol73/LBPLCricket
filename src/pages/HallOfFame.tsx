@@ -138,7 +138,7 @@ export default function HallOfFame() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {keys.map((k) => <HofCard key={k} k={k} rec={data[k]} />)}
+            {keys.map((k) => <HofCard key={k} k={k} rec={data[k] as HofRecord | undefined} />)}
           </div>
         )}
 
