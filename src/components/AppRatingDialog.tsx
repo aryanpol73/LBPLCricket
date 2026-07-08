@@ -15,18 +15,9 @@ const AppRatingDialog = ({ open, onClose }: AppRatingDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  // Get unique user identifier
-  const getUserIdentifier = () => {
-    let identifier = localStorage.getItem("lbpl_user_identifier");
-    if (!identifier) {
-      identifier = `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-      localStorage.setItem("lbpl_user_identifier", identifier);
-    }
-    return identifier;
-  };
-
   // Check if user has already rated (via localStorage only - database is write-only for privacy)
   const hasRated = localStorage.getItem("lbpl_app_rated") === "true";
+
 
   const handleSubmit = async () => {
     if (rating === 0) {
