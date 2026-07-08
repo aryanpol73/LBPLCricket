@@ -122,6 +122,12 @@ export default function MoreSheet({
           <div className="w-10 h-1 bg-gray-500/50 rounded-full" />
         </div>
 
+        {/* Season switcher header */}
+        <div className="px-4 pb-3">
+          <div className="text-[10px] uppercase tracking-widest text-[#f0b429]/80 mb-2 font-semibold">Active Season</div>
+          <SeasonSwitcher variant="inline" />
+        </div>
+
         {/* Grid of items */}
         <div className="grid grid-cols-3 gap-4 px-4 pt-2 pb-4">
           {allItems.map((item) => {
