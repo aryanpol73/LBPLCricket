@@ -91,7 +91,12 @@ const AppContent = () => {
       <div className="min-h-screen flex flex-col">
         <div className="flex-1">
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<SeasonHub />} />
+            <Route path="/season/:seasonId" element={<SeasonShell />} />
+            <Route path="/hall-of-fame" element={<HallOfFame />} />
+            <Route path="/archive" element={<Archive />} />
+            <Route path="/archive/:seasonId" element={<ArchiveSeason />} />
+            <Route path="/legacy-home" element={<Index />} />
             <Route path="/matches" element={<Matches />} />
             <Route path="/results" element={<Results />} />
             <Route path="/points-table" element={<PointsTable />} />
