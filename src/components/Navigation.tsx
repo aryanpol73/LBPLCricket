@@ -102,7 +102,7 @@ export const Navigation = () => {
                     {navLinks.map((link) => (
                       <button
                         key={link.href}
-                        onClick={() => handleNavClick(link.href)}
+                        onClick={() => handleNavClick(link.href, (link as any).route)}
                         className="px-4 py-3 rounded-lg font-medium text-white hover:bg-secondary/20 hover:text-secondary transition-all duration-300 text-left"
                       >
                         {link.label}
