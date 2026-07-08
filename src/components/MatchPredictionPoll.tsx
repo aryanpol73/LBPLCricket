@@ -50,15 +50,6 @@ export const MatchPredictionPoll = ({
     };
   }, [matchId]);
 
-  const getUserIdentifier = () => {
-    let identifier = localStorage.getItem('user_identifier');
-    if (!identifier) {
-      identifier = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      localStorage.setItem('user_identifier', identifier);
-    }
-    return identifier;
-  };
-
   const checkIfVoted = () => {
     // Track votes locally for UX (database constraint prevents actual duplicates)
     const votedMatches = JSON.parse(localStorage.getItem('voted_predictions') || '{}');
@@ -72,7 +63,10 @@ export const MatchPredictionPoll = ({
   };
 
   const loadResults = async () => {
-    // Use secure RPC function that returns only aggregated counts
+    // Use secure RPC function that returns only aggregated counts (auth required)
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
     const { data, error } = await supabase
       .rpc('get_match_prediction_counts', { p_match_id: matchId });
 
@@ -90,11 +84,16 @@ export const MatchPredictionPoll = ({
     }
 
     setLoading(true);
-    const identifier = getUserIdentifier();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("Please sign in to vote");
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase
       .from('match_predictions')
-      .insert({ match_id: matchId, team_id: teamId, user_identifier: identifier });
+      .insert({ match_id: matchId, team_id: teamId, user_identifier: user.id });
 
     if (error) {
       if (error.code === '23505') {
