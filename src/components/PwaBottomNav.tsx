@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, Calendar, Users, Menu, Trophy, Image, BarChart3, Award } from "lucide-react";
+import { Home, Calendar, Users, Menu, Trophy, Image, BarChart3, Award, Crown, Archive as ArchiveIcon } from "lucide-react";
 import MoreSheet from "./MoreSheet";
 
 interface NavItem {
@@ -11,11 +11,14 @@ interface NavItem {
 }
 
 const moreItems: NavItem[] = [
+  { label: "Hall of Fame", icon: Crown, path: "/hall-of-fame" },
+  { label: "Archive", icon: ArchiveIcon, path: "/archive" },
   { label: "Points Table", icon: Trophy, path: "/points-table" },
   { label: "Results", icon: Award, path: "/results" },
   { label: "Teams", icon: Users, path: "/teams" },
   { label: "Stats", icon: BarChart3, path: "/stats" },
   { label: "Gallery", icon: Image, path: "/gallery" },
+  { label: "Sponsors", icon: Award, path: "/sponsors" },
 ];
 
 export default function PwaBottomNav() {
