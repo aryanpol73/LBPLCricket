@@ -4,10 +4,13 @@ import { useTheme } from "next-themes";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import SeasonSwitcher from "@/components/SeasonSwitcher";
 import lbplLogo from "@/assets/lbpl-logo-new.jpg";
 
 const navLinks = [
-  { href: "#home", label: "Home" },
+  { href: "/", label: "Season Hub", route: true },
+  { href: "/archive", label: "Tournament Archive", route: true },
+  { href: "/hall-of-fame", label: "Hall of Fame", route: true },
   { href: "#pointsTable", label: "Points Table" },
   { href: "#results", label: "Match Results" },
   { href: "#playerStats", label: "Player Statistics" },
@@ -29,17 +32,23 @@ export const Navigation = () => {
     setMounted(true);
   }, []);
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (href: string, isRoute?: boolean) => {
     setIsOpen(false);
-    const targetId = href.replace("#", "");
-    
-    // If not on homepage, navigate to homepage with hash
-    if (location.pathname !== "/") {
-      navigate("/" + href);
+
+    if (isRoute) {
+      navigate(href);
       return;
     }
-    
-    // If on homepage, scroll to section
+
+    const targetId = href.replace("#", "");
+    const homePaths = ["/legacy-home"];
+    const isOnHomepage = homePaths.includes(location.pathname) || location.pathname.startsWith("/season/");
+
+    if (!isOnHomepage) {
+      navigate("/legacy-home" + href);
+      return;
+    }
+
     const element = document.getElementById(targetId);
     if (element) {
       const navHeight = 64;
@@ -93,7 +102,7 @@ export const Navigation = () => {
                     {navLinks.map((link) => (
                       <button
                         key={link.href}
-                        onClick={() => handleNavClick(link.href)}
+                        onClick={() => handleNavClick(link.href, (link as any).route)}
                         className="px-4 py-3 rounded-lg font-medium text-white hover:bg-secondary/20 hover:text-secondary transition-all duration-300 text-left"
                       >
                         {link.label}
@@ -132,8 +141,9 @@ export const Navigation = () => {
             </button>
           </div>
 
-          {/* Right Side - Dark Mode Toggle */}
+          {/* Right Side - Season switcher + Dark Mode Toggle */}
           <div className="flex items-center gap-2">
+            <SeasonSwitcher />
             {mounted && (
               <Button
                 variant="ghost"

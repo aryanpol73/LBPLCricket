@@ -202,7 +202,7 @@ const SettingsHome = () => {
           </div>
         ))}
         <p className="text-center text-xs text-gray-500 pt-4">
-          LBPL Cricket · v1.1.2
+          LBPL Cricket · v1.2.0
         </p>
       </div>
 

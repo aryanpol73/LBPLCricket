@@ -1,5 +1,6 @@
 import { useRef, useCallback, useEffect } from "react";
 import { Settings } from "lucide-react";
+import SeasonSwitcher from "@/components/SeasonSwitcher";
 
 interface NavItem {
   label: string;
@@ -119,6 +120,12 @@ export default function MoreSheet({
         {/* Drag handle */}
         <div className="flex justify-center pt-3 pb-2">
           <div className="w-10 h-1 bg-gray-500/50 rounded-full" />
+        </div>
+
+        {/* Season switcher header */}
+        <div className="px-4 pb-3">
+          <div className="text-[10px] uppercase tracking-widest text-[#f0b429]/80 mb-2 font-semibold">Active Season</div>
+          <SeasonSwitcher variant="inline" />
         </div>
 
         {/* Grid of items */}

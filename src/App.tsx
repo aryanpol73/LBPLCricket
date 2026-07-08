@@ -14,6 +14,11 @@ import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 import AppRatingDialog from "@/components/AppRatingDialog";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
+import SeasonHub from "./pages/SeasonHub";
+import SeasonShell from "./pages/SeasonShell";
+import HallOfFame from "./pages/HallOfFame";
+import Archive from "./pages/Archive";
+import ArchiveSeason from "./pages/ArchiveSeason";
 import Matches from "./pages/Matches";
 import Results from "./pages/Results";
 import PointsTable from "./pages/PointsTable";
@@ -35,6 +40,7 @@ import SettingsFavoriteTeam from "./pages/settings/SettingsFavoriteTeam";
 import AppearanceSettings from "./components/settings/AppearanceSettings";
 import NotificationSettings from "./components/settings/NotificationSettings";
 import LiveScoreWidget from "./pages/widget/LiveScoreWidget";
+import { SeasonProvider } from "./context/SeasonContext";
 
 const queryClient = new QueryClient();
 
@@ -85,7 +91,12 @@ const AppContent = () => {
       <div className="min-h-screen flex flex-col">
         <div className="flex-1">
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<SeasonHub />} />
+            <Route path="/season/:seasonId" element={<SeasonShell />} />
+            <Route path="/hall-of-fame" element={<HallOfFame />} />
+            <Route path="/archive" element={<Archive />} />
+            <Route path="/archive/:seasonId" element={<ArchiveSeason />} />
+            <Route path="/legacy-home" element={<Index />} />
             <Route path="/matches" element={<Matches />} />
             <Route path="/results" element={<Results />} />
             <Route path="/points-table" element={<PointsTable />} />
@@ -128,7 +139,9 @@ const App = () => {
           <ErrorBoundary>
             <BrowserRouter>
               <ScrollToTop />
-              <AppContent />
+              <SeasonProvider>
+                <AppContent />
+              </SeasonProvider>
             </BrowserRouter>
           </ErrorBoundary>
         </TooltipProvider>
