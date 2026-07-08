@@ -45,15 +45,6 @@ export const PlayerOfMatchVoting = ({ matchId }: PlayerOfMatchVotingProps) => {
     }
   };
 
-  const getUserIdentifier = () => {
-    let identifier = localStorage.getItem('user_identifier');
-    if (!identifier) {
-      identifier = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      localStorage.setItem('user_identifier', identifier);
-    }
-    return identifier;
-  };
-
   const checkIfVoted = () => {
     // Track votes locally for UX (database constraint prevents actual duplicates)
     const votedMatches = JSON.parse(localStorage.getItem('voted_potm') || '{}');
@@ -73,14 +64,19 @@ export const PlayerOfMatchVoting = ({ matchId }: PlayerOfMatchVotingProps) => {
     }
 
     setLoading(true);
-    const userIdentifier = getUserIdentifier();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("Please sign in to vote");
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase
       .from('potm_votes')
       .insert({
         match_id: matchId,
         player_id: playerId,
-        user_identifier: userIdentifier
+        user_identifier: user.id
       });
 
     if (error) {
