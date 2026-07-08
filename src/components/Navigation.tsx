@@ -32,17 +32,23 @@ export const Navigation = () => {
     setMounted(true);
   }, []);
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (href: string, isRoute?: boolean) => {
     setIsOpen(false);
-    const targetId = href.replace("#", "");
-    
-    // If not on homepage, navigate to homepage with hash
-    if (location.pathname !== "/") {
-      navigate("/" + href);
+
+    if (isRoute) {
+      navigate(href);
       return;
     }
-    
-    // If on homepage, scroll to section
+
+    const targetId = href.replace("#", "");
+    const homePaths = ["/legacy-home"];
+    const isOnHomepage = homePaths.includes(location.pathname) || location.pathname.startsWith("/season/");
+
+    if (!isOnHomepage) {
+      navigate("/legacy-home" + href);
+      return;
+    }
+
     const element = document.getElementById(targetId);
     if (element) {
       const navHeight = 64;
